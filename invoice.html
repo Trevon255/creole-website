@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice | Creole</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="script..js">
+</head>
+<body>
+    <div class="invoice-container">
+        <header>
+            <img src="../Assets/creole.jpg" alt="Logo" class="invoice-logo">
+            <h2>Creole Jamaican Artistry</h2>
+            <p><strong>TRN:</strong> 123-456-789</p>
+        </header>
+
+        <section class="invoice-title">
+            <h1>INVOICE</h1>
+            <p>Invoice #: <span id="displayInvNum"></span></p>
+            <p>Date: <span id="displayDate"></span></p>
+        </section>
+
+        <section class="shipping-info">
+            <h3>Shipping To:</h3>
+            <p id="displayShipName"></p>
+            <p id="displayShipAddr"></p>
+        </section>
+
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="invoiceItemsBody">
+                </tbody>
+        </table>
+
+        <div class="totals-area">
+            <p>Subtotal: <span id="displaySubtotal"></span></p>
+            <p>Tax (GCT 15%): <span id="displayTax"></span></p>
+            <h2 class="grand-total">Grand Total: <span id="displayGrandTotal"></span> JMD</h2>
+        </div>
+
+        <footer>
+            <p>Thank you for supporting authentic Jamaican craftsmanship!</p>
+            <p><em>A copy of this invoice has been sent to your email.</em></p>
+            <button onclick="window.print()" class="btn">Print Invoice</button>
+            <a href="index.html" class="btn" style="background: #666;">Return Home</a>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
