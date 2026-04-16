@@ -3,39 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <title>Login | Creole</title>
-    <link rel="icon" type="image/jpeg" href="Assets/creole.jpg">
-    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/jpeg" href="../Assets/creole.jpg">
+    <link rel="stylesheet" href="../style.css">
     <style>
-        .login-box { max-width: 350px; margin: 60px auto; padding: 30px; background: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        label { font-size: 0.8rem; font-weight: 600; color: #666; }
+        .login-box {
+            max-width: 350px;
+            margin: 60px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
-    <header>
-        <a href="index.html"><img src="Assets/creole.jpg" alt="Logo" id="mainLogo"></a>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li><a href="registration.html">Register</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="about.html">About Us</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main class="container">
-        <div class="login-box">
-            <h3>Welcome Back</h3>
-            <form>
-                <div class="form-group"><label>Username</label><input type="text" required></div>
-                <div class="form-group"><label>Password</label><input type="password" required></div>
-                <button type="submit" class="btn" style="width:100%;">Sign In</button>
-            </form>
-            <p style="font-size: 0.8rem; margin-top: 15px;">New here? <a href="registration.html" style="color:#d8a7b1;">Register</a></p>
-        </div>
-    </main>
-    <footer><p>&copy; 2026 Creole - All Rights Reserved</p></footer>
+<header>
+    <a href="index.html"><img src="../Assets/creole.jpg" alt="Logo" id="mainLogo"></a>
+</header>
+
+<main class="container">
+    <div class="login-box">
+        <h3>Welcome Back</h3>
+
+        <!-- Added ID -->
+        <form id="loginForm">
+
+            <div class="form-group">
+                <label>TRN</label>
+                <!-- Changed from Username to TRN -->
+                <input type="text" id="loginTrn" placeholder="000-000-000" required>
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required>
+            </div>
+
+            <button type="submit" class="btn" style="width:100%;">Sign In</button>
+            <button type="reset" class="btn" style="width:100%; margin-top:10px;">Cancel</button>
+
+            <!-- Error Message Display -->
+            <p id="errorMsg" class="error"></p>
+
+        </form>
+
+        <p style="font-size: 0.8rem; margin-top: 15px;">
+            Forgot Password? <a href="#">Reset</a>
+        </p>
+
+        <p style="font-size: 0.8rem; margin-top: 10px;">
+            New here? <a href="registration.html">Register</a>
+        </p>
+
+    </div>
+</main>
+
+<footer>
+    <p>&copy; 2026 Creole - All Rights Reserved</p>
+</footer>
+
+<!-- JavaScript -->
+<script src="../js/auth.js"></script>
+
 </body>
 </html>
