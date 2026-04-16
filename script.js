@@ -305,6 +305,65 @@ function addToCart(index) {
 }
 
 /************************************************************
+QUESTION – CHECKOUT (localStorage and Objects)
+************************************************************/
+// 1. Initialize the user's invoice array (simulated user session)
+    let user = {
+        invoices: []
+    };
+
+    function confirmOrder(event) {
+        event.preventDefault(); 
+
+        // 2. Capture Shipping Details from the form
+        const name = document.getElementById("custName").value;
+        const address = document.getElementById("custAddress").value;
+
+        // 3. Generate the Invoice Object with all required details
+        const newInvoice = {
+            companyName: "Creole Jamaican Artistry",
+            date: new Date().toLocaleDateString('en-JM'),
+            invoiceNumber: "INV-" + Date.now(), // Generates a unique ID
+            trn: "123-456-789",
+            shippingInfo: {
+                name: name,
+                address: address
+            },
+            // Item details matching your cart summary
+            items: [
+                { name: "Rustic Burlap Tote", qty: 1, price: 3500.00, discount: "5%" },
+                { name: "Artisan Serving Tray", qty: 1, price: 5800.00, discount: "5%" }
+            ],
+            subtotal: 9300.00,
+            taxes: 1325.25, // GCT 15%
+            totalCost: 10160.25
+        };
+
+        // 4. Append to the user's array of invoices
+        user.invoices.push(newInvoice);
+
+        // 5. Store to localStorage under the key 'AllInvoices'
+        // We fetch existing data first, then add the new invoice to the list
+        let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+        allInvoices.push(newInvoice);
+        localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
+
+        // 6. Display "Sent to Email" message and confirm order
+        alert(
+            "Success! Your order " + newInvoice.invoiceNumber + " has been confirmed.\n\n" +
+            "A copy of your invoice has been sent to your email address."
+        );
+
+        // 7. Redirect to the invoice display page
+        window.location.href = "invoice.html"; 
+    }
+
+    function cancelOrder() {
+        if(confirm("Do you want to cancel the checkout and return to your cart?")) {
+            window.location.href = "cart.html";
+        }
+
+/************************************************************
 QUESTION – INVOICE (localStorage and Objects)
 ************************************************************/
 // 1. Initial Data & User Object
