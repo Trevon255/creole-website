@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout | Creole</title>
+    <link rel="icon" type="image/jpeg" href="../Assets/creole.jpg">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .order-summary-box { background: var(--gray); padding: 25px; border-radius: 10px; border: 1px solid var(--creole-pink); }
+        .checkout-actions { display: flex; gap: 15px; margin-top: 30px; }
+        .btn-cancel { background: transparent; border: 1px solid #ccc; color: #666; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html"><img src="../Assets/creole.jpg" alt="Logo" id="mainLogo"></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="checkout.html">Checkout</a></li>
+                <li><a href="about.html">About Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>Secure Checkout</h2>
+        <div class="checkout-grid">
+            <div>
+                <h3>Shipping Details</h3>
+                <form id="checkoutForm" onsubmit="confirmOrder(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="custName" placeholder="Enter your name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Shipping Address</label>
+                        <input type="text" id="custAddress" placeholder="Enter street address" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Amount Being Paid ($ JMD)</label>
+                        <input type="text" value="10,160.25" disabled style="background:#eee;">
+                    </div>
+                    
+                    <div class="checkout-actions">
+                        <button type="button" class="btn btn-cancel" onclick="cancelOrder()">Cancel</button>
+                        <button type="submit" class="btn">Confirm Order</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="order-summary-box">
+                <h3>Order Summary</h3>
+                <p>Items: 2</p>
+                <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ddd;">
+                <p style="font-size: 1.2rem; font-weight: bold;">Total Cost: $10,160.25 JMD</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function confirmOrder(event) {
+            event.preventDefault(); // Prevents the page from just refreshing
+            const name = document.getElementById("custName").value;
+            alert("Thank you, " + name + "!\nYour order has been confirmed and is being processed.");
+            window.location.href = "index.html"; // Returns to home after confirmation
+        }
+
+        function cancelOrder() {
+            if(confirm("Do you want to cancel the checkout and return to your cart?")) {
+                window.location.href = "cart.html";
+            }
+        }
+    </script>
+</body>
+</html>

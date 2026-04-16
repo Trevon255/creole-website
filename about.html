@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>About Us | Creole</title>
+    <link rel="icon" type="image/jpeg" href="../Assets/creole.jpg">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .story-hero {
+            position: relative;
+            padding: 60px 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            color: #2d2d2d;
+            margin-bottom: 40px;
+            background-image: url('../Assets/creole.jpg'); 
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-color: #fff;
+        }
+        .story-hero::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.92); 
+            z-index: 1;
+        }
+        .story-content-inner { position: relative; z-index: 2; max-width: 700px; margin: 0 auto; }
+        .about-grid { display: flex; gap: 30px; flex-wrap: wrap; }
+        .dev-sidebar {
+            flex: 0.7; min-width: 230px; background: #fffafa; padding: 20px;
+            border-radius: 12px; border: 1px dashed #f4cfdf; font-size: 0.8rem; align-self: flex-start;
+        }
+        .dev-sidebar h3 { color: #d8a7b1; text-transform: uppercase; letter-spacing: 1.2px; font-size: 0.8rem; margin-bottom: 15px; }
+        .story-text p { line-height: 1.8; margin-bottom: 15px; font-size: 0.95rem; color: #444; }
+        .btn-small { display: block; background-color: #2d2d2d; color: white; padding: 10px; text-decoration: none; border-radius: 5px; text-align: center; font-size: 0.75rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html"><img src="../Assets/creole.jpg" alt="Logo" id="mainLogo"></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="registration.html">Register</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="about.html">About Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="about-grid">
+            <div style="flex: 2.5;">
+                <section class="story-hero">
+                    <div class="story-content-inner">
+                        <h2 style="text-align: center; margin-bottom: 20px;">Our Story</h2>
+                        <div class="story-text">
+                            <p>Creole is born from the soul of a natural creative. What started as a quiet evening hobby soon blossomed into a vibrant business dedicated to the celebration of Jamaican craftsmanship.</p>
+                            <p>The true spark for Creole was ignited in the skies. While serving as an air hostess with <strong>Caribbean Airlines</strong>, our founder traversed the islands and the world, gaining a unique perspective on global aesthetics while carrying the warmth of Jamaica in her heart.</p>
+                            <p>Today, Creole stands as a bridge between traditional island techniques and modern luxury decor transforming simple clay and fiber into timeless statements of artistry.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <aside class="dev-sidebar">
+                <h3>Developer Profile</h3>
+                <p><strong>Niketa Muschette</strong><br>ID: 2403103</p>
+                <p style="margin-top:15px;"><strong>Academic Context</strong><br>CIT2011 | IA#2<br>Friday @ 11:00 AM</p>
+                <p style="margin-top:15px;"><strong>Contact Me</strong><br>
+                <a href="mailto:niketamuschette@gmail.com" style="color: #d8a7b1; text-decoration: none; font-weight: bold;">niketamuschette@gmail.com</a></p>
+                <a href="mailto:niketamuschette@gmail.com" class="btn-small" style="margin-top: 20px;">Send Query</a>
+            </aside>
+        </div>
+    </main>
+    <footer><p>&copy; 2026 Creole - All Rights Reserved</p></footer>
+</body>
+</html>

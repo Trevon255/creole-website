@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home | Creole Jamaican Artistry</title>
+    <link rel="icon" type="image/jpeg" href="../Assets/creole.jpg">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Side-by-side Layout & One-Scroll View */
+        .hero-flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 40px;
+            /* Adjusts height to fit screen minus header/footer */
+            height: calc(100vh - 160px); 
+            padding: 0 5%;
+        }
+
+        .hero-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        .hero-image-container {
+            flex: 1.2;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .main-display-photo {
+            width: 100%;
+            max-width: 650px;
+            height: 480px; /* Locked height to prevent scrolling */
+            object-fit: cover;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 1px solid #f0f0f0;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            color: #2d2d2d;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            color: #666;
+            margin-bottom: 35px;
+            max-width: 450px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Responsive adjustment for mobile */
+        @media (max-width: 900px) {
+            .hero-flex {
+                flex-direction: column;
+                height: auto;
+                padding: 40px 20px;
+                text-align: center;
+            }
+            .hero-text { text-align: center; order: 2; }
+            .hero-image-container { order: 1; justify-content: center; width: 100%; }
+            .btn-group { justify-content: center; }
+            .main-display-photo { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html">
+            <img src="../Assets/creole.jpg" alt="Creole Logo" id="mainLogo">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="checkout.html">Checkout</a></li>
+                <li><a href="registration.html">Register</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="about.html">About Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="hero-flex">
+            <div class="hero-text">
+                <h1 class="hero-title">Woven by Tradition,<br>Fired by Soul</h1>
+                <p class="hero-subtitle">Elevate your living space with authentic, hand-crafted Jamaican decor designed for modern luxury.</p>
+                
+                <div class="btn-group">
+                    <a href="products.html" class="btn" style="padding: 14px 35px;">Shop Collection</a>
+                    <a href="login.html" class="btn" style="padding: 14px 35px; background-color: transparent; color: #2d2d2d; border: 1px solid #2d2d2d;">Sign In</a>
+                </div>
+            </div>
+
+            <div class="hero-image-container">
+                <img src="../Assets/collection.jpg" alt="Creole Collection Display" class="main-display-photo">
+            </div>
+        </div>
+    </main>
+
+    <footer style="margin-top: 0; padding: 15px 0; border-top: 1px solid #eee;">
+        <p>&copy; 2026 Creole - All Rights Reserved</p>
+    </footer>
+</body>
+</html>

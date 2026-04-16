@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shopping Cart | Creole</title>
+    <link rel="icon" type="image/jpeg" href="../Assets/creole.jpg">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: var(--gray); padding: 15px; text-align: left; border-bottom: 2px solid var(--creole-pink); }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        .cart-summary { float: right; width: 300px; margin-top: 30px; }
+        .summary-row { display: flex; justify-content: space-between; padding: 5px 0; }
+        .total-row { font-weight: bold; font-size: 1.2rem; color: var(--creole-dark); border-top: 2px solid #eee; margin-top: 10px; padding-top: 10px; }
+        .cart-actions { margin-top: 40px; display: flex; gap: 15px; justify-content: flex-end; width: 100%; }
+        .btn-clear { background: #e74c3c; } 
+        .btn-close { background: #95a5a6; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html"><img src="../Assets/creole.jpg" alt="Logo" id="mainLogo"></a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="cart.html">Cart</a></li>
+                <li><a href="checkout.html">Checkout</a></li>
+                <li><a href="about.html">About Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>Your Shopping Bag</h2>
+        <table id="cartTable">
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Sub-total</th>
+                </tr>
+            </thead>
+            <tbody id="cartBody">
+                <tr>
+                    <td>Rustic Burlap Tote</td>
+                    <td>$3,500.00</td>
+                    <td>1</td>
+                    <td>$3,500.00</td>
+                </tr>
+                <tr>
+                    <td>Artisan Serving Tray</td>
+                    <td>$5,800.00</td>
+                    <td>1</td>
+                    <td>$5,800.00</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="cart-summary" id="summaryBox">
+            <div class="summary-row"><span>Sub-total:</span> <span>$9,300.00</span></div>
+            <div class="summary-row"><span>Discount (5%):</span> <span style="color: green;">-$465.00</span></div>
+            <div class="summary-row"><span>Tax (GCT 15%):</span> <span>$1,325.25</span></div>
+            <div class="summary-row total-row"><span>Total:</span> <span>$10,160.25</span></div>
+        </div>
+
+        <div style="clear: both;"></div>
+
+        <div class="cart-actions">
+            <button class="btn btn-clear" onclick="clearCart()">Clear All</button>
+            <button class="btn btn-close" onclick="window.location.href='products.html'">Close</button>
+            <button class="btn" onclick="window.location.href='checkout.html'">Check Out</button>
+        </div>
+    </main>
+
+    <script>
+        function clearCart() {
+            if(confirm("Are you sure you want to clear your cart?")) {
+                document.getElementById("cartBody").innerHTML = "<tr><td colspan='4' style='text-align:center; padding:50px;'>Your cart is currently empty.</td></tr>";
+                document.getElementById("summaryBox").style.opacity = "0.3";
+            }
+        }
+    </script>
+</body>
+</html>

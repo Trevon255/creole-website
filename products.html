@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products | Creole Decor</title>
+    <link rel="icon" type="image/jpeg" href="../Assets/creole.jpg">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Product Page Specific Styling */
+        .products-header {
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .product-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #f9f9f9;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+
+        .product-title {
+            font-size: 1.1rem;
+            color: #2d2d2d;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .product-desc {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .product-price {
+            display: block;
+            color: #d8a7b1;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .buy-btn {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.85rem;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html">
+            <img src="../Assets/creole.jpg" alt="Logo" id="mainLogo">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="registration.html">Register</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="about.html">About Us</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="products-header">
+            <h2>The Signature Collection</h2>
+            <p>Handcrafted pieces that bring the spirit of the Caribbean into your home.</p>
+        </section>
+
+        <div class="product-grid">
+            <div class="product-card">
+                <img src="../Assets/burlap%20bag.jpg" alt="Burlap Bag" class="product-image">
+                <h3 class="product-title">Rustic Burlap Tote</h3>
+                <p class="product-desc">Hand-stitched natural jute for everyday elegance.</p>
+                <span class="product-price">$3,500 JMD</span>
+                <button class="btn buy-btn">Add to Cart</button>
+            </div>
+
+            <div class="product-card">
+                <img src="../Assets/large%20tray%20.jpg" alt="Large Tray" class="product-image">
+                <h3 class="product-title">Artisan Serving Tray</h3>
+                <p class="product-desc">Spacious handcrafted tray with carved handles.</p>
+                <span class="product-price">$5,800 JMD</span>
+                <button class="btn buy-btn">Add to Cart</button>
+            </div>
+
+            <div class="product-card">
+                <img src="../Assets/small%20large%20.jpg" alt="Small Large Decor" class="product-image">
+                <h3 class="product-title">Creole Accent Set</h3>
+                <p class="product-desc">A duo of decorative pieces for versatile styling.</p>
+                <span class="product-price">$4,200 JMD</span>
+                <button class="btn buy-btn">Add to Cart</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Creole - All Rights Reserved</p>
+    </footer>
+</body>
+</html>
