@@ -111,6 +111,60 @@ nav a {
     margin-bottom: 10px;
 }
 
+/* Invoice Specific Styles- Caryl Lee*/ 
+.invoice-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 40px;
+    border: 1px solid #ddd;
+    background: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.invoice-logo { width: 80px; border-radius: 50%; }
+
+.invoice-title h1 {
+    font-size: 3rem;
+    margin-bottom: 5px;
+    letter-spacing: 2px;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+}
+
+.invoice-table th {
+    text-align: left;
+    border-bottom: 2px solid #2d2d2d;
+    padding: 10px;
+}
+
+.invoice-table td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.totals-area {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.grand-total {
+    color: #2d2d2d;
+    border-top: 2px solid #2d2d2d;
+    display: inline-block;
+    padding-top: 10px;
+}
+
+footer {
+    margin-top: 50px;
+    text-align: center;
+    border-top: 1px solid #eee;
+    padding-top: 20px;
+}
+
 /* Buttons */
 .btn {
     display: inline-block;
@@ -142,6 +196,8 @@ input {
     box-sizing: border-box;
     background: #fafafa;
 }
+
+
 
 footer {
     text-align: center;
