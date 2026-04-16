@@ -3,64 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Login | Creole</title>
-    <link rel="icon" type="image/jpeg" href="../Assets/creole.jpg">
     <link rel="stylesheet" href="../style.css">
-
-    <style>
-        .login-box {
-            max-width: 350px;
-            margin: 60px auto;
-            padding: 30px;
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: #666;
-        }
-
-        input {
-            width: 100%;
-            padding: 8px;
-        }
-
-        .btn {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .error {
-            color: red;
-            font-size: 0.8rem;
-            margin-top: 10px;
-        }
-    </style>
 </head>
 <body>
 
 <header>
-    <a href="index.html">
-        <img src="../Assets/creole.jpg" alt="Logo" id="mainLogo">
-    </a>
+    <h2>Creole Jamaican Artistry</h2>
 </header>
 
-<main class="container">
+<main>
     <div class="login-box">
         <h3>Welcome Back</h3>
 
         <form id="loginForm" autocomplete="off">
 
             <div class="form-group">
-                <label>TRN</label>
+                <label for="loginTrn">TRN</label>
                 <input type="text"
                        id="loginTrn"
                        placeholder="000-000-000"
@@ -70,34 +28,29 @@
             </div>
 
             <div class="form-group">
-                <label>Password</label>
+                <label for="loginPassword">Password</label>
                 <input type="password"
                        id="loginPassword"
                        required>
             </div>
 
-            <button type="submit" class="btn" style="width:100%;">Sign In</button>
-            <button type="reset" class="btn" style="width:100%; margin-top:10px;">Cancel</button>
+            <button type="submit" class="btn">Sign In</button>
+            <button type="reset" class="btn">Cancel</button>
 
             <p id="errorMsg" class="error"></p>
 
         </form>
 
-        <p style="font-size: 0.8rem; margin-top: 15px;">
+        <p>
             Forgot Password?
             <a href="#" onclick="resetPassword()">Reset</a>
         </p>
 
-        <p style="font-size: 0.8rem; margin-top: 10px;">
+        <p>
             New here? <a href="register.html">Register</a>
         </p>
-
     </div>
 </main>
-
-<footer>
-    <p>&copy; 2026 Creole - All Rights Reserved</p>
-</footer>
 
 <script src="../js/auth.js"></script>
 
