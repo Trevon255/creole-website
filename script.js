@@ -205,3 +205,101 @@ function resetPassword() {
 
     alert("Password successfully updated!");
 }
+/************************************************************
+QUESTION 2 – PRODUCT CATALOGUE (localStorage & Objects)
+************************************************************/
+
+// 1. Array of product objects 
+// Requirement: name, price, description, image
+const products = [
+    {
+        name: "Rustic Burlap Tote",
+        price: 3500,
+        description: "Hand-stitched natural jute for everyday elegance.",
+        image: "Assets/burlap%20bag.jpg"
+    },
+    {
+        name: "Artisan Serving Tray",
+        price: 5800,
+        description: "Spacious handcrafted tray with carved handles.",
+        image: "large tray .jpg"
+    },
+    {
+        name: "Creole Accent Set",
+        price: 4200,
+        description: "A duo of decorative pieces for versatile styling.",
+        image: "collection.jpg"
+    }
+];
+
+// 2. Keep updated product list on localStorage as 'AllProducts'
+localStorage.setItem("AllProducts", JSON.stringify(products));
+
+// 3. Display the product list dynamically on the website
+function displayProducts() {
+    const productGrid = document.querySelector(".product-grid");
+    
+    // Check if we are on the products page
+    if (!productGrid) return;
+
+    // Retrieve the products we just saved
+    const allProducts = JSON.parse(localStorage.getItem("AllProducts"));
+
+    // Clear existing hardcoded HTML to prevent duplicates
+    productGrid.innerHTML = "";
+
+    allProducts.forEach((product, index) => {
+        // Create the dynamic HTML for each product
+        // Note: buy-btn now calls the addToCart function with the item's index
+        productGrid.innerHTML += `
+            <div class="product-card">
+                <img src="${product.image}" alt="${product.name}" class="product-image">
+                <h3 class="product-title">${product.name}</h3>
+                <p class="product-desc">${product.description}</p>
+                <span class="product-price">$${product.price.toLocaleString()} JMD</span>
+                <button class="btn buy-btn" onclick="addToCart(${index})">Add to Cart</button>
+            </div>
+        `;
+    });
+}
+
+// Initialize product display when the page loads
+document.addEventListener("DOMContentLoaded", displayProducts);
+
+
+/************************************************************
+QUESTION 3 – SHOPPING CART (localStorage and Objects)
+************************************************************/
+
+function addToCart(index) {
+    const allProducts = JSON.parse(localStorage.getItem("AllProducts"));
+    const selectedProduct = allProducts[index];
+
+    // Defining calculation rates
+    const TAX_RATE = 0.15; // 15% GCT
+    const DISCOUNT_RATE = 0.05; // 5% Discount
+
+    // Requirement: Shopping cart must include details, taxes, discounts, subtotal, and total cost.
+    // We initialize the cart as an Object if it doesn't exist
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || {
+        items: [],
+        subtotal: 0,
+        taxes: 0,
+        discounts: 0,
+        totalCost: 0
+    };
+
+    // Add selected product to the cart's items array
+    cart.items.push(selectedProduct);
+
+    // Update financial calculations
+    cart.subtotal = cart.items.reduce((sum, item) => sum + item.price, 0);
+    cart.discounts = cart.subtotal * DISCOUNT_RATE;
+    cart.taxes = (cart.subtotal - cart.discounts) * TAX_RATE;
+    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
+
+    // Save the updated shopping cart object back to localStorage
+    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
+
+    alert(`${selectedProduct.name} has been added to your cart!`);
+}
