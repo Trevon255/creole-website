@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>Register | Creole</title>
     <link rel="stylesheet" href="../style.css">
+
     <style>
         .registration-container {
             max-width: 500px;
@@ -43,16 +44,24 @@
     <div class="registration-container">
         <h2>Register</h2>
 
-        <form id="registrationForm">
+        <form id="registrationForm" autocomplete="off">
 
             <div class="form-group">
                 <label>First Name</label>
-                <input type="text" id="firstName" required>
+                <input type="text"
+                       id="firstName"
+                       pattern="[A-Za-z]+"
+                       title="Only letters allowed"
+                       required>
             </div>
 
             <div class="form-group">
                 <label>Last Name</label>
-                <input type="text" id="lastName" required>
+                <input type="text"
+                       id="lastName"
+                       pattern="[A-Za-z]+"
+                       title="Only letters allowed"
+                       required>
             </div>
 
             <div class="form-group">
@@ -72,7 +81,11 @@
 
             <div class="form-group">
                 <label>Phone Number</label>
-                <input type="tel" id="phone" required>
+                <input type="tel"
+                       id="phone"
+                       pattern="[0-9]{7,15}"
+                       title="Enter valid phone number"
+                       required>
             </div>
 
             <div class="form-group">
@@ -82,12 +95,21 @@
 
             <div class="form-group">
                 <label>TRN (000-000-000)</label>
-                <input type="text" id="trn" placeholder="123-456-789" required>
+                <input type="text"
+                       id="trn"
+                       placeholder="123-456-789"
+                       pattern="\d{3}-\d{3}-\d{3}"
+                       title="TRN must be in format 000-000-000"
+                       required>
             </div>
 
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="password" required>
+                <input type="password"
+                       id="password"
+                       minlength="8"
+                       title="Minimum 8 characters"
+                       required>
             </div>
 
             <button type="submit" class="btn">Register</button>
