@@ -9,26 +9,26 @@ const products = [
     { id: 102, name: "Artisan Serving Tray", price: 5800, description: "Cedar wood tray with Jamaican patterns.", image: "Assets/large tray .jpg" },
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
-localStorage.setItem("AllProducts", JSON.stringify(products));
 
-// --- 2. DYNAMIC PRODUCT DISPLAY (Fix: This was missing!) ---
+// --- 2. DYNAMIC PRODUCT DISPLAY ---
 function displayProducts() {
-    const productGrid = document.querySelector(".product-grid");
-    if (!productGrid) return; // Exit if not on the products page
+    const grid = document.querySelector(".product-grid");
+    if (!grid) return;
 
-    productGrid.innerHTML = products.map((product, index) => `
+    grid.innerHTML = products.map((p, index) => `
         <div class="product-card">
-            <img src="${product.image}" class="product-image" alt="${product.name}">
-            <h3>${product.name}</h3>
-            <p class="description">${product.description}</p>
-            <p class="product-price">$${product.price.toLocaleString()} JMD</p>
-            <button type="button" class="btn" onclick="addToCart(${index})">Add to Cart</button>
+            <img src="${p.image}" class="product-image" alt="${p.name}">
+            <h3>${p.name}</h3>
+            <p>${p.description}</p>
+            <span class="product-price">$${p.price.toLocaleString()} JMD</span>
+            <button onclick="addToCart(${index})" class="btn">Add to Cart</button>
         </div>
     `).join('');
 }
 
-// --- 3. ADD TO CART (Requirement: localStorage & Objects) ---
+// --- 3. ADD TO CART (Object Requirement) ---
 function addToCart(index) {
+    // 1. Initialize the Object with all required properties
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { 
         items: [], 
         subtotal: 0, 
@@ -38,10 +38,11 @@ function addToCart(index) {
     };
 
     const selectedProduct = products[index];
-    const existingItem = cart.items.find(item => item.id === selectedProduct.id);
 
-    if (existingItem) {
-        existingItem.quantity += 1;
+    // 2. Add/Update Product Details in the items array
+    const existing = cart.items.find(item => item.id === selectedProduct.id);
+    if (existing) {
+        existing.quantity += 1;
     } else {
         cart.items.push({ 
             id: selectedProduct.id, 
@@ -51,96 +52,36 @@ function addToCart(index) {
         });
     }
 
-    calculateAndSave(cart);
-    alert(`${selectedProduct.name} added to bag! Details, Taxes, and Totals saved to object.`);
-}
-
-// --- 4. CALCULATE AND SAVE OBJECT ---
-function calculateAndSave(cart) {
+    // 3. Update Financial Details WITHIN the Cart Object
     cart.subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    cart.discounts = cart.subtotal * 0.05;
-    cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
+    cart.discounts = cart.subtotal * 0.05; // 5% Discount
+    cart.taxes = (cart.subtotal - cart.discounts) * 0.15; // 15% GCT
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
+    // 4. Save the full Object to localStorage
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    
-    if (document.getElementById("cart-table-body")) displayCart();
-}
 
-// --- 5. DISPLAY CART PAGE ---
-function displayCart() {
-    const tableBody = document.getElementById("cart-table-body");
-    if (!tableBody) return;
-
-    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    tableBody.innerHTML = "";
-
-    if (!cart || cart.items.length === 0) {
-        tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Your bag is empty.</td></tr>";
-        updateSummaryUI(null);
-        return;
-    }
-
-    cart.items.forEach((item, index) => {
-        tableBody.innerHTML += `
-            <tr>
-                <td>${item.name}</td>
-                <td>$${item.price.toLocaleString()}</td>
-                <td>
-                    <input type="number" value="${item.quantity}" min="1" 
-                           onchange="updateQty(${index}, this.value)" style="width:50px;">
-                </td>
-                <td>$${(item.price * item.quantity).toLocaleString()}</td>
-                <td><button onclick="removeItem(${index})" style="color:red; border:none; background:none; cursor:pointer;">Remove</button></td>
-            </tr>`;
-    });
+    // Update the UI totals at the bottom of the product page
     updateSummaryUI(cart);
+    alert(`${selectedProduct.name} added to your Bag!`);
 }
 
-function updateQty(index, newQty) {
-    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (parseInt(newQty) > 0) {
-        cart.items[index].quantity = parseInt(newQty);
-        calculateAndSave(cart);
-    }
-}
-
-function removeItem(index) {
-    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    cart.items.splice(index, 1);
-    calculateAndSave(cart);
-    displayCart();
-}
-
-function clearAll() {
-    if (confirm("Remove all items from your bag?")) {
-        localStorage.removeItem("ShoppingCart");
-        displayCart();
-        updateSummaryUI(null);
-    }
-}
-
-// --- 6. UI UPDATER ---
+// --- 4. UI UPDATER ---
 function updateSummaryUI(cart) {
-    const format = (num) => "$" + num.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    if (!cart) return;
+    const fmt = (val) => "$" + val.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+
+    if (document.getElementById("cart-subtotal")) document.getElementById("cart-subtotal").innerText = fmt(cart.subtotal);
+    if (document.getElementById("cart-total")) document.getElementById("cart-total").innerText = fmt(cart.totalCost);
     
-    if (cart) {
-        if(document.getElementById("cart-subtotal")) document.getElementById("cart-subtotal").innerText = format(cart.subtotal);
-        if(document.getElementById("cart-discount")) document.getElementById("cart-discount").innerText = "-" + format(cart.discounts);
-        if(document.getElementById("cart-tax")) document.getElementById("cart-tax").innerText = format(cart.taxes);
-        if(document.getElementById("cart-total")) document.getElementById("cart-total").innerText = format(cart.totalCost);
-    } else {
-        const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total"];
-        ids.forEach(id => {
-            if(document.getElementById(id)) document.getElementById(id).innerText = "$0.00 JMD";
-        });
-    }
+    // Additional fields for the Cart page
+    if (document.getElementById("cart-discount")) document.getElementById("cart-discount").innerText = "-" + fmt(cart.discounts);
+    if (document.getElementById("cart-tax")) document.getElementById("cart-tax").innerText = fmt(cart.taxes);
 }
 
-// --- 7. INITIALIZE (Fix: Call both functions) ---
+// --- 5. INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
-    displayProducts(); // Shows your catalogue
-    displayCart();     // Shows your bag items
+    displayProducts();
     
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) updateSummaryUI(savedCart);
