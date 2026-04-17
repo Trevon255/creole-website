@@ -10,142 +10,144 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 1.1 PRODUCT DISPLAY (Fixes the "Disappearing Products" bug) ---
+// --- 2. DISPLAY FUNCTIONS ---
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
-    if (!grid) return; // Only runs if the element exists on the page
-
-    grid.innerHTML = products.map((product, index) => `
-        <div class="product-card" style="border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; background: #fff;">
-            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px;">
-            <h3 style="margin: 15px 0 5px 0;">${product.name}</h3>
-            <p style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">${product.description}</p>
-            <p style="font-weight: bold; color: #d63384; font-size: 1.1rem;">$${product.price.toLocaleString()} JMD</p>
-            <button onclick="addToCart(${index})" style="background: #d63384; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%;">Add to Bag</button>
+    if (!grid) return;
+    grid.innerHTML = products.map((p, i) => `
+        <div class="product-card" style="border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center;">
+            <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px;">
+            <h3>${p.name}</h3>
+            <p style="font-weight: bold; color: #d63384;">$${p.price.toLocaleString()} JMD</p>
+            <button onclick="addToCart(${i})" style="background: #d63384; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%;">Add to Bag</button>
         </div>
     `).join('');
 }
 
-// --- 2. ADD TO CART & MATH LOGIC ---
-function addToCart(index) {
-    let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { 
-        items: [], subtotal: 0, taxes: 0, discounts: 0, totalCost: 0 
-    };
-
-    const selectedProduct = products[index];
-    const existing = cart.items.find(item => item.id === selectedProduct.id);
-
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        cart.items.push({ 
-            id: selectedProduct.id, 
-            name: selectedProduct.name, 
-            price: selectedProduct.price, 
-            quantity: 1 
-        });
-    }
-
-    calculateTotals(cart);
-    alert(`${selectedProduct.name} added to your bag!`);
-}
-
-function calculateTotals(cart) {
-    cart.subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    cart.discounts = cart.subtotal * 0.05; 
-    cart.taxes = (cart.subtotal - cart.discounts) * 0.15; 
-    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
-
-    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    updateSummaryUI(cart);
-}
-
-// --- 3. UI UPDATER (Math Display) ---
-function updateSummaryUI(cart) {
-    const fmt = (val) => "$" + (val || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-    
-    const fields = {
-        "cart-subtotal": cart.subtotal,
-        "cart-discount": cart.discounts,
-        "cart-tax": cart.taxes,
-        "cart-total": cart.totalCost,
-        "checkout-amount": cart.totalCost 
-    };
-
-    for (let id in fields) {
-        let el = document.getElementById(id);
-        if (el) el.innerText = fmt(fields[id]);
-    }
-}
-
-// --- 4. CART TABLE RENDERER ---
 function displayCartTable() {
-    const tableBody = document.getElementById("cart-table-body");
-    if (!tableBody) return;
-
+    const body = document.getElementById("cart-table-body");
+    if (!body) return;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-
-    if (!cart || !cart.items || cart.items.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 50px;">Your shopping bag is empty.</td></tr>';
+    if (!cart || cart.items.length === 0) {
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Your bag is empty.</td></tr>';
         return;
     }
-
-    tableBody.innerHTML = cart.items.map((item, index) => `
+    body.innerHTML = cart.items.map((item, index) => `
         <tr>
-            <td style="padding: 15px; font-weight: 600;">${item.name}</td>
-            <td style="padding: 15px;">$${item.price.toLocaleString()} JMD</td>
-            <td style="padding: 15px;">${item.quantity}</td>
-            <td style="padding: 15px;">$${(item.price * item.quantity).toLocaleString()} JMD</td>
-            <td style="padding: 15px;">
-                <button onclick="removeItem(${index})" style="color: #e74c3c; background: none; border: none; cursor: pointer; font-weight: bold;">Remove</button>
-            </td>
+            <td style="padding: 10px;">${item.name}</td>
+            <td>$${item.price.toLocaleString()}</td>
+            <td>${item.quantity}</td>
+            <td>$${(item.price * item.quantity).toLocaleString()}</td>
+            <td><button onclick="removeItem(${index})" style="color: red; border: none; background: none; cursor: pointer;">Remove</button></td>
         </tr>
     `).join('');
 }
 
-// --- 5. CHECKOUT & INVOICE GENERATION ---
 function displayCheckoutDetails() {
-    const detailsDisplay = document.getElementById("checkout-item-details");
-    if (!detailsDisplay) return;
-
+    const el = document.getElementById("checkout-item-details");
+    if (!el) return;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (cart && cart.items) {
-        detailsDisplay.innerHTML = cart.items.map(item => `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem;">
-                <span>${item.quantity}x ${item.name}</span>
-                <span style="font-weight: 600;">$${(item.price * item.quantity).toLocaleString()} JMD</span>
+        el.innerHTML = cart.items.map(i => `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>${i.quantity}x ${i.name}</span>
+                <span>$${(i.price * i.quantity).toLocaleString()} JMD</span>
             </div>
         `).join('');
     }
 }
 
+// --- 3. CART LOGIC ---
+function addToCart(index) {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
+    const selected = products[index];
+    const existing = cart.items.find(item => item.id === selected.id);
+    if (existing) { existing.quantity++; } 
+    else { cart.items.push({ ...selected, quantity: 1 }); }
+    calculateTotals(cart);
+    alert(selected.name + " added!");
+}
+
+function calculateTotals(cart) {
+    cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    cart.discounts = cart.subtotal * 0.05;
+    cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
+    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
+    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
+    updateSummaryUI(cart);
+}
+
+function updateSummaryUI(cart) {
+    const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "checkout-amount"];
+    ids.forEach(id => {
+        let el = document.getElementById(id);
+        if (el) {
+            let val = id.includes("discount") ? cart.discounts : (id.includes("tax") ? cart.taxes : (id.includes("subtotal") ? cart.subtotal : cart.totalCost));
+            el.innerText = fmt(val);
+        }
+    });
+}
+
+// --- 4. THE INVOICE GENERATOR (New & Updated) ---
 function generateInvoice() {
     const name = document.getElementById("cust-name")?.value;
     const address = document.getElementById("cust-address")?.value;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
 
-    if (!name || !address) {
-        alert("Please enter your name and delivery address.");
+    if (!name || !address || !cart || cart.items.length === 0) {
+        alert("Please provide shipping details.");
         return;
     }
 
-    let itemSummary = cart.items.map(item => 
-        `${item.name} x${item.quantity} - $${(item.price * item.quantity).toLocaleString()} JMD`
-    ).join('\n');
+    // A. Generate Metadata
+    const invoiceID = "CJ-" + Math.floor(100000 + Math.random() * 900000);
+    const today = new Date().toLocaleDateString();
+    const trn = "TRN-009-876-543";
 
+    // B. Build Invoice Object
+    const invoiceObj = {
+        company: "Creole Jamaican Artistry",
+        invoiceNumber: invoiceID,
+        trn: trn,
+        date: today,
+        customer: name,
+        shipping: address,
+        items: cart.items,
+        subtotal: cart.subtotal,
+        discountTotal: cart.discounts,
+        taxTotal: cart.taxes,
+        grandTotal: cart.totalCost
+    };
+
+    // C. Store to "AllInvoices" Array
+    let history = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    history.push(invoiceObj);
+    localStorage.setItem("AllInvoices", JSON.stringify(history));
+
+    // D. Visual Display
+    let itemSummary = cart.items.map(i => `${i.name} x${i.quantity} - $${(i.price * i.quantity).toLocaleString()}`).join('\n');
+    
     const receipt = `
 ========================================
        CREOLE JAMAICAN ARTISTRY
-            ORDER INVOICE
+            OFFICIAL INVOICE
 ========================================
-Customer: ${name}
+Invoice #: ${invoiceID}
+Date: ${today} | TRN: ${trn}
+----------------------------------------
+Bill To: ${name}
 Address: ${address}
 ----------------------------------------
-ITEMS:
+Items:
 ${itemSummary}
 ----------------------------------------
-TOTAL PAID: $${cart.totalCost.toLocaleString()} JMD
+Subtotal: $${cart.subtotal.toLocaleString()}
+Discount (5%): -$${cart.discounts.toLocaleString()}
+GCT (15%): $${cart.taxes.toLocaleString()}
+TOTAL COST: $${cart.totalCost.toLocaleString()} JMD
 ========================================
+Invoice sent to your email!
     `;
 
     alert(receipt);
@@ -153,7 +155,6 @@ TOTAL PAID: $${cart.totalCost.toLocaleString()} JMD
     window.location.href = "index.html";
 }
 
-// --- 6. REMOVE & CLEAR FUNCTIONS ---
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
@@ -162,21 +163,16 @@ function removeItem(index) {
 }
 
 function clearCart() {
-    if (confirm("Clear your entire shopping bag?")) {
-        localStorage.removeItem("ShoppingCart");
-        location.reload(); 
-    }
+    if(confirm("Clear Bag?")) { localStorage.removeItem("ShoppingCart"); location.reload(); }
 }
 
-// --- 7. INITIALIZE ---
+// --- 5. INIT ---
 document.addEventListener("DOMContentLoaded", () => {
-    // This runs on EVERY page. If it finds the IDs, it fills them.
-    displayProductGrid(); 
-    
+    displayProductGrid();
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (cart) {
         updateSummaryUI(cart);
-        displayCartTable();       
-        displayCheckoutDetails(); 
+        displayCartTable();
+        displayCheckoutDetails();
     }
 });
