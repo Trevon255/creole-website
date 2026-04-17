@@ -1,3 +1,5 @@
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +24,7 @@
             margin-bottom: 60px;
         }
 
-        /* Styling for the dynamically generated cards */
+        /* Card styling for dynamically generated products */
         .product-card {
             background: #fff;
             padding: 20px;
@@ -83,6 +85,35 @@
         .buy-btn:hover {
             background-color: #c58d98;
         }
+
+        /* Cart Summary Styling - Niketa Muschette */
+        #cart-summary {
+            background: #fdf2f4;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 40px 0;
+            border: 1px dashed #d8a7b1;
+        }
+
+        .summary-details {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            text-align: center;
+        }
+
+        .summary-item h4 {
+            margin-bottom: 5px;
+            color: #888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .summary-item p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2d2d2d;
+        }
     </style>
 </head>
 <body>
@@ -108,6 +139,32 @@
         </section>
 
         <div class="product-grid"></div>
+
+        <section id="cart-summary">
+            <h3 style="text-align: center; margin-bottom: 20px;">Shopping Cart Totals</h3>
+            <div class="summary-details">
+                <div class="summary-item">
+                    <h4>Subtotal</h4>
+                    <p id="cart-subtotal">$0 JMD</p>
+                </div>
+                <div class="summary-item">
+                    <h4>GCT (15%)</h4>
+                    <p id="cart-tax">$0 JMD</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Discount (5%)</h4>
+                    <p id="cart-discount">$0 JMD</p>
+                </div>
+                <div class="summary-item">
+                    <h4>Total Cost</h4>
+                    <p id="cart-total" style="color: #d8a7b1;">$0 JMD</p>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="buy-btn" style="width: auto; padding: 10px 40px;" onclick="window.location.href='checkout.html'">Proceed to Checkout</button>
+            </div>
+        </section>
     </main>
 
     <footer>
@@ -117,3 +174,4 @@
     <script src="script.js"></script>
 </body>
 </html>
+```
