@@ -2,55 +2,73 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | Creole</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Ensuring the layout is clean for your lab demo */
+        .login-box { max-width: 400px; margin: 80px auto; padding: 30px; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        .button-group { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-login { background: #d63384; color: white; }
+        .btn-cancel { background: #6c757d; color: white; }
+        .error-text { color: #dc3545; font-size: 0.9em; margin-top: 10px; min-height: 20px; text-align: center; }
+        .reset-p { text-align: center; margin-top: 20px; font-size: 0.9em; }
+        .reset-p a { color: #d63384; text-decoration: none; font-weight: bold; }
+    </style>
 </head>
 <body>
 
-<header>
+<header style="text-align: center; padding: 20px; border-bottom: 1px solid #eee;">
     <h2>Creole Jamaican Artistry</h2>
 </header>
 
 <main>
     <div class="login-box">
-        <h3>Welcome Back</h3>
+        <h3 style="text-align: center;">Welcome Back</h3>
 
-        <form id="loginForm" autocomplete="off">
+        <form id="loginForm" autocomplete="off" onsubmit="checkLogin(event)">
 
             <div class="form-group">
                 <label for="loginTrn">TRN</label>
-                <input type="text"
-                       id="loginTrn"
-                       placeholder="000-000-000"
-                       pattern="\d{3}-\d{3}-\d{3}"
-                       title="TRN must be in format 000-000-000"
+                <input type="text" 
+                       id="loginTrn" 
+                       placeholder="000-000-000" 
+                       pattern="\d{3}-\d{3}-\d{3}" 
+                       title="TRN must be in format 000-000-000" 
                        required>
             </div>
 
             <div class="form-group">
                 <label for="loginPassword">Password</label>
-                <input type="password"
-                       id="loginPassword"
+                <input type="password" 
+                       id="loginPassword" 
+                       placeholder="Enter your password"
                        required>
             </div>
 
-            <button type="submit" class="btn">Sign In</button>
-            <button type="reset" class="btn">Cancel</button>
+            <div class="button-group">
+                <button type="submit" class="btn btn-login">Login</button>
+                <button type="reset" class="btn btn-cancel">Cancel</button>
+            </div>
 
-            <p id="errorMsg" class="error"></p>
+            <p id="errorMsg" class="error-text"></p>
 
         </form>
 
-        <p>
-            Forgot Password?
-            <a href="#" onclick="resetPassword()">Reset</a>
-        </p>
-
-        <p>
-            New here? <a href="register.html">Register</a>
-        </p>
+        <div class="reset-p">
+            <p>
+                Forgot Password? 
+                <a href="#" onclick="resetPassword()">Reset Password</a>
+            </p>
+            <p>New here? <a href="register.html">Create an Account</a></p>
+        </div>
     </div>
 </main>
+
 <script src="script.js"></script>
 
 </body>
