@@ -4,54 +4,36 @@
     <meta charset="UTF-8">
     <title>Checkout | Niketa Muschette</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
-        .order-summary-box { background: #f9f9f9; padding: 25px; border-radius: 10px; border: 1px solid #f4cfdf; }
-        .checkout-actions { display: flex; gap: 15px; margin-top: 30px; }
-        .btn-cancel { background: transparent !important; border: 1px solid #ccc !important; color: #666 !important; }
-    </style>
 </head>
 <body>
-    <header>
-        <a href="index.html"><img src="Assets/creole.jpg" alt="Logo" id="mainLogo" style="height:80px;"></a>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li><a href="cart.html">Cart</a></li>
-                <li><a href="checkout.html">Checkout</a></li>
-                <li><a href="about.html">About Us</a></li>
-            </ul>
-        </nav>
-    </header>
-
     <main class="container">
         <h2>Secure Checkout</h2>
-        <div class="checkout-grid">
-            <div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+            
+            <section>
                 <h3>Shipping Details</h3>
-                <form onsubmit="confirmOrder(event)">
+                <form onsubmit="generateInvoice(event)">
                     <div class="form-group">
                         <label>Full Name</label>
-                        <input type="text" id="custName" placeholder="Enter your name" required>
+                        <input type="text" id="custName" placeholder="e.g. Niketa Muschette" required>
                     </div>
                     <div class="form-group">
-                        <label>Shipping Address</label>
-                        <input type="text" id="custAddress" placeholder="Enter street address" required>
+                        <label>Delivery Address</label>
+                        <textarea id="custAddress" rows="3" placeholder="Enter street and parish" required></textarea>
                     </div>
-                    <div class="checkout-actions">
-                        <button type="button" class="btn btn-cancel" onclick="cancelOrder()">Cancel</button>
-                        <button type="submit" class="btn">Confirm Order</button>
-                    </div>
+                    <button type="submit" class="btn">Confirm Order</button>
                 </form>
-            </div>
+            </section>
 
-            <div class="order-summary-box">
+            <section style="background: #f9f9f9; padding: 25px; border-radius: 10px;">
                 <h3>Order Summary</h3>
-                <p>Order handled by: Niketa Muschette</p>
+                <p>Handled by: Niketa Muschette</p>
                 <hr>
-                <p style="font-size: 1.2rem; font-weight: bold;">Amount Due: <span id="summary-total">$0.00 JMD</span></p>
-            </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.3rem;">
+                    <span>Amount Due:</span>
+                    <span id="summary-total">$0.00 JMD</span>
+                </div>
+            </section>
         </div>
     </main>
     <script src="script.js"></script>
