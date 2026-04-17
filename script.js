@@ -1,4 +1,4 @@
-/************************************************************
+***********************************************************
  * CREOLE JAMAICAN ARTISTRY - MASTER SCRIPT
  * Developer: Niketa Muschette
  ************************************************************/
@@ -10,7 +10,7 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. LOGIN & AUTH LOGIC ---
+// --- 2. LOGIN LOGIC ---
 function checkLogin(event) {
     event.preventDefault(); 
     const enteredTrn = document.getElementById("loginTrn").value;
@@ -21,16 +21,19 @@ function checkLogin(event) {
     if (userFound) {
         localStorage.setItem("currentUser", JSON.stringify(userFound));
         alert("Login Successful! Welcome, " + userFound.firstName);
-        window.location.href = "products.html"; 
+        window.location.href = "products.html"; // Updated redirect to catalog
     } else {
         alert("Invalid credentials.");
     }
 }
 
-// --- 3. PRODUCT GRID & CART DISPLAY ---
+// --- 3. DISPLAY FUNCTIONS ---
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
-    if (!grid) return;
+    if (!grid) {
+        console.log("Product grid container not found on this page.");
+        return;
+    }
 
     grid.innerHTML = products.map((p, i) => `
         <div class="product-card" style="background: white; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
@@ -62,7 +65,7 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 4. CART CALCULATIONS & INVOICING ---
+// --- 4. CART & INVOICE LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -99,10 +102,10 @@ function generateInvoice() {
     const address = document.getElementById("cust-address")?.value;
     const paid = document.getElementById("amount-paid")?.value;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    const user = JSON.parse(localStorage.getItem("currentUser")) || { trn: "N/A" };
+    const user = JSON.parse(localStorage.getItem("currentUser")) || { trn: "Walk-in" };
 
     if (!name || !address || !paid || !cart || cart.items.length === 0) {
-        alert("Please complete all shipping and payment details.");
+        alert("Please complete the shipping and payment details.");
         return;
     }
 
@@ -125,6 +128,12 @@ function generateInvoice() {
     window.location.href = "invoice.html";
 }
 
+function clearCart() {
+    localStorage.removeItem("ShoppingCart");
+    alert("Bag cleared.");
+    location.reload();
+}
+
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
@@ -137,115 +146,36 @@ function removeItem(index) {
     }
 }
 
-// --- 5. DASHBOARD & SEARCH FUNCTIONS ---
-function ShowDashboardStats() {
+// --- 5. DASHBOARD FUNCTIONS ---
+function ShowUserFrequency() {
     const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
     let genderStats = { Male: 0, Female: 0 };
-    let ageStats = { "18-25": 0, "26-35": 0, "36+": 0 };
 
     users.forEach(user => {
-        // Gender Statistics
         if (user.gender === "Male") genderStats.Male++;
         else if (user.gender === "Female") genderStats.Female++;
-
-        // Age Statistics (Calculation based on DOB)
-        const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
-        if (age <= 25) ageStats["18-25"]++;
-        else if (age <= 35) ageStats["26-35"]++;
-        else ageStats["36+"]++;
     });
 
     const gDiv = document.getElementById("genderFrequency");
-    const aDiv = document.getElementById("ageFrequency");
-
     if (gDiv) {
-        gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>` +
-                         `Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
-    }
-    if (aDiv) {
-        aDiv.innerHTML = `18-25: ${"█".repeat(ageStats["18-25"])} (${ageStats["18-25"]})<br>` +
-                         `26-35: ${"█".repeat(ageStats["26-35"])} (${ageStats["26-35"]})<br>` +
-                         `36+: ${"█".repeat(ageStats["36+"])} (${ageStats["36+"]})`;
+        gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
     }
 }
 
-// Function to handle the TRN Search Results on the Dashboard
-function displayResults() {
-    const searchInput = document.getElementById("searchTRN")?.value;
-    const resultsDiv = document.getElementById("invoiceDisplayArea");
-    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-
-    if (!resultsDiv) return;
-
-    const filtered = allInvoices.filter(inv => inv.trn === searchInput);
-
-    if (filtered.length === 0) {
-        resultsDiv.innerHTML = `<p style="color: #e74c3c;">No records found for TRN: ${searchInput}</p>`;
-        return;
-    }
-
-    resultsDiv.innerHTML = `
-        <table border="1" style="width:100%; border-collapse: collapse; margin-top: 15px; background: white;">
-            <tr style="background: #f8f9fa;">
-                <th style="padding: 10px;">Invoice #</th>
-                <th>Customer</th>
-                <th>Total</th>
-                <th>Date</th>
-            </tr>
-            ${filtered.map(inv => `
-                <tr>
-                    <td style="padding: 8px; text-align: center;">${inv.invoiceNumber}</td>
-                    <td>${inv.customer}</td>
-                    <td style="text-align: right; padding-right: 10px;">$${Number(inv.totalDue).toLocaleString()}</td>
-                    <td style="text-align: center;">${inv.date}</td>
-                </tr>
-            `).join('')}
-        </table>
-    `;
-}
-
-// Logic to pull the last saved order from AllInvoices
- // Created by: Lee
-document.addEventListener("DOMContentLoaded", () => {
-     const history = JSON.parse(localStorage.getItem("AllInvoices"));
-            if (history && history.length > 0) {
-                const data = history[history.length - 1]; 
-                
-                document.getElementById("displayInvNum").innerText = data.invoiceNumber;
-                document.getElementById("displayDate").innerText = data.date;
-                document.getElementById("displayShipName").innerText = data.customer;
-                document.getElementById("displayShipAddr").innerText = data.shipping;
-
-                const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-
-                document.getElementById("displaySubtotal").innerText = fmt(data.subtotal);
-                document.getElementById("displayTax").innerText = fmt(data.taxTotal);
-                document.getElementById("displayDiscount").innerText = "-" + fmt(data.discountTotal);
-                document.getElementById("displayGrandTotal").innerText = fmt(data.grandTotal);
-
-                const itemTable = document.getElementById("invoiceItemsBody");
-                itemTable.innerHTML = data.items.map(item => `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>$${item.price.toLocaleString()}</td>
-                        <td>$${(item.price * item.quantity).toLocaleString()}</td>
-                    </tr>
-                `).join('');
-            }
-        
 // --- 6. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Run the grid display
     displayProductGrid();
     
+    // 2. Load cart data if it exists
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (cart) {
         updateSummaryUI(cart);
         displayCartTable();
     }
     
-    // Auto-load dashboard if on the right page
+    // 3. Run dashboard if on dashboard page
     if (document.getElementById("genderFrequency")) {
-        ShowDashboardStats();
+        ShowUserFrequency();
     }
 });
