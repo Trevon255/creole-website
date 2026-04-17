@@ -102,7 +102,7 @@ function displayCheckoutDetails() {
     }
 }
 
-// --- 6. REMOVE & CLEAR FUNCTIONS ---
+// --- 6. REMOVE, CLEAR & INVOICE FUNCTIONS ---
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
@@ -113,8 +113,61 @@ function removeItem(index) {
 function clearCart() {
     if (confirm("Clear your entire shopping bag?")) {
         localStorage.removeItem("ShoppingCart");
-        location.reload(); // Hard refresh to reset all UI
+        location.reload(); 
     }
+}
+
+// NEW: Confirm Order / Generate Invoice Function
+function generateInvoice() {
+    const name = document.getElementById("cust-name")?.value;
+    const address = document.getElementById("cust-address")?.value;
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+
+    if (!name || !address) {
+        alert("Please enter your name and delivery address to confirm the order.");
+        return;
+    }
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+        alert("Your shopping bag is empty.");
+        return;
+    }
+
+    // Build invoice string
+    let itemSummary = cart.items.map(item => 
+        `${item.name} x${item.quantity} - $${(item.price * item.quantity).toLocaleString()} JMD`
+    ).join('\n');
+
+    const invoiceContent = `
+========================================
+       CREOLE JAMAICAN ARTISTRY
+            ORDER INVOICE
+========================================
+Date: ${new Date().toLocaleDateString()}
+Invoice #: ${Math.floor(Math.random() * 90000) + 10000}
+----------------------------------------
+CUSTOMER DETAILS:
+Name: ${name}
+Address: ${address}
+----------------------------------------
+ITEMS PURCHASED:
+${itemSummary}
+----------------------------------------
+Sub-total: $${cart.subtotal.toLocaleString()} JMD
+Discount (5%): -$${cart.discounts.toLocaleString()} JMD
+GCT (15%): $${cart.taxes.toLocaleString()} JMD
+========================================
+TOTAL PAID: $${cart.totalCost.toLocaleString()} JMD
+========================================
+Thank you for supporting local artistry!
+    `;
+
+    // Display formatted invoice
+    alert(invoiceContent);
+
+    // Clear cart and redirect to home
+    localStorage.removeItem("ShoppingCart");
+    window.location.href = "index.html";
 }
 
 // --- 7. INITIALIZE ---
