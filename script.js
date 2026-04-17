@@ -39,7 +39,7 @@ function displayCartTable() {
     tableBody.innerHTML = cart.items.map((item, index) => `
         <tr>
             <td style="display: flex; align-items: center; gap: 15px;">
-                <img src="${item.image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                <img src="${item.itemImage || item.image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
                 <span style="font-weight: 500;">${item.name}</span>
             </td>
             <td>$${item.price.toLocaleString()}</td>
@@ -50,7 +50,7 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 3. UPDATED PROFESSIONAL INVOICE LOGIC ---
+// --- 3. CHECKOUT & INVOICE GENERATION ---
 function generateInvoice() {
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     const nameInput = document.getElementById("cust-name");
@@ -76,45 +76,58 @@ function generateInvoice() {
     } else {
         const change = amountPaid - cart.totalCost;
         
-        // --- BUILDS A PROFESSIONAL ITEM LIST FOR THE ALERT ---
-        let itemizedList = "";
-        cart.items.forEach(item => {
-            itemizedList += `${item.quantity}x ${item.name} @ $${item.price.toLocaleString()}\n`;
-        });
+        // Save Order Info for the Invoice Page
+        const orderSummary = {
+            customerName: name,
+            customerAddr: address,
+            invNum: "INV-" + Math.floor(Math.random() * 90000 + 10000),
+            date: new Date().toLocaleDateString(),
+            paid: amountPaid,
+            change: change
+        };
+        localStorage.setItem("LastOrder", JSON.stringify(orderSummary));
 
-        const fmt = (v) => "$" + v.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-
-        // --- THE "BILL OF SALE" DISPLAY ---
-        const invoiceDisplay = 
-            `====================================\n` +
-            `       CREOLE JAMAICAN ARTISTRY       \n` +
-            `           OFFICIAL INVOICE           \n` +
-            `====================================\n\n` +
-            `Customer: ${name}\n` +
-            `Address: ${address}\n` +
-            `Date: ${new Date().toLocaleDateString()}\n\n` +
-            `PURCHASED ITEMS:\n` +
-            `------------------------------------\n` +
-            `${itemizedList}` +
-            `------------------------------------\n` +
-            `SUB-TOTAL:      ${fmt(cart.subtotal)}\n` +
-            `DISCOUNT (5%):  -${fmt(cart.discounts)}\n` +
-            `GCT (15%):      ${fmt(cart.taxes)}\n` +
-            `TOTAL DUE:      ${fmt(cart.totalCost)}\n` +
-            `====================================\n` +
-            `AMOUNT PAID:    ${fmt(amountPaid)}\n` +
-            `CHANGE DUE:     ${fmt(change)}\n\n` +
-            `Thank you for supporting Jamaican artistry!`;
-
-        alert(invoiceDisplay);
+        // Alert Confirmation
+        alert("Order Successful! Generating your invoice now.");
         
-        // Finalize transaction
-        localStorage.removeItem("ShoppingCart");
-        window.location.href = "index.html"; 
+        // Redirect to invoice page
+        window.location.href = "invoice.html"; 
     }
 }
 
-// --- 4. CART & TOTALS CORE ---
+// --- 4. RENDER FINAL INVOICE (For invoice.html) ---
+function renderFinalInvoice() {
+    const order = JSON.parse(localStorage.getItem("LastOrder"));
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    const itemsBody = document.getElementById("invoiceItemsBody");
+
+    if (!order || !cart || !itemsBody) return;
+
+    // Set Header Data
+    document.getElementById("displayInvNum").innerText = order.invNum;
+    document.getElementById("displayDate").innerText = order.date;
+    document.getElementById("displayShipName").innerText = order.customerName;
+    document.getElementById("displayShipAddr").innerText = order.customerAddr;
+
+    // Populate Table
+    itemsBody.innerHTML = cart.items.map(item => `
+        <tr>
+            <td>${item.name}</td>
+            <td>${item.quantity}</td>
+            <td>$${item.price.toLocaleString()}</td>
+            <td>$${(item.price * item.quantity).toLocaleString()}</td>
+        </tr>
+    `).join('');
+
+    // Set Totals
+    const fmt = (v) => "$" + v.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    document.getElementById("displaySubtotal").innerText = fmt(cart.subtotal);
+    document.getElementById("displayDiscount").innerText = "-" + fmt(cart.discounts);
+    document.getElementById("displayTax").innerText = fmt(cart.taxes);
+    document.getElementById("displayGrandTotal").innerText = fmt(cart.totalCost);
+}
+
+// --- 5. CART CORE LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -178,10 +191,11 @@ function removeItem(index) {
     }
 }
 
-// --- 5. INITIALIZATION ---
+// --- 6. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
     displayProductGrid();
     displayCartTable();
+    renderFinalInvoice(); // Logic to fill invoice.html if we are on that page
     
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) {
