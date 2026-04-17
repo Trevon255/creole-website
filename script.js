@@ -114,7 +114,6 @@ function processOrder(event) {
         return;
     }
 
-    // Capture User TRN and Form Data
     const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
     const userTRN = storedData ? storedData.trn : "N/A";
     const nameInput = document.getElementById("cust-name");
@@ -127,11 +126,11 @@ function processOrder(event) {
     localStorage.setItem("CustomerAddress", customerAddress);
     localStorage.setItem("UserTRN", userTRN);
 
-    // Save this order into AllInvoices for the Dashboard
     const newInvoice = {
         invoiceNum: "CR-" + Math.floor(Math.random() * 900000 + 100000),
         customerTrn: userTRN,
         customerName: customerName,
+        customerAddress: customerAddress,
         totalCost: cart.totalCost,
         date: new Date().toLocaleDateString(),
         items: cart.items
@@ -141,7 +140,6 @@ function processOrder(event) {
     allInvoices.push(newInvoice);
     localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
 
-    // Redirect to invoice page
     window.location.href = "invoice.html";
 }
 
@@ -173,17 +171,13 @@ function removeItem(index) {
 // --- 5. DASHBOARD FUNCTIONS ---
 
 function ShowUserFrequency() {
-    // Note: Assuming registration page saves to 'AllUsers' list
     const allUsers = JSON.parse(localStorage.getItem("AllUsers")) || [];
     
     let genderCounts = { Male: 0, Female: 0, Other: 0 };
     let ageGroups = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
 
     allUsers.forEach(user => {
-        // Count Gender
         if (genderCounts[user.gender] !== undefined) genderCounts[user.gender]++;
-        
-        // Count Age Group
         const age = parseInt(user.age);
         if (age >= 18 && age <= 25) ageGroups["18-25"]++;
         else if (age >= 26 && age <= 35) ageGroups["26-35"]++;
@@ -205,20 +199,32 @@ function ShowInvoices() {
 
     const trnSearch = trnInput.value.trim();
     const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-
-    // Filter by TRN
     const filtered = allInvoices.filter(inv => inv.customerTrn === trnSearch);
 
     if (filtered.length > 0) {
         resultsArea.innerHTML = filtered.map(inv => `
-            <div style="border:1px solid #eee; padding:10px; margin-top:10px; border-radius:8px; background:#fafafa;">
-                <p><strong>Invoice #:</strong> ${inv.invoiceNum} | <strong>Date:</strong> ${inv.date}</p>
-                <p><strong>Customer:</strong> ${inv.customerName}</p>
-                <p><strong>Total:</strong> $${inv.totalCost.toLocaleString()} JMD</p>
+            <div style="border:1px solid #eee; padding:15px; margin-top:10px; border-radius:8px; background:#fafafa; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <p><strong>Invoice #:</strong> ${inv.invoiceNum} | <strong>Date:</strong> ${inv.date}</p>
+                    <p><strong>Customer:</strong> ${inv.customerName}</p>
+                    <p><strong>Total:</strong> $${inv.totalCost.toLocaleString()} JMD</p>
+                </div>
+                <button onclick="viewInvoiceDetail('${inv.invoiceNum}')" style="background: #d63384; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">View Full Invoice</button>
             </div>
         `).join('');
     } else {
         resultsArea.innerHTML = "<p style='color:red;'>No invoices found for TRN: " + trnSearch + "</p>";
+    }
+}
+
+// Bridge function to view invoice from Dashboard
+function viewInvoiceDetail(invoiceNum) {
+    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    const selectedInvoice = allInvoices.find(inv => inv.invoiceNum === invoiceNum);
+
+    if (selectedInvoice) {
+        localStorage.setItem("CurrentViewingInvoice", JSON.stringify(selectedInvoice));
+        window.location.href = "invoice.html";
     }
 }
 
@@ -227,23 +233,15 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("product-grid")) displayProductGrid();
     if (document.getElementById("cart-table-body")) displayCartTable();
     
-    // Dashboard Initialization
     if (document.getElementById("genderStatsDisplay")) {
         ShowUserFrequency();
-        
         const displayBtn = document.getElementById("displayResultsBtn");
         if (displayBtn) displayBtn.onclick = ShowInvoices;
-
-        const auditBtn = document.getElementById("auditBtn");
-        if (auditBtn) {
-            auditBtn.onclick = () => console.log("All Invoices Audit:", JSON.parse(localStorage.getItem("AllInvoices")));
-        }
     }
 
     const loginForm = document.getElementById("loginForm");
     if (loginForm) loginForm.addEventListener("submit", handleLogin);
 
-    // Listen for the Confirm Order button
     const confirmBtn = document.getElementById("confirm-order-btn");
     if (confirmBtn) confirmBtn.onclick = processOrder;
 
