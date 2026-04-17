@@ -99,7 +99,6 @@ function updateSummaryUI(cart) {
 // --- 4. THE INVOICE GENERATOR ---
 
 // Question 7: Generate an invoice and store in AllInvoices array in localStorage.
-// Created by: Lee
 function generateInvoice() {
     const name = document.getElementById("cust-name")?.value;
     const address = document.getElementById("cust-address")?.value;
@@ -112,7 +111,7 @@ function generateInvoice() {
 
     const invoiceID = "CJ-" + Math.floor(100000 + Math.random() * 900000);
     const today = new Date().toLocaleDateString();
-    const trn = "TRN-009-876-543"; // Default business TRN
+    const trn = "TRN-009-876-543"; 
 
     const invoiceObj = {
         company: "Creole Jamaican Artistry",
@@ -153,88 +152,69 @@ function clearCart() {
  * DASHBOARD & ADMIN FUNCTIONALITIES
  ************************************************************/
 
-// Question 10: ShowUserFrequency() – Show user frequency based on Gender and Age Group
+// Question 10: ShowUserFrequency() – Simple Frequency Stats
 function ShowUserFrequency() {
-    const users = JSON.parse(localStorage.getItem("RegisterData")) || [];
+    // Ensuring it uses "RegistrationData" per requirements
+    const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
     
-    // i. Gender Categories
     let genderStats = { Male: 0, Female: 0, Other: 0 };
-    
-    // ii. Age Groups
     let ageStats = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
 
     users.forEach(user => {
         // Count Gender
-        if (genderStats[user.gender] !== undefined) {
-            genderStats[user.gender]++;
-        } else {
-            genderStats["Other"]++;
-        }
-
-        // Calculate Age and Count Groups
-        const birthDate = new Date(user.dob);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
+        if (genderStats[user.gender] !== undefined) genderStats[user.gender]++;
         
+        // Count Age Group
+        const birthYear = new Date(user.dob).getFullYear();
+        const age = new Date().getFullYear() - birthYear;
+
         if (age >= 18 && age <= 25) ageStats["18-25"]++;
         else if (age >= 26 && age <= 35) ageStats["26-35"]++;
         else if (age >= 36 && age <= 50) ageStats["36-50"]++;
         else if (age > 50) ageStats["50+"]++;
     });
 
-    // iii. Display this data on a dashboard
     const genderDiv = document.getElementById("genderFrequency");
     const ageDiv = document.getElementById("ageFrequency");
 
     if (genderDiv) {
-        genderDiv.innerHTML = `<strong>Gender Distribution:</strong><br> 
-            Male: ${genderStats.Male} | Female: ${genderStats.Female} | Other: ${genderStats.Other}`;
+        genderDiv.innerHTML = `
+            <p><strong>Male:</strong> ${genderStats.Male}</p>
+            <p><strong>Female:</strong> ${genderStats.Female}</p>
+            <p><strong>Other:</strong> ${genderStats.Other}</p>
+        `;
     }
+
     if (ageDiv) {
-        ageDiv.innerHTML = `<strong>Age Group Distribution:</strong><br> 
-            18-25: ${ageStats["18-25"]} | 26-35: ${ageStats["26-35"]} | 36-50: ${ageStats["36-50"]} | 50+: ${ageStats["50+"]}`;
+        ageDiv.innerHTML = `
+            <p><strong>18-25:</strong> ${ageStats["18-25"]}</p>
+            <p><strong>26-35:</strong> ${ageStats["26-35"]}</p>
+            <p><strong>36-50:</strong> ${ageStats["36-50"]}</p>
+            <p><strong>50+:</strong> ${ageStats["50+"]}</p>
+        `;
     }
 }
 
-// Question 11: ShowInvoices() - displays all invoices and allows search by TRN using console.log()
+// Question 11: ShowInvoices() - Log to console
 function ShowInvoices() {
     const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    const searchTRN = document.getElementById("searchTRN")?.value;
-
-    console.log("--- All Stored Invoices ---");
-    console.table(allInvoices);
-
-    if (searchTRN) {
-        const results = allInvoices.filter(inv => inv.trn === searchTRN);
-        console.log(`--- Search Results for TRN: ${searchTRN} ---`);
-        console.table(results);
-        alert("Search results sent to the Console (F12).");
-    }
+    console.log("--- Stored Invoices ---", allInvoices);
+    alert("Invoice list sent to the console (F12).");
 }
 
-// Question 12: GetUserInvoices() – displays all the invoices for a user based on trn stored in localStorage
+// Question 12: GetUserInvoices() – Filter by TRN
 function GetUserInvoices() {
     const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     const searchTRN = document.getElementById("searchTRN")?.value;
     const displayArea = document.getElementById("invoiceDisplayArea");
 
-    if (!searchTRN) {
-        alert("Please enter a TRN to search.");
-        return;
-    }
+    if (!searchTRN) return;
 
-    const userInvoices = allInvoices.filter(inv => inv.trn === searchTRN);
+    const results = allInvoices.filter(inv => inv.trn === searchTRN);
 
-    if (userInvoices.length === 0) {
-        displayArea.innerHTML = `<p style="color:red;">No invoices found for TRN: ${searchTRN}</p>`;
-    } else {
-        displayArea.innerHTML = userInvoices.map(inv => `
-            <div class="invoice-item" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
-                <p><strong>Invoice #:</strong> ${inv.invoiceNumber} | <strong>Date:</strong> ${inv.date}</p>
-                <p><strong>Customer:</strong> ${inv.customer} | <strong>Total:</strong> $${inv.grandTotal.toLocaleString()} JMD</p>
-            </div>
-        `).join('');
-    }
+    displayArea.innerHTML = results.length ? 
+        results.map(inv => `<p>Invoice: ${inv.invoiceNumber} | Date: ${inv.date} | Total: $${inv.grandTotal}</p>`).join('') : 
+        `<p style="color:red;">No invoices found for TRN: ${searchTRN}</p>`;
 }
 
 // --- 5. INITIALIZATION ---
@@ -247,7 +227,6 @@ document.addEventListener("DOMContentLoaded", () => {
         displayCheckoutDetails();
     }
     
-    // Automatically run dashboard stats if the dashboard divs exist
     if (document.getElementById("genderFrequency")) {
         ShowUserFrequency();
     }
