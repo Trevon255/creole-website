@@ -3,48 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Creole Jamaican Artistry</title>
+    <title>Admin Dashboard | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .stat-card { background: #f9f9f9; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 5px solid #d63384; }
-        .invoice-item { border-bottom: 1px solid #ddd; padding: 10px 0; }
-        input { padding: 8px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 8px 15px; background: #d63384; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .stat-card { 
+            background: #fff; 
+            padding: 15px; 
+            margin: 10px 0; 
+            border-radius: 8px; 
+            border-left: 5px solid #d63384; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .invoice-item { 
+            background: #fdfdfd; 
+            border: 1px solid #eee; 
+            padding: 15px; 
+            margin-bottom: 10px; 
+            border-radius: 5px; 
+        }
+        .controls { margin-bottom: 20px; background: #eee; padding: 20px; border-radius: 8px; }
+        input { padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 15px; background: #d63384; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        button:hover { background: #b02a6b; }
+        .nav-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #d63384; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <a href="index.html" class="nav-link">← Back to Store</a>
         <h1>Admin Dashboard</h1>
+        <p>Manage users and track sales performance below.</p>
 
         <section>
             <h2>User Statistics</h2>
-            <div id="genderFrequency" class="stat-card"></div>
-            <div id="ageFrequency" class="stat-card"></div>
+            <div id="genderFrequency" class="stat-card">
+                <p><em>Loading gender stats...</em></p>
+            </div>
+            <div id="ageFrequency" class="stat-card">
+                <p><em>Loading age stats...</em></p>
+            </div>
         </section>
 
-        <hr>
+        <hr style="margin: 40px 0;">
 
         <section>
             <h2>Invoice Management</h2>
-            <div style="margin-bottom: 20px;">
-                <input type="text" id="searchTRN" placeholder="Enter TRN (000-000-000)">
-                <button onclick="ShowInvoices()">Search Invoices (Console)</button>
-                <button onclick="GetUserInvoices()" style="background:#333;">Display on Page</button>
+            <div class="controls">
+                <p><strong>Search by TRN:</strong></p>
+                <input type="text" id="searchTRN" placeholder="Enter TRN (e.g., TRN-009-876-543)">
+                <button onclick="ShowInvoices()">Audit (Console Log)</button>
+                <button onclick="GetUserInvoices()" style="background:#333;">Display Results</button>
             </div>
             
+            <h3>Search Results</h3>
             <div id="invoiceDisplayArea">
-                <p><em>Search results will appear here...</em></p>
+                <p style="color: #888;">Enter a TRN and click "Display Results" to view invoices.</p>
             </div>
         </section>
     </div>
 
     <script src="script.js"></script>
-    <script>
-        // Run stats automatically when dashboard loads
-        document.addEventListener("DOMContentLoaded", () => {
-            ShowUserFrequency();
-        });
-    </script>
 </body>
 </html>
