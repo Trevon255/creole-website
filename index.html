@@ -19,11 +19,16 @@
             border-bottom: 1px solid #f0f0f0;
         }
 
-        /* Logo updated to use creole.jpg */
+        /* Ensuring the logo container is visible */
+        .logo {
+            display: block;
+            margin-bottom: 15px;
+        }
+
         .logo img {
             height: 65px; 
             width: auto;
-            margin-bottom: 10px;
+            display: inline-block;
         }
 
         nav {
@@ -35,7 +40,7 @@
         nav a {
             text-decoration: none;
             color: #666;
-            font-size: 14px; /* Increased for better visibility */
+            font-size: 14px; 
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -89,15 +94,9 @@
             background-color: #2d2d2d;
             color: white;
         }
-        .btn-black:hover {
-            background-color: #000;
-        }
         .btn-outline {
             border: 1px solid #ccc;
             color: #333;
-        }
-        .btn-outline:hover {
-            background-color: #f9f9f9;
         }
 
         /* Hero Image */
@@ -132,7 +131,8 @@
         <a href="register.html">Register</a>
         <a href="login.html">Login</a>
         <a href="about.html">About Us</a>
-        <a href="dashboard.html">Dashboard</a> </nav>
+        <a href="dashboard.html">Dashboard</a>
+    </nav>
 </header>
 
 <main class="hero-container">
