@@ -28,19 +28,13 @@ function displayProducts() {
 
 // --- 3. ADD TO CART (Object Requirement) ---
 function addToCart(index) {
-    // 1. Initialize the Object with all required properties
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { 
-        items: [], 
-        subtotal: 0, 
-        taxes: 0, 
-        discounts: 0, 
-        totalCost: 0 
+        items: [], subtotal: 0, taxes: 0, discounts: 0, totalCost: 0 
     };
 
     const selectedProduct = products[index];
-
-    // 2. Add/Update Product Details in the items array
     const existing = cart.items.find(item => item.id === selectedProduct.id);
+
     if (existing) {
         existing.quantity += 1;
     } else {
@@ -52,38 +46,98 @@ function addToCart(index) {
         });
     }
 
-    // 3. Update Financial Details WITHIN the Cart Object
-    cart.subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    cart.discounts = cart.subtotal * 0.05; // 5% Discount
-    cart.taxes = (cart.subtotal - cart.discounts) * 0.15; // 15% GCT
-    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
-
-    // 4. Save the full Object to localStorage
-    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-
-    // Update the UI totals at the bottom of the product page
-    updateSummaryUI(cart);
+    calculateAndSave(cart);
     alert(`${selectedProduct.name} added to your Bag!`);
 }
 
-// --- 4. UI UPDATER ---
-function updateSummaryUI(cart) {
-    if (!cart) return;
-    const fmt = (val) => "$" + val.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+// --- 4. CALCULATIONS & SAVING ---
+function calculateAndSave(cart) {
+    // 1. Subtotal
+    cart.subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // 2. Discount (5%)
+    cart.discounts = cart.subtotal * 0.05; 
+    // 3. GCT (15% after discount)
+    cart.taxes = (cart.subtotal - cart.discounts) * 0.15; 
+    // 4. Final Total
+    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
-    if (document.getElementById("cart-subtotal")) document.getElementById("cart-subtotal").innerText = fmt(cart.subtotal);
-    if (document.getElementById("cart-total")) document.getElementById("cart-total").innerText = fmt(cart.totalCost);
-    
-    // Additional fields for the Cart page
-    if (document.getElementById("cart-discount")) document.getElementById("cart-discount").innerText = "-" + fmt(cart.discounts);
-    if (document.getElementById("cart-tax")) document.getElementById("cart-tax").innerText = fmt(cart.taxes);
+    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
+    updateSummaryUI(cart);
+    if (document.getElementById("cart-table-body")) displayCart();
 }
 
-// --- 5. INITIALIZE ---
+// --- 5. DISPLAY CART PAGE (cart.html) ---
+function displayCart() {
+    const tableBody = document.getElementById("cart-table-body");
+    if (!tableBody) return;
+
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    tableBody.innerHTML = "";
+
+    if (!cart || cart.items.length === 0) {
+        tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Your bag is empty.</td></tr>";
+        updateSummaryUI(null);
+        return;
+    }
+
+    cart.items.forEach((item, index) => {
+        tableBody.innerHTML += `
+            <tr>
+                <td>${item.name}</td>
+                <td>$${item.price.toLocaleString()}</td>
+                <td>
+                    <input type="number" value="${item.quantity}" min="1" 
+                           onchange="updateQty(${index}, this.value)" style="width:50px;">
+                </td>
+                <td>$${(item.price * item.quantity).toLocaleString()}</td>
+                <td><button onclick="removeItem(${index})" style="color:red; border:none; background:none; cursor:pointer;">Remove</button></td>
+            </tr>`;
+    });
+    updateSummaryUI(cart);
+}
+
+function updateQty(index, newQty) {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (parseInt(newQty) > 0) {
+        cart.items[index].quantity = parseInt(newQty);
+        calculateAndSave(cart);
+    }
+}
+
+function removeItem(index) {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    cart.items.splice(index, 1);
+    calculateAndSave(cart);
+}
+
+function clearAll() {
+    if (confirm("Remove all items from your bag?")) {
+        localStorage.removeItem("ShoppingCart");
+        location.reload();
+    }
+}
+
+// --- 6. UI UPDATER (Syncs both pages) ---
+function updateSummaryUI(cart) {
+    const fmt = (val) => "$" + (val || 0).toLocaleString(undefined, {minimumFractionDigits: 2});
+    
+    const fields = {
+        "cart-subtotal": cart?.subtotal,
+        "cart-discount": cart?.discounts ? -cart.discounts : 0,
+        "cart-tax": cart?.taxes,
+        "cart-total": cart?.totalCost
+    };
+
+    for (let id in fields) {
+        let el = document.getElementById(id);
+        if (el) el.innerText = fmt(fields[id]) + " JMD";
+    }
+}
+
+// --- 7. INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
-    
-    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (savedCart) updateSummaryUI(savedCart);
+    displayCart();
+    const saved = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (saved) updateSummaryUI(saved);
 });
-
