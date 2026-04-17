@@ -3,34 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Creole</title>
+    <title>Login | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; background-color: #ffffff; color: #333; }
         .login-box { max-width: 400px; margin: 80px auto; padding: 30px; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
         .form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         .button-group { display: flex; gap: 10px; margin-top: 20px; }
-        .btn { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-login { background: #d63384; color: white; }
         .btn-cancel { background: #6c757d; color: white; }
-        .error-text { color: #dc3545; font-size: 0.9em; margin-top: 10px; min-height: 20px; text-align: center; }
+        .error-text { color: #dc3545; font-size: 0.9em; margin-top: 15px; min-height: 20px; text-align: center; font-weight: bold; }
         .reset-p { text-align: center; margin-top: 20px; font-size: 0.9em; }
         .reset-p a { color: #d63384; text-decoration: none; font-weight: bold; }
+        
+        header { text-align: center; padding: 20px; border-bottom: 1px solid #f0f0f0; }
+        .logo img { height: 60px; width: auto; }
     </style>
 </head>
 <body>
 
-<header style="text-align: center; padding: 20px; border-bottom: 1px solid #eee;">
-    <h2>Creole Jamaican Artistry</h2>
+<header>
+    <div class="logo">
+        <img src="Assets/creole.jpg" alt="Creole Logo">
+    </div>
 </header>
 
 <main>
     <div class="login-box">
-        <h3 style="text-align: center;">Welcome Back</h3>
+        <h3 style="text-align: center; text-transform: uppercase; letter-spacing: 1px;">Welcome Back</h3>
 
-        <form id="loginForm" autocomplete="off" onsubmit="handleLogin(event)">
-
+        <form id="loginForm" autocomplete="off">
             <div class="form-group">
                 <label for="loginTrn">TRN (XXX-XXX-XXX)</label>
                 <input type="text" 
@@ -55,20 +60,46 @@
             </div>
 
             <p id="errorMsg" class="error-text"></p>
-
         </form>
 
         <div class="reset-p">
-            <p>
-                Forgot Password? 
-                <a href="#" onclick="resetPassword()">Reset Password</a>
-            </p>
+            <p>Forgot Password? <a href="#">Reset Password</a></p>
             <p>New here? <a href="register.html">Create an Account</a></p>
         </div>
     </div>
 </main>
 
-<script src="script.js"></script>
+<script>
+    // Tracking login attempts locally
+    let attempts = 0;
+
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Stop page from refreshing
+
+        const trnInput = document.getElementById('loginTrn').value;
+        const passInput = document.getElementById('loginPassword').value;
+        const errorDisplay = document.getElementById('errorMsg');
+
+        // 1. Retrieve data from localStorage
+        const registrationData = JSON.parse(localStorage.getItem('RegistrationData'));
+
+        // 2. Check if registration data exists and matches
+        if (registrationData && registrationData.trn === trnInput && registrationData.password === passInput) {
+            alert("Login Successful! Redirecting to products...");
+            window.location.href = "products.html"; // Redirect to catalog
+        } else {
+            attempts++;
+            
+            // 3. Handle three (3) failed attempts
+            if (attempts >= 3) {
+                alert("Account Locked! Too many failed attempts.");
+                window.location.href = "locked.html"; // Redirect to error/locked page
+            } else {
+                errorDisplay.innerText = `Invalid TRN or Password. Attempt ${attempts} of 3.`;
+            }
+        }
+    });
+</script>
 
 </body>
 </html>
