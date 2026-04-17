@@ -121,22 +121,21 @@ function displayCart() {
 function updateSummaryUI(cart) {
     if (!cart) return;
 
-    // Update ID elements if they exist (Products & Cart pages)
-    const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total"];
-    ids.forEach(id => {
+    // List of IDs to update across all pages
+    const fieldMapping = {
+        "cart-subtotal": cart.subtotal,
+        "cart-discount": cart.discounts,
+        "cart-tax": cart.taxes,
+        "cart-total": cart.totalCost,
+        "summary-total": cart.totalCost // This is for the Checkout Page
+    };
+
+    for (const [id, value] of Object.entries(fieldMapping)) {
         const el = document.getElementById(id);
         if (el) {
-            if (id === "cart-subtotal") el.innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
-            if (id === "cart-discount") el.innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-            if (id === "cart-tax") el.innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-            if (id === "cart-total") el.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+            let prefix = (id === "cart-discount") ? "-$" : "$";
+            el.innerText = `${prefix}${value.toLocaleString(undefined, {minimumFractionDigits: 2})} JMD`;
         }
-    });
-
-    // CRITICAL: Update the Checkout page "Amount Due"
-    const summaryTotal = document.getElementById("summary-total");
-    if (summaryTotal) {
-        summaryTotal.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     }
 }
 
@@ -151,8 +150,8 @@ function generateInvoice(event) {
         return;
     }
 
-    const name = document.getElementById("custName") ? document.getElementById("custName").value : "Guest";
-    const addr = document.getElementById("custAddress") ? document.getElementById("custAddress").value : "N/A";
+    const name = document.getElementById("custName")?.value || "Guest";
+    const addr = document.getElementById("custAddress")?.value || "N/A";
 
     const newInvoice = {
         invoiceNumber: "CJA-" + Math.floor(Math.random() * 899999 + 100000),
@@ -178,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
     displayCart();
     
-    // Automatically load cart data for summary fields on page load
+    // Auto-load totals on Page Load for all pages (Products, Cart, Checkout)
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) {
         updateSummaryUI(savedCart);
