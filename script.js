@@ -1,7 +1,4 @@
-/************************************************************
- * CREOLE JAMAICAN ARTISTRY - MASTER SCRIPT
- * Developer: Niketa Muschette
- ************************************************************/
+
 
 // --- 1. UTILITY FUNCTIONS ---
 function calculateAge(dob) {
