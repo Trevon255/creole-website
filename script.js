@@ -28,8 +28,6 @@ if (registrationForm) {
         if (!/^\d{3}-\d{3}-\d{3}$/.test(trn)) return alert("TRN Format: 000-000-000");
 
         let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-        if (users.some(u => u.trn === trn)) return alert("TRN already registered.");
-
         users.push({ firstName, trn, dob, password: btoa(password) });
         localStorage.setItem("RegistrationData", JSON.stringify(users));
         alert("Registration Successful!");
@@ -93,7 +91,7 @@ function addToCart(index) {
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     
-    // This updates the totals on the current page immediately
+    // Update UI on products page immediately
     updateSummaryUI(cart);
 }
 
@@ -124,7 +122,7 @@ function displayCart() {
 
 function updateSummaryUI(cart) {
     const subEl = document.getElementById("cart-subtotal");
-    if (!subEl) return; // Exit if the summary elements aren't on this page
+    if (!subEl) return;
 
     if (cart) {
         document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
@@ -132,18 +130,18 @@ function updateSummaryUI(cart) {
         document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
         document.getElementById("cart-total").innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
         
-        // Also update the checkout specific field if it exists
+        // Update Checkout Page "Amount Due"
         const summaryTotal = document.getElementById("summary-total");
         if (summaryTotal) summaryTotal.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     } else {
-        ["cart-subtotal", "cart-discount", "cart-tax", "cart-total"].forEach(id => {
+        ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "summary-total"].forEach(id => {
             const el = document.getElementById(id);
             if(el) el.innerText = "$0.00 JMD";
         });
     }
 }
 
-// --- 5. CHECKOUT & INVOICE GENERATION ---
+// --- 5. CHECKOUT & INVOICE ---
 function generateInvoice(event) {
     if (event) event.preventDefault();
 
@@ -152,7 +150,7 @@ function generateInvoice(event) {
     const addrInput = document.getElementById("custAddress");
 
     if (!cart || cart.items.length === 0) {
-        alert("Nothing to checkout! Add items to your bag first.");
+        alert("Nothing to checkout! Please add items to your bag first.");
         return;
     }
 
@@ -182,8 +180,6 @@ function generateInvoice(event) {
 document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
     displayCart();
-    
-    // Load existing totals if returning to page
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (cart) updateSummaryUI(cart);
 });
