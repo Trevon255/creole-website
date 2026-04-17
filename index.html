@@ -18,14 +18,14 @@
             text-align: center;
             border-bottom: 1px solid #f0f0f0;
         }
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #f1a7c4; /* Matching the pink 'Creole' logo */
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+
+        /* Restoring the image logo from Assets */
+        .logo img {
+            height: 60px; /* Adjust height based on your logo file */
+            width: auto;
+            margin-bottom: 10px;
         }
+
         nav {
             display: flex;
             justify-content: center;
@@ -82,7 +82,7 @@
             font-size: 14px;
             border-radius: 4px;
             text-align: center;
-            transition: 0.3s;
+            transition: 0.3s ease;
         }
         .btn-black {
             background-color: #2d2d2d;
@@ -120,16 +120,18 @@
 <body>
 
 <header>
-    <div class="logo">Creole</div>
+    <div class="logo">
+        <img src="Assets/creole logo.png" alt="Creole Logo">
+    </div>
     <nav>
         <a href="index.html">Home</a>
         <a href="products.html">Products</a>
         <a href="cart.html">Cart</a>
         <a href="checkout.html">Checkout</a>
-        <a href="dashboard.html">Dashboard</a> <a href="register.html">Register</a>
+        <a href="register.html">Register</a>
         <a href="login.html">Login</a>
         <a href="about.html">About Us</a>
-    </nav>
+        <a href="dashboard.html">Dashboard</a> </nav>
 </header>
 
 <main class="hero-container">
