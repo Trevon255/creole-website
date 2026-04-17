@@ -129,3 +129,83 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) updateCartUI(savedCart);
 });
+
+//-------CHECKOUT-------
+
+
+
+
+// ------INVOICE------
+// 1. Initial Data & User Object
+let currentUser = {
+    username: "Customer",
+    invoices: [] // Array of invoice objects
+};
+
+// 2. Function to execute when Order is Confirmed (Triggered from Checkout)
+function generateInvoice() {
+    // Capture data from checkout form
+    const custName = document.getElementById("custName")?.value || "Guest User";
+    const custAddress = document.getElementById("custAddress")?.value || "No Address Provided";
+
+    // Create unique invoice object
+    const newInvoice = {
+        company: "Creole Jamaican Artistry",
+        date: new Date().toLocaleDateString('en-JM'),
+        invoiceNumber: "CJA-" + Date.now().toString().slice(-6), // Unique 6-digit ID
+        trn: "123-456-789",
+        shipping: { name: custName, address: custAddress },
+        items: [
+            { name: "Rustic Burlap Tote", qty: 1, price: 3500.00, discount: "5%" },
+            { name: "Artisan Serving Tray", qty: 1, price: 5800.00, discount: "5%" }
+        ],
+        subtotal: 9300.00,
+        tax: 1325.25,
+        total: 10160.25
+    };
+
+    // 3. Update User Object & LocalStorage
+    currentUser.invoices.push(newInvoice);
+    
+    let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    allInvoices.push(newInvoice);
+    localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
+
+    // 4. Populate HTML (if on invoice page)
+    displayInvoiceData(newInvoice);
+
+    // 5. Notify User
+    console.log("Invoice emailed to: user@example.com");
+}
+
+function displayInvoiceData(data) {
+    if (!document.getElementById("invNum")) return;
+
+    document.getElementById("invNum").innerText = data.invoiceNumber;
+    document.getElementById("invDate").innerText = data.date;
+    document.getElementById("shipName").innerText = data.shipping.name;
+    document.getElementById("shipAddress").innerText = data.shipping.address;
+    document.getElementById("subTotal").innerText = "$" + data.subtotal.toLocaleString();
+    document.getElementById("taxAmount").innerText = "$" + data.tax.toLocaleString();
+    document.getElementById("grandTotal").innerText = "$" + data.total.toLocaleString();
+
+    const itemTable = document.getElementById("invoiceItems");
+    itemTable.innerHTML = data.items.map(item => `
+        <tr>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>$${item.price.toLocaleString()}</td>
+            <td>${item.discount}</td>
+            <td>$${(item.price * 0.95).toLocaleString()}</td>
+        </tr>
+    `).join('');
+}
+
+// Auto-run if elements exist (simulating landing on the page)
+window.onload = () => {
+    // In a real app, you'd pull the LATEST invoice from localStorage to display
+    let all = JSON.parse(localStorage.getItem("AllInvoices"));
+    if (all && all.length > 0) {
+        displayInvoiceData(all[all.length - 1]);
+    }
+};
