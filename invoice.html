@@ -56,38 +56,6 @@
             </p>
         </div>
     </div>
-
-    <script>
-        // Logic to pull the last saved order from AllInvoices
-        // Created by: Lee
-        document.addEventListener("DOMContentLoaded", () => {
-            const history = JSON.parse(localStorage.getItem("AllInvoices"));
-            if (history && history.length > 0) {
-                const data = history[history.length - 1]; 
-                
-                document.getElementById("displayInvNum").innerText = data.invoiceNumber;
-                document.getElementById("displayDate").innerText = data.date;
-                document.getElementById("displayShipName").innerText = data.customer;
-                document.getElementById("displayShipAddr").innerText = data.shipping;
-
-                const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-
-                document.getElementById("displaySubtotal").innerText = fmt(data.subtotal);
-                document.getElementById("displayTax").innerText = fmt(data.taxTotal);
-                document.getElementById("displayDiscount").innerText = "-" + fmt(data.discountTotal);
-                document.getElementById("displayGrandTotal").innerText = fmt(data.grandTotal);
-
-                const itemTable = document.getElementById("invoiceItemsBody");
-                itemTable.innerHTML = data.items.map(item => `
-                    <tr>
-                        <td>${item.name}</td>
-                        <td>${item.quantity}</td>
-                        <td>$${item.price.toLocaleString()}</td>
-                        <td>$${(item.price * item.quantity).toLocaleString()}</td>
-                    </tr>
-                `).join('');
-            }
-        });
-    </script>
+ <script src="script.js"></script>
 </body>
 </html>
