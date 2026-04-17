@@ -28,7 +28,8 @@ if (registrationForm) {
         if (!/^\d{3}-\d{3}-\d{3}$/.test(trn)) return alert("TRN Format: 000-000-000");
 
         let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-        users.push({ firstName, trn, dob, password: btoa(password) });
+       let gender = document.getElementById("gender").value;
+users.push({ firstName, trn, dob, gender, password: btoa(password) });
         localStorage.setItem("RegistrationData", JSON.stringify(users));
         alert("Registration Successful!");
         window.location.href = "login.html";
@@ -245,4 +246,56 @@ function searchInvoice() {
 // Run dashboard ONLY if dashboard page is open
 if (document.getElementById("invoiceList")) {
     loadInvoices();
+    showGenderFrequency();
+    showAgeFrequency();
 }
+
+// -------- FREQUENCY --------
+
+// Gender Frequency
+function showGenderFrequency() {
+    let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+
+    let counts = { Male: 0, Female: 0, Other: 0 };
+
+    users.forEach(u => {
+        if (counts[u.gender] !== undefined) {
+            counts[u.gender]++;
+        }
+    });
+
+    let container = document.getElementById("genderChart");
+    if (!container) return;
+
+    container.innerHTML = `
+        <p>Male: ${counts.Male}</p>
+        <p>Female: ${counts.Female}</p>
+        <p>Other: ${counts.Other}</p>
+    `;
+}
+
+// Age Frequency
+function showAgeFrequency() {
+    let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+
+    let groups = { "18-25": 0, "26-35": 0, "36+": 0 };
+
+    users.forEach(u => {
+        let age = calculateAge(u.dob);
+
+        if (age >= 18 && age <= 25) groups["18-25"]++;
+        else if (age <= 35) groups["26-35"]++;
+        else groups["36+"]++;
+    });
+
+    let container = document.getElementById("ageChart");
+    if (!container) return;
+
+    container.innerHTML = `
+        <p>18–25: ${groups["18-25"]}</p>
+        <p>26–35: ${groups["26-35"]}</p>
+        <p>36+: ${groups["36+"]}</p>
+    `;
+}
+
+
