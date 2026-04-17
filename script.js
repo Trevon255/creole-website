@@ -10,59 +10,38 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. REGISTRATION & LOGIN LOGIC ---
-let loginAttempts = 0; 
-
-function saveRegistration(event) {
-    event.preventDefault(); 
-    const newUser = {
-        firstName: document.getElementById("firstName").value,
-        lastName: document.getElementById("lastName").value,
-        dob: document.getElementById("dob").value,
-        gender: document.getElementById("gender").value,
-        email: document.getElementById("email").value,
-        trn: document.getElementById("trn").value,
-        password: document.getElementById("password").value 
-    };
-    let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-    users.push(newUser);
-    localStorage.setItem("RegistrationData", JSON.stringify(users));
-    alert("Registration Successful!");
-    window.location.href = "login.html"; 
-}
-
+// --- 2. LOGIN LOGIC ---
 function checkLogin(event) {
     event.preventDefault(); 
     const enteredTrn = document.getElementById("loginTrn").value;
     const enteredPass = document.getElementById("loginPassword").value;
     const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
     const userFound = users.find(u => u.trn === enteredTrn && u.password === enteredPass);
-    
+
     if (userFound) {
-        // FIX: Save the user so the Invoice can find the TRN later
         localStorage.setItem("currentUser", JSON.stringify(userFound));
         alert("Login Successful! Welcome, " + userFound.firstName);
-        window.location.href = "index.html"; 
+        window.location.href = "products.html"; // Updated redirect to catalog
     } else {
-        loginAttempts++;
-        if (loginAttempts >= 3) {
-            window.location.href = "error.html"; 
-        } else {
-            alert("Invalid credentials. Attempts remaining: " + (3 - loginAttempts));
-        }
+        alert("Invalid credentials.");
     }
 }
 
 // --- 3. DISPLAY FUNCTIONS ---
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
-    if (!grid) return;
+    if (!grid) {
+        console.log("Product grid container not found on this page.");
+        return;
+    }
+
     grid.innerHTML = products.map((p, i) => `
-        <div class="product-card" style="border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center;">
-            <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px;">
-            <h3>${p.name}</h3>
-            <p style="font-weight: bold; color: #d63384;">$${p.price.toLocaleString()} JMD</p>
-            <button onclick="addToCart(${i})" style="background: #d63384; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; width: 100%;">Add to Bag</button>
+        <div class="product-card" style="background: white; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
+            <h3 style="margin: 10px 0;">${p.name}</h3>
+            <p style="font-size: 0.9rem; color: #666; min-height: 40px;">${p.description}</p>
+            <p style="font-weight: bold; color: #d63384; font-size: 1.2rem; margin: 15px 0;">$${p.price.toLocaleString()} JMD</p>
+            <button onclick="addToCart(${i})" style="background: #d63384; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold;">Add to Bag</button>
         </div>
     `).join('');
 }
@@ -72,7 +51,7 @@ function displayCartTable() {
     if (!body) return;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (!cart || cart.items.length === 0) {
-        body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Your bag is empty.</td></tr>';
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Your bag is empty.</td></tr>';
         return;
     }
     body.innerHTML = cart.items.map((item, index) => `
@@ -94,7 +73,7 @@ function addToCart(index) {
     if (existing) { existing.quantity++; } 
     else { cart.items.push({ ...selected, quantity: 1 }); }
     calculateTotals(cart);
-    alert(selected.name + " added!");
+    alert(selected.name + " added to bag!");
 }
 
 function calculateTotals(cart) {
@@ -121,30 +100,31 @@ function updateSummaryUI(cart) {
 function generateInvoice() {
     const name = document.getElementById("cust-name")?.value;
     const address = document.getElementById("cust-address")?.value;
+    const paid = document.getElementById("amount-paid")?.value;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    const user = JSON.parse(localStorage.getItem("currentUser")) || { trn: "N/A" };
+    const user = JSON.parse(localStorage.getItem("currentUser")) || { trn: "Walk-in" };
 
-    if (!name || !address || !cart || cart.items.length === 0) {
-        alert("Please fill in shipping details.");
+    if (!name || !address || !paid || !cart || cart.items.length === 0) {
+        alert("Please complete the shipping and payment details.");
         return;
     }
 
     const invoiceObj = {
         invoiceNumber: "CJ-" + Math.floor(100000 + Math.random() * 900000),
         trn: user.trn,
-        date: new Date().toLocaleDateString(),
         customer: name,
         shipping: address,
-        items: cart.items,
-        grandTotal: cart.totalCost
+        amountPaid: paid,
+        totalDue: cart.totalCost,
+        date: new Date().toLocaleDateString()
     };
 
     let history = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     history.push(invoiceObj);
     localStorage.setItem("AllInvoices", JSON.stringify(history));
+    localStorage.removeItem("ShoppingCart");
 
     alert("Invoice Generated!");
-    localStorage.removeItem("ShoppingCart");
     window.location.href = "invoice.html";
 }
 
@@ -158,38 +138,44 @@ function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
     calculateTotals(cart);
-    displayCartTable();
+    if (cart.items.length === 0) {
+        localStorage.removeItem("ShoppingCart");
+        location.reload();
+    } else {
+        displayCartTable();
+    }
 }
 
 // --- 5. DASHBOARD FUNCTIONS ---
 function ShowUserFrequency() {
     const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-    let genderStats = { Male: 0, Female: 0, Other: 0 };
-    let ageStats = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
+    let genderStats = { Male: 0, Female: 0 };
 
     users.forEach(user => {
-        if (genderStats[user.gender] !== undefined) genderStats[user.gender]++;
-        const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
-        if (age >= 18 && age <= 25) ageStats["18-25"]++;
-        else if (age >= 26 && age <= 35) ageStats["26-35"]++;
-        else if (age >= 36 && age <= 50) ageStats["36-50"]++;
-        else if (age > 50) ageStats["50+"]++;
+        if (user.gender === "Male") genderStats.Male++;
+        else if (user.gender === "Female") genderStats.Female++;
     });
 
     const gDiv = document.getElementById("genderFrequency");
-    const aDiv = document.getElementById("ageFrequency");
-    if (gDiv) gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
-    if (aDiv) aDiv.innerHTML = `18-25: ${"█".repeat(ageStats["18-25"])} (${ageStats["18-25"]})`;
+    if (gDiv) {
+        gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
+    }
 }
 
 // --- 6. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Run the grid display
     displayProductGrid();
+    
+    // 2. Load cart data if it exists
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (cart) {
         updateSummaryUI(cart);
         displayCartTable();
     }
-    // FIX: Automatically load dashboard stats if on the dashboard page
-    if (document.getElementById("genderFrequency")) ShowUserFrequency();
+    
+    // 3. Run dashboard if on dashboard page
+    if (document.getElementById("genderFrequency")) {
+        ShowUserFrequency();
+    }
 });
