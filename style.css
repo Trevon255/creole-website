@@ -158,3 +158,43 @@ footer {
     color: #888;
     border-top: 1px solid #eee;
 }
+
+/* SIMPLE DASHBOARD STYLE */
+
+body {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h2 {
+    margin-top: 25px;
+}
+
+#genderChart, #ageChart, #invoiceList {
+    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+
+
+
