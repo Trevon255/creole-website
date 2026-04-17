@@ -5,10 +5,12 @@
     --creole-dark: #2d2d2d;
     --white: #ffffff;
     --gray: #f9f9f9;
+    --soft-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
+/* --- BASE STYLES --- */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #fdfbfb;
@@ -18,14 +20,9 @@ body {
 
 header {
     background-color: var(--white);
-    padding: 20px 0;
+    padding: 30px 0;
     text-align: center;
-    border-bottom: 1px solid #eee;
-}
-
-#mainLogo {
-    height: 80px;
-    margin-bottom: 15px;
+    border-bottom: 1px solid #f1f1f1;
 }
 
 nav ul {
@@ -33,7 +30,7 @@ nav ul {
     padding: 0;
     display: flex;
     justify-content: center;
-    gap: 30px;
+    gap: 40px;
 }
 
 nav a {
@@ -41,160 +38,182 @@ nav a {
     color: var(--creole-dark);
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    transition: 0.3s;
+}
+
+nav a:hover {
+    color: var(--creole-pink-dark);
 }
 
 .container {
-    max-width: 1100px;
-    margin: 40px auto;
+    max-width: 1150px;
+    margin: 50px auto;
     padding: 40px;
     background: var(--white);
-    border-radius: 15px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
 }
 
-/* --- FIXED PRODUCT GRID --- */
+/* --- PRODUCT GRID --- */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Forces 3 columns even if images are huge */
-    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
     margin-top: 30px;
 }
 
 .product-card {
-    padding: 20px;
-    border-radius: 15px;
+    padding: 25px;
+    border-radius: 18px;
     text-align: center;
-    transition: 0.3s ease;
-    border: 1px solid #eee;
-    background: #fff;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    border: 1px solid #f1f1f1;
+    background: var(--white);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
 }
 
 .product-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(214, 51, 132, 0.1);
+    border-color: var(--creole-pink);
 }
 
-/* --- FIXED IMAGE PROPORTIONS --- */
 .product-image {
     width: 100%;
-    height: 220px; /* Constrains the "Big" images seen in your screenshot */
-    object-fit: cover; /* Crops the image to fit the box perfectly */
-    border-radius: 12px;
-    margin-bottom: 15px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 14px;
+    margin-bottom: 20px;
 }
 
 .product-price {
     display: block;
     color: var(--creole-pink-dark);
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin-bottom: 15px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 20px;
 }
 
-/* --- MODERN TOTALS SECTION --- */
+/* --- MODERN TOTALS SECTION (Products Page) --- */
 .shopping-cart-totals {
     background: #fffcfd;
     border: 1px solid var(--creole-pink);
-    border-radius: 15px;
-    padding: 25px;
-    margin-top: 40px;
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 50px;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.total-item {
     text-align: center;
+    flex: 1;
+    min-width: 150px;
 }
 
 .total-item label {
     display: block;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #888;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #a0a0a0;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.total-item span {
+    font-size: 1.1rem;
+    font-weight: 600;
 }
 
 #cart-total {
     color: var(--creole-pink-dark);
-    font-size: 1.4rem;
-    font-weight: bold;
+    font-size: 1.5rem;
+    font-weight: 800;
 }
 
-/* Buttons */
+/* --- SHOPPING BAG TABLE (Cart Page) --- */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+    margin-top: 20px;
+}
+
+th {
+    text-align: left;
+    color: #888;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    padding: 10px;
+}
+
+td {
+    padding: 20px;
+    background: #fdfdfd;
+    border-top: 1px solid #f1f1f1;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+td:first-child { border-left: 1px solid #f1f1f1; border-radius: 12px 0 0 12px; }
+td:last-child { border-right: 1px solid #f1f1f1; border-radius: 0 12px 12px 0; }
+
+/* --- BUTTONS --- */
 .btn {
     display: inline-block;
     background-color: var(--creole-dark);
     color: white;
-    padding: 12px 30px;
+    padding: 14px 35px;
     text-decoration: none;
-    border-radius: 8px;
+    border-radius: 10px;
     transition: 0.3s;
     border: none;
     cursor: pointer;
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 0.9rem;
 }
 
-.btn:hover { background-color: #555; }
+.btn:hover {
+    background-color: var(--creole-pink-dark);
+    box-shadow: 0 5px 15px rgba(214, 51, 132, 0.3);
+}
 
-/* Forms */
-input, textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box;
-    background: #fafafa;
-    margin-top: 5px;
+.btn-clear {
+    background-color: #ff5e5e;
+}
+
+.btn-checkout {
+    background-color: #2ecc71;
+}
+
+/* --- DASHBOARD SPECIFIC --- */
+/* We wrap dashboard styles in a class so they don't mess up the products page */
+.dashboard-view {
+    max-width: 900px;
+    margin: auto;
+}
+
+#genderChart, #ageChart, #invoiceList {
+    background: var(--gray);
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 20px;
 }
 
 footer {
     text-align: center;
-    padding: 40px;
-    font-size: 0.8rem;
-    color: #888;
+    padding: 50px;
+    font-size: 0.85rem;
+    color: #aaa;
     border-top: 1px solid #eee;
 }
-
-/* SIMPLE DASHBOARD STYLE */
-
-body {
-    max-width: 900px;
-    margin: auto;
-    padding: 20px;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-h2 {
-    margin-top: 25px;
-}
-
-#genderChart, #ageChart, #invoiceList {
-    background: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 10px;
-}
-
-input {
-    width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-button {
-    margin-top: 10px;
-    padding: 8px 15px;
-    cursor: pointer;
-}
-
 
 
 
