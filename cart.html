@@ -2,19 +2,74 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Shopping Cart | Creole</title>
+    <title>Shopping Cart | Creole Jamaican Artistry</title>
     <link rel="icon" type="image/jpeg" href="Assets/creole.jpg">
     <link rel="stylesheet" href="style.css">
+    
     <style>
+        /* Shopping Cart Specific Styling 
+           Student: Niketa Muschette
+        */
         table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th { background: var(--gray); padding: 15px; text-align: left; border-bottom: 2px solid var(--creole-pink); }
+        
+        th { 
+            background: #f9f9f9; 
+            padding: 15px; 
+            text-align: left; 
+            border-bottom: 2px solid #f4cfdf; 
+            color: #888;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
         td { padding: 15px; border-bottom: 1px solid #eee; }
-        .cart-summary { float: right; width: 300px; margin-top: 30px; }
-        .summary-row { display: flex; justify-content: space-between; padding: 5px 0; }
-        .total-row { font-weight: bold; font-size: 1.2rem; color: var(--creole-dark); border-top: 2px solid #eee; margin-top: 10px; padding-top: 10px; }
-        .cart-actions { margin-top: 40px; display: flex; gap: 15px; justify-content: flex-end; width: 100%; }
-        .btn-clear { background: #e74c3c; } 
-        .btn-close { background: #95a5a6; }
+
+        .cart-summary { 
+            float: right; 
+            width: 320px; 
+            margin-top: 30px; 
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .summary-row { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 8px 0; 
+            font-size: 1rem;
+        }
+
+        .total-row { 
+            font-weight: bold; 
+            font-size: 1.3rem; 
+            color: #2d2d2d; 
+            border-top: 2px solid #eee; 
+            margin-top: 10px; 
+            padding-top: 10px; 
+        }
+
+        /* Cart Page Button Styles */
+        .cart-actions { 
+            margin-top: 40px; 
+            display: flex; 
+            gap: 15px; 
+            justify-content: flex-end; 
+            width: 100%; 
+            clear: both;
+        }
+
+        .btn-clear { background: #e74c3c !important; } 
+        .btn-close { background: #95a5a6 !important; }
+        
+        .remove-btn {
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            background: none;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -32,7 +87,10 @@
     </header>
 
     <main class="container">
+        <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Cart Managed by: Niketa Muschette</p>
+        
         <h2>Your Shopping Bag</h2>
+
         <table id="cartTable">
             <thead>
                 <tr>
@@ -42,45 +100,44 @@
                     <th>Sub-total</th>
                 </tr>
             </thead>
-            <tbody id="cartBody">
-                <tr>
-                    <td>Rustic Burlap Tote</td>
-                    <td>$3,500.00</td>
-                    <td>1</td>
-                    <td>$3,500.00</td>
-                </tr>
-                <tr>
-                    <td>Artisan Serving Tray</td>
-                    <td>$5,800.00</td>
-                    <td>1</td>
-                    <td>$5,800.00</td>
-                </tr>
-            </tbody>
+            <tbody id="cart-table-body">
+                </tbody>
         </table>
 
         <div class="cart-summary" id="summaryBox">
-            <div class="summary-row"><span>Sub-total:</span> <span>$9,300.00</span></div>
-            <div class="summary-row"><span>Discount (5%):</span> <span style="color: green;">-$465.00</span></div>
-            <div class="summary-row"><span>Tax (GCT 15%):</span> <span>$1,325.25</span></div>
-            <div class="summary-row total-row"><span>Total:</span> <span>$10,160.25</span></div>
+            <div class="summary-row">
+                <span>Sub-total:</span> 
+                <span id="summary-subtotal">$0.00 JMD</span>
+            </div>
+            <div class="summary-row">
+                <span>Discount (5%):</span> 
+                <span id="summary-discount" style="color: #27ae60;">-$0.00 JMD</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax (GCT 15%):</span> 
+                <span id="summary-tax">$0.00 JMD</span>
+            </div>
+            <div class="summary-row total-row">
+                <span>Total:</span> 
+                <span id="summary-total">$0.00 JMD</span>
+            </div>
         </div>
 
         <div style="clear: both;"></div>
 
         <div class="cart-actions">
             <button class="btn btn-clear" onclick="clearCart()">Clear All</button>
+            
             <button class="btn btn-close" onclick="window.location.href='products.html'">Close</button>
-            <button class="btn" onclick="window.location.href='checkout.html'">Check Out</button>
+            
+            <button class="btn btn-checkout" onclick="window.location.href='checkout.html'">Check Out</button>
         </div>
     </main>
 
-    <script>
-        function clearCart() {
-            if(confirm("Are you sure you want to clear your cart?")) {
-                document.getElementById("cartBody").innerHTML = "<tr><td colspan='4' style='text-align:center; padding:50px;'>Your cart is currently empty.</td></tr>";
-                document.getElementById("summaryBox").style.opacity = "0.3";
-            }
-        }
-    </script>
+    <footer>
+        <p>&copy; 2026 Creole Jamaican Artistry - Niketa Muschette</p>
+    </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
