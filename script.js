@@ -3,14 +3,39 @@
  * Developer: Niketa Muschette
  ************************************************************/
 
-// 1. PRODUCT DATA
+// ==========================================
+// 1. GLOBAL FUNCTIONS (Clear Bag Logic)
+// ==========================================
+
+// This is renamed to clearBag to match your HTML button
+window.clearBag = function() {
+    console.log("clearBag function triggered"); 
+    
+    if (confirm("Are you sure you want to empty your shopping bag?")) {
+        // 1. Wipe the specific cart data from local storage
+        localStorage.removeItem("ShoppingCart");
+        
+        // 2. Force the summary UI back to zero immediately
+        const resetTotals = { subtotal: 0, discounts: 0, taxes: 0, totalCost: 0 };
+        updateSummaryUI(resetTotals);
+        
+        // 3. Refresh the page to clear the table rows
+        window.location.reload();
+    }
+};
+
+// ==========================================
+// 2. PRODUCT DATA
+// ==========================================
 const products = [
     { id: 101, name: "Rustic Burlap Tote", price: 3500, description: "Hand-stitched natural fiber tote.", image: "Assets/burlap bag.jpg" },
     { id: 102, name: "Artisan Serving Tray", price: 5800, description: "Cedar wood tray with Jamaican patterns.", image: "Assets/large tray .jpg" },
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. LOGIN & SECURITY LOGIC ---
+// ==========================================
+// 3. LOGIN & SECURITY
+// ==========================================
 let loginAttempts = parseInt(sessionStorage.getItem("loginAttempts")) || 0; 
 
 function handleLogin(event) {
@@ -47,7 +72,9 @@ function handleLogin(event) {
     }
 }
 
-// --- 3. DISPLAY FUNCTIONS ---
+// ==========================================
+// 4. DISPLAY FUNCTIONS
+// ==========================================
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
     if (!grid) return;
@@ -66,10 +93,12 @@ function displayCartTable() {
     const tableBody = document.getElementById("cart-table-body");
     if (!tableBody) return;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
+    
     if (cart.items.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #888;">Your bag is currently empty.</td></tr>';
         return;
     }
+    
     tableBody.innerHTML = cart.items.map((item, index) => `
         <tr>
             <td style="display: flex; align-items: center; gap: 15px;">
@@ -84,78 +113,9 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 4. UPDATED CLEAR CART LOGIC ---
-
-// Explicitly attaching to 'window' ensures HTML can always find it
-window.clearCart = function() {
-    if (confirm("Are you sure you want to empty your shopping bag?")) {
-        localStorage.removeItem("ShoppingCart");
-        // Clear summary totals immediately
-        const emptyData = { subtotal: 0, discounts: 0, taxes: 0, totalCost: 0 };
-        updateSummaryUI(emptyData);
-        // Refresh the page to update the table
-        window.location.reload();
-    }
-};
-
-function calculateTotals(cart) {
-    cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-    cart.discounts = cart.subtotal * 0.05; 
-    cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
-    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
-    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    updateSummaryUI(cart);
-}
-
-function updateSummaryUI(cart) {
-    const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-    const subtotalEl = document.getElementById("cart-subtotal");
-    const discountEl = document.getElementById("cart-discount");
-    const taxEl = document.getElementById("cart-tax");
-    const totalEl = document.getElementById("cart-total") || document.getElementById("checkout-amount");
-    if (subtotalEl) subtotalEl.innerText = fmt(cart.subtotal);
-    if (discountEl) discountEl.innerText = (cart.discounts > 0 ? "-" : "") + fmt(cart.discounts);
-    if (taxEl) taxEl.innerText = fmt(cart.taxes);
-    if (totalEl) totalEl.innerText = fmt(cart.totalCost);
-}
-
-function processOrder(event) {
-    if (event) event.preventDefault();
-    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (!cart || cart.items.length === 0) {
-        alert("Your bag is empty!");
-        return;
-    }
-
-    const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
-    const userTRN = storedData ? storedData.trn : "N/A";
-    const nameInput = document.getElementById("cust-name");
-    const addrInput = document.getElementById("cust-address");
-    
-    const customerName = nameInput?.value || "Valued Customer";
-    const customerAddress = addrInput?.value || "Kingston, Jamaica";
-
-    localStorage.setItem("CustomerName", customerName);
-    localStorage.setItem("CustomerAddress", customerAddress);
-    localStorage.setItem("UserTRN", userTRN);
-
-    const newInvoice = {
-        invoiceNum: "CR-" + Math.floor(Math.random() * 900000 + 100000),
-        customerTrn: userTRN,
-        customerName: customerName,
-        customerAddress: customerAddress,
-        totalCost: cart.totalCost,
-        date: new Date().toLocaleDateString(),
-        items: cart.items
-    };
-
-    let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    allInvoices.push(newInvoice);
-    localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
-
-    window.location.href = "invoice.html";
-}
-
+// ==========================================
+// 5. SHOPPING LOGIC
+// ==========================================
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -181,81 +141,45 @@ function removeItem(index) {
     }
 }
 
-// --- 5. DASHBOARD FUNCTIONS ---
-
-function ShowUserFrequency() {
-    const allUsers = JSON.parse(localStorage.getItem("AllUsers")) || [];
-    let genderCounts = { Male: 0, Female: 0, Other: 0 };
-    let ageGroups = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
-
-    allUsers.forEach(user => {
-        if (genderCounts[user.gender] !== undefined) genderCounts[user.gender]++;
-        const age = parseInt(user.age);
-        if (age >= 18 && age <= 25) ageGroups["18-25"]++;
-        else if (age >= 26 && age <= 35) ageGroups["26-35"]++;
-        else if (age >= 36 && age <= 50) ageGroups["36-50"]++;
-        else if (age > 50) ageGroups["50+"]++;
-    });
-
-    const gDisp = document.getElementById("genderStatsDisplay");
-    const aDisp = document.getElementById("ageStatsDisplay");
-
-    if (gDisp) gDisp.innerHTML = `Male: ${genderCounts.Male} | Female: ${genderCounts.Female} | Other: ${genderCounts.Other}`;
-    if (aDisp) aDisp.innerHTML = `18-25: ${ageGroups["18-25"]} | 26-35: ${ageGroups["26-35"]} | 36-50: ${ageGroups["36-50"]} | 50+: ${ageGroups["50+"]}`;
+function calculateTotals(cart) {
+    cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    cart.discounts = cart.subtotal * 0.05; 
+    cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
+    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
+    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
+    updateSummaryUI(cart);
 }
 
-function ShowInvoices() {
-    const trnInput = document.getElementById("trnInput");
-    const resultsArea = document.getElementById("searchResults");
-    if (!trnInput || !resultsArea) return;
-
-    const trnSearch = trnInput.value.trim();
-    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    const filtered = allInvoices.filter(inv => inv.customerTrn === trnSearch);
-
-    if (filtered.length > 0) {
-        resultsArea.innerHTML = filtered.map(inv => `
-            <div style="border:1px solid #eee; padding:15px; margin-top:10px; border-radius:8px; background:#fafafa; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <p><strong>Invoice #:</strong> ${inv.invoiceNum} | <strong>Date:</strong> ${inv.date}</p>
-                    <p><strong>Customer:</strong> ${inv.customerName}</p>
-                    <p><strong>Total:</strong> $${inv.totalCost.toLocaleString()} JMD</p>
-                </div>
-                <button onclick="viewInvoiceDetail('${inv.invoiceNum}')" style="background: #d63384; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">View Full Invoice</button>
-            </div>
-        `).join('');
-    } else {
-        resultsArea.innerHTML = "<p style='color:red;'>No invoices found for TRN: " + trnSearch + "</p>";
-    }
+function updateSummaryUI(cart) {
+    const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    const subtotalEl = document.getElementById("cart-subtotal");
+    const discountEl = document.getElementById("cart-discount");
+    const taxEl = document.getElementById("cart-tax");
+    const totalEl = document.getElementById("cart-total") || document.getElementById("checkout-amount");
+    
+    if (subtotalEl) subtotalEl.innerText = fmt(cart.subtotal);
+    if (discountEl) discountEl.innerText = (cart.discounts > 0 ? "-" : "") + fmt(cart.discounts);
+    if (taxEl) taxEl.innerText = fmt(cart.taxes);
+    if (totalEl) totalEl.innerText = fmt(cart.totalCost);
 }
 
-function viewInvoiceDetail(invoiceNum) {
-    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    const selectedInvoice = allInvoices.find(inv => inv.invoiceNum === invoiceNum);
-
-    if (selectedInvoice) {
-        localStorage.setItem("CurrentViewingInvoice", JSON.stringify(selectedInvoice));
-        window.location.href = "invoice.html";
-    }
-}
-
-// --- 6. INITIALIZATION ---
+// ==========================================
+// 6. INITIALIZATION
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
+    // 1. Populate visuals based on page
     if (document.getElementById("product-grid")) displayProductGrid();
     if (document.getElementById("cart-table-body")) displayCartTable();
-    
-    if (document.getElementById("genderStatsDisplay")) {
-        ShowUserFrequency();
-        const displayBtn = document.getElementById("displayResultsBtn");
-        if (displayBtn) displayBtn.onclick = ShowInvoices;
+
+    // 2. Initialize totals on the Cart Page
+    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (savedCart) {
+        updateSummaryUI(savedCart);
+    } else {
+        updateSummaryUI({ subtotal: 0, discounts: 0, taxes: 0, totalCost: 0 });
     }
 
+    // 3. Setup Listeners
     const loginForm = document.getElementById("loginForm");
     if (loginForm) loginForm.addEventListener("submit", handleLogin);
-
-    const confirmBtn = document.getElementById("confirm-order-btn");
-    if (confirmBtn) confirmBtn.onclick = processOrder;
-
-    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (savedCart) updateSummaryUI(savedCart);
 });
