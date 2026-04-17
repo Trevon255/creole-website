@@ -54,11 +54,11 @@ nav a {
     box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* --- FIX: Modern Product Grid --- */
+/* --- FIXED PRODUCT GRID --- */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 Equal Columns */
-    gap: 30px;
+    grid-template-columns: repeat(3, 1fr); /* Forces 3 columns even if images are huge */
+    gap: 25px;
     margin-top: 30px;
 }
 
@@ -79,11 +79,11 @@ nav a {
     box-shadow: 0 10px 20px rgba(0,0,0,0.08);
 }
 
-/* --- FIX: Proportionate Images --- */
+/* --- FIXED IMAGE PROPORTIONS --- */
 .product-image {
     width: 100%;
-    height: 250px; /* Uniform height */
-    object-fit: cover; /* Prevents stretching */
+    height: 220px; /* Constrains the "Big" images seen in your screenshot */
+    object-fit: cover; /* Crops the image to fit the box perfectly */
     border-radius: 12px;
     margin-bottom: 15px;
 }
@@ -96,13 +96,13 @@ nav a {
     margin-bottom: 15px;
 }
 
-/* --- FIX: Modern Totals Bar --- */
+/* --- MODERN TOTALS SECTION --- */
 .shopping-cart-totals {
     background: #fffcfd;
     border: 1px solid var(--creole-pink);
     border-radius: 15px;
     padding: 25px;
-    margin-top: 50px;
+    margin-top: 40px;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -118,14 +118,10 @@ nav a {
     margin-bottom: 5px;
 }
 
-.total-item span {
-    font-size: 1.1rem;
-    font-weight: 600;
-}
-
 #cart-total {
     color: var(--creole-pink-dark);
     font-size: 1.4rem;
+    font-weight: bold;
 }
 
 /* Buttons */
@@ -145,14 +141,14 @@ nav a {
 .btn:hover { background-color: #555; }
 
 /* Forms */
-.form-group { margin-bottom: 20px; }
-input {
+input, textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-sizing: border-box;
     background: #fafafa;
+    margin-top: 5px;
 }
 
 footer {
