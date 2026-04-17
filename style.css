@@ -56,6 +56,57 @@ nav a:hover {
     box-shadow: var(--soft-shadow);
 }
 
+/* -----Registration-----*/
+/* Center the container on the screen */
+.registration-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: Arial, sans-serif;
+}
+
+/* Make each label/input pair stack vertically */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+/* Style the labels */
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Make inputs and selects full width and pretty */
+.form-group input, 
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%; /* Ensures they don't shrink */
+    box-sizing: border-box; /* Prevents padding from adding to width */
+}
+
+/* Style your buttons to sit side-by-side */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #333;
+    color: white;
+    margin-right: 10px;
+}
+
+.btn:hover {
+    background-color: #555;
+}
+
+
 /* --- PRODUCT GRID --- */
 .product-grid {
     display: grid;
