@@ -113,6 +113,28 @@ function updateSummaryUI(cart) {
     if (totalEl) totalEl.innerText = fmt(cart.totalCost);
 }
 
+// New function to handle the Confirm Order button
+function processOrder(event) {
+    if (event) event.preventDefault();
+
+    const name = document.querySelector('input[placeholder="Full Name"]')?.value || "Valued Customer";
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+
+    if (!cart || cart.items.length === 0) {
+        alert("Your bag is empty! Please add items before checking out.");
+        return;
+    }
+
+    // Trigger the print dialog for the invoice
+    alert("Order confirmed for " + name + "! Generating your invoice...");
+    window.print();
+
+    // Clear the cart after order is confirmed/printed
+    localStorage.removeItem("ShoppingCart");
+    alert("Transaction complete. Your bag has been cleared.");
+    window.location.href = "products.html";
+}
+
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -143,7 +165,6 @@ function removeItem(index) {
 
 // --- 5. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
-    // Check which elements exist on the current page
     if (document.getElementById("product-grid")) {
         displayProductGrid();
     }
@@ -155,6 +176,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("loginForm");
     if (loginForm) {
         loginForm.addEventListener("submit", handleLogin);
+    }
+
+    // Logic to catch the Confirm Order button click
+    const confirmBtn = document.querySelector('button[style*="background: #28a745"]') || 
+                       document.querySelector('button[onclick*="confirm"]');
+    
+    if (confirmBtn) {
+        confirmBtn.onclick = processOrder;
     }
 
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
