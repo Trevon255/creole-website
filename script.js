@@ -10,7 +10,60 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. DISPLAY FUNCTIONS ---
+// --- 2. LOGIN & SECURITY LOGIC (Requirements i - vi) ---
+let loginAttempts = 0; // Track failed attempts
+
+function handleLogin(event) {
+    if (event) event.preventDefault(); // Stop page refresh
+    
+    const trnInput = document.getElementById("loginTrn").value.trim();
+    const passInput = document.getElementById("loginPassword").value;
+    const errorMsg = document.getElementById("errorMsg");
+
+    // Requirement ii: Validate against localStorage 'RegistrationData'
+    const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
+
+    if (!storedData) {
+        if (errorMsg) errorMsg.innerText = "No registration found. Please create an account.";
+        return;
+    }
+
+    // Requirement ii: Check TRN and Password
+    if (storedData.trn === trnInput && storedData.password === passInput) {
+        alert("Login Successful! Redirecting to Catalog...");
+        loginAttempts = 0; 
+        localStorage.setItem("isLoggedIn", "true");
+        window.location.href = "index.html"; // Requirement iii: Redirect to product catalog
+    } else {
+        loginAttempts++;
+        // Requirement iii: 3 Attempts Limit
+        if (loginAttempts >= 3) {
+            alert("Account Locked: Too many failed attempts.");
+            window.location.href = "error.html"; // Redirect to error/locked page
+        } else {
+            if (errorMsg) errorMsg.innerText = `Invalid credentials. Attempt ${loginAttempts} of 3.`;
+        }
+    }
+}
+
+// Requirement vi: Reset Password by matching TRN
+function resetPassword() {
+    const trnConfirm = prompt("Please enter your TRN to verify your identity:");
+    const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
+
+    if (storedData && storedData.trn === trnConfirm) {
+        const newPass = prompt("Enter your new password:");
+        if (newPass) {
+            storedData.password = newPass;
+            localStorage.setItem("RegistrationData", JSON.stringify(storedData)); // Update storage
+            alert("Password updated successfully! You can now log in.");
+        }
+    } else {
+        alert("TRN verification failed. Account not found.");
+    }
+}
+
+// --- 3. DISPLAY FUNCTIONS ---
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
     if (!grid) return;
@@ -50,7 +103,7 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 3. CHECKOUT & INVOICE GENERATION ---
+// --- 4. CHECKOUT & INVOICE GENERATION ---
 function generateInvoice() {
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     const nameInput = document.getElementById("cust-name");
@@ -75,8 +128,6 @@ function generateInvoice() {
         alert("Transaction Refused: Insufficient Payment.\nAmount Due: $" + cart.totalCost.toLocaleString() + " JMD");
     } else {
         const change = amountPaid - cart.totalCost;
-        
-        // Save Order Info for the Invoice Page
         const orderSummary = {
             customerName: name,
             customerAddr: address,
@@ -86,16 +137,12 @@ function generateInvoice() {
             change: change
         };
         localStorage.setItem("LastOrder", JSON.stringify(orderSummary));
-
-        // Alert Confirmation
         alert("Order Successful! Generating your invoice now.");
-        
-        // Redirect to invoice page
         window.location.href = "invoice.html"; 
     }
 }
 
-// --- 4. RENDER FINAL INVOICE (For invoice.html) ---
+// --- 5. RENDER FINAL INVOICE ---
 function renderFinalInvoice() {
     const order = JSON.parse(localStorage.getItem("LastOrder"));
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
@@ -103,13 +150,11 @@ function renderFinalInvoice() {
 
     if (!order || !cart || !itemsBody) return;
 
-    // Set Header Data
     document.getElementById("displayInvNum").innerText = order.invNum;
     document.getElementById("displayDate").innerText = order.date;
     document.getElementById("displayShipName").innerText = order.customerName;
     document.getElementById("displayShipAddr").innerText = order.customerAddr;
 
-    // Populate Table
     itemsBody.innerHTML = cart.items.map(item => `
         <tr>
             <td>${item.name}</td>
@@ -119,7 +164,6 @@ function renderFinalInvoice() {
         </tr>
     `).join('');
 
-    // Set Totals
     const fmt = (v) => "$" + v.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     document.getElementById("displaySubtotal").innerText = fmt(cart.subtotal);
     document.getElementById("displayDiscount").innerText = "-" + fmt(cart.discounts);
@@ -127,7 +171,7 @@ function renderFinalInvoice() {
     document.getElementById("displayGrandTotal").innerText = fmt(cart.totalCost);
 }
 
-// --- 5. CART CORE LOGIC ---
+// --- 6. CART CORE LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -164,7 +208,6 @@ function calculateTotals(cart) {
 
 function updateSummaryUI(cart) {
     const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-    
     const subtotalEl = document.getElementById("cart-subtotal");
     const discountEl = document.getElementById("cart-discount");
     const taxEl = document.getElementById("cart-tax");
@@ -191,14 +234,12 @@ function removeItem(index) {
     }
 }
 
-// --- 6. INITIALIZATION ---
+// --- 7. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
     displayProductGrid();
     displayCartTable();
-    renderFinalInvoice(); // Logic to fill invoice.html if we are on that page
+    renderFinalInvoice();
     
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (savedCart) {
-        updateSummaryUI(savedCart);
-    }
+    if (savedCart) updateSummaryUI(savedCart);
 });
