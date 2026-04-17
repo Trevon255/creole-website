@@ -15,7 +15,6 @@ let loginAttempts = parseInt(sessionStorage.getItem("loginAttempts")) || 0;
 
 function handleLogin(event) {
     if (event) event.preventDefault(); 
-    
     const trnField = document.getElementById("loginTrn");
     const passField = document.getElementById("loginPassword");
     const errorMsg = document.getElementById("errorMsg");
@@ -39,7 +38,6 @@ function handleLogin(event) {
     } else {
         loginAttempts++;
         sessionStorage.setItem("loginAttempts", loginAttempts);
-
         if (loginAttempts >= 3) {
             alert("Account Locked: Maximum attempts reached.");
             window.location.href = "locked.html"; 
@@ -53,7 +51,6 @@ function handleLogin(event) {
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
     if (!grid) return;
-
     grid.innerHTML = products.map((p, i) => `
         <div class="product-card" style="background: white; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
             <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
@@ -68,13 +65,11 @@ function displayProductGrid() {
 function displayCartTable() {
     const tableBody = document.getElementById("cart-table-body");
     if (!tableBody) return;
-
     const cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     if (cart.items.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #888;">Your bag is currently empty.</td></tr>';
         return;
     }
-
     tableBody.innerHTML = cart.items.map((item, index) => `
         <tr>
             <td style="display: flex; align-items: center; gap: 15px;">
@@ -89,13 +84,12 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 4. CHECKOUT & INVOICE ---
+// --- 4. CHECKOUT & INVOICE LOGIC ---
 function calculateTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     cart.discounts = cart.subtotal * 0.05; 
     cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
-    
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     updateSummaryUI(cart);
 }
@@ -106,34 +100,32 @@ function updateSummaryUI(cart) {
     const discountEl = document.getElementById("cart-discount");
     const taxEl = document.getElementById("cart-tax");
     const totalEl = document.getElementById("cart-total") || document.getElementById("checkout-amount");
-
     if (subtotalEl) subtotalEl.innerText = fmt(cart.subtotal);
     if (discountEl) discountEl.innerText = (cart.discounts > 0 ? "-" : "") + fmt(cart.discounts);
     if (taxEl) taxEl.innerText = fmt(cart.taxes);
     if (totalEl) totalEl.innerText = fmt(cart.totalCost);
 }
 
-// Updated function to save details and redirect to invoice.html
 function processOrder(event) {
     if (event) event.preventDefault();
-
-    const nameInput = document.querySelector('input[placeholder="FULL NAME"]') || document.querySelector('input[placeholder="Full Name"]');
-    const addrInput = document.querySelector('textarea');
-    
-    const name = nameInput?.value || "Valued Customer";
-    const address = addrInput?.value || "No address provided";
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-
     if (!cart || cart.items.length === 0) {
-        alert("Your bag is empty! Please add items before checking out.");
+        alert("Your bag is empty!");
         return;
     }
 
-    // Save details for the invoice page to use
-    localStorage.setItem("CustomerName", name);
-    localStorage.setItem("CustomerAddress", address);
+    // Capture User TRN and Form Data
+    const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
+    const userTRN = storedData ? storedData.trn : "N/A";
+    const nameInput = document.querySelector('input[placeholder="FULL NAME"]') || 
+                      document.querySelector('input[placeholder="Full Name"]');
+    const addrInput = document.querySelector('textarea');
+    
+    localStorage.setItem("CustomerName", nameInput?.value || "Valued Customer");
+    localStorage.setItem("CustomerAddress", addrInput?.value || "Kingston, Jamaica");
+    localStorage.setItem("UserTRN", userTRN);
 
-    // Redirect to the professional invoice page
+    // Redirect to invoice page
     window.location.href = "invoice.html";
 }
 
@@ -141,13 +133,11 @@ function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
     const existing = cart.items.find(item => item.id === selected.id);
-
     if (existing) {
         existing.quantity++;
     } else {
         cart.items.push({ ...selected, quantity: 1 });
     }
-
     calculateTotals(cart);
     alert(selected.name + " added to bag!");
 }
@@ -155,7 +145,6 @@ function addToCart(index) {
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
-    
     if (cart.items.length === 0) {
         localStorage.removeItem("ShoppingCart");
         location.reload(); 
@@ -167,26 +156,15 @@ function removeItem(index) {
 
 // --- 5. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById("product-grid")) {
-        displayProductGrid();
-    }
-    
-    if (document.getElementById("cart-table-body")) {
-        displayCartTable();
-    }
-
+    if (document.getElementById("product-grid")) displayProductGrid();
+    if (document.getElementById("cart-table-body")) displayCartTable();
     const loginForm = document.getElementById("loginForm");
-    if (loginForm) {
-        loginForm.addEventListener("submit", handleLogin);
-    }
+    if (loginForm) loginForm.addEventListener("submit", handleLogin);
 
-    // Updated listener to find your "Confirm Order" button and run processOrder
+    // Listen for the Confirm Order button
     const confirmBtn = document.getElementById("confirm-order-btn") || 
                        document.querySelector('button[style*="background: #28a745"]');
-    
-    if (confirmBtn) {
-        confirmBtn.onclick = processOrder;
-    }
+    if (confirmBtn) confirmBtn.onclick = processOrder;
 
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) updateSummaryUI(savedCart);
