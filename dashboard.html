@@ -39,10 +39,10 @@
 
         <section>
             <h2>User Statistics</h2>
-            <div id="genderFrequency" class="stat-card">
+            <div id="genderStatsDisplay" class="stat-card">
                 <p><em>Loading gender stats...</em></p>
             </div>
-            <div id="ageFrequency" class="stat-card">
+            <div id="ageStatsDisplay" class="stat-card">
                 <p><em>Loading age stats...</em></p>
             </div>
         </section>
@@ -53,13 +53,15 @@
             <h2>Invoice Management</h2>
             <div class="controls">
                 <p><strong>Search by TRN:</strong></p>
-                <input type="text" id="searchTRN" placeholder="Enter TRN (e.g., TRN-009-876-543)">
-             <button onclick="console.log(localStorage.getItem('AllInvoices'))">Audit (Console Log)</button>
-             <button onclick="displayResults()">Display Results</button>
+                <input type="text" id="trnInput" placeholder="Enter TRN (e.g., 123-456-789)">
+                
+                <button id="auditBtn">Audit (Console Log)</button>
+                
+                <button id="displayResultsBtn">Display Results</button>
             </div>
             
             <h3>Search Results</h3>
-            <div id="invoiceDisplayArea">
+            <div id="searchResults">
                 <p style="color: #888;">Enter a TRN and click "Display Results" to view invoices.</p>
             </div>
         </section>
