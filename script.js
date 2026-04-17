@@ -167,13 +167,16 @@ function generateInvoice(event) {
     const name = document.getElementById("custName")?.value || "Guest";
     const addr = document.getElementById("custAddress")?.value || "N/A";
 
-    const newInvoice = {
-        invoiceNumber: "CJA-" + Math.floor(Math.random() * 899999 + 100000),
-        date: new Date().toLocaleDateString('en-JM'),
-        shipping: { name: name, address: addr },
-        items: cart.items,
-        total: cart.totalCost
-    };
+   const newInvoice = {
+    invoiceNumber: "CJA-" + Math.floor(Math.random() * 899999 + 100000),
+    date: new Date().toLocaleDateString('en-JM'),
+    shipping: { name: name, address: addr },
+    items: cart.items,
+    subtotal: cart.subtotal,
+    tax: cart.taxes,
+    discount: cart.discounts,
+    total: cart.totalCost
+};
 
     let history = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     history.push(newInvoice);
