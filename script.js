@@ -141,3 +141,28 @@ document.addEventListener("DOMContentLoaded", () => {
     const saved = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (saved) updateSummaryUI(saved);
 });
+
+//Registration
+document.getElementById('registrationForm').addEventListener('submit', function(event) {
+    // 1. Prevent the form from actually submitting to a server for now
+    event.preventDefault();
+
+    // 2. (Optional) Basic validation check
+    // If the browser's built-in validation (pattern, required) passes, this code runs.
+
+    // 3. Redirect to your home page
+    window.location.href = 'index.html'; 
+});
+
+const registrationForm = document.getElementById('registrationForm');
+
+registrationForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const firstName = document.getElementById('firstName').value;
+
+    alert(`Welcome to Creole Jamaican Artistry, ${firstName}! Registration successful.`);
+    
+    // Redirect to home page
+    window.location.href = 'index.html';
+});
