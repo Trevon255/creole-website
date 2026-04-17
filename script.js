@@ -1,3 +1,4 @@
+
 /************************************************************
  * CREOLE JAMAICAN ARTISTRY - MASTER SCRIPT
  * Developer: Niketa Muschette
@@ -243,3 +244,4 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) updateSummaryUI(savedCart);
 });
+```
