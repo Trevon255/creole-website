@@ -13,7 +13,7 @@ function calculateAge(dob) {
     return age;
 }
 
-// --- 2. AUTHENTICATION ---
+// --- 2. AUTHENTICATION (REGISTRATION & LOGIN) ---
 const registrationForm = document.getElementById("registrationForm");
 if (registrationForm) {
     registrationForm.addEventListener("submit", function (e) {
@@ -85,8 +85,8 @@ function addToCart(index) {
     
     // Recalculate Totals
     cart.subtotal = cart.items.reduce((sum, item) => sum + item.price, 0);
-    cart.discounts = cart.subtotal * 0.05; 
-    cart.taxes = (cart.subtotal - cart.discounts) * 0.15; 
+    cart.discounts = cart.subtotal * 0.05; // 5% Discount
+    cart.taxes = (cart.subtotal - cart.discounts) * 0.15; // 15% GCT
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
@@ -119,38 +119,34 @@ function displayCart() {
 }
 
 function updateSummaryUI(cart) {
-    if (!cart) return;
+    const summaryTotal = document.getElementById("summary-total"); // Checkout page field
+    const cartTotal = document.getElementById("cart-total");       // Cart/Product page field
 
-    // List of IDs to update across all pages
-    const fieldMapping = {
-        "cart-subtotal": cart.subtotal,
-        "cart-discount": cart.discounts,
-        "cart-tax": cart.taxes,
-        "cart-total": cart.totalCost,
-        "summary-total": cart.totalCost // This is for the Checkout Page
-    };
-
-    for (const [id, value] of Object.entries(fieldMapping)) {
-        const el = document.getElementById(id);
-        if (el) {
-            let prefix = (id === "cart-discount") ? "-$" : "$";
-            el.innerText = `${prefix}${value.toLocaleString(undefined, {minimumFractionDigits: 2})} JMD`;
-        }
+    if (cart) {
+        // Update generic cart totals
+        if (document.getElementById("cart-subtotal")) document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
+        if (document.getElementById("cart-discount")) document.getElementById("cart-discount").innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+        if (document.getElementById("cart-tax")) document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+        
+        // Update Final Totals (for both Products.html and Checkout.html)
+        if (cartTotal) cartTotal.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+        if (summaryTotal) summaryTotal.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    } else {
+        ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "summary-total"].forEach(id => {
+            const el = document.getElementById(id);
+            if(el) el.innerText = "$0.00 JMD";
+        });
     }
 }
 
-// --- 5. CHECKOUT & INVOICE ---
+// --- 5. CHECKOUT & INVOICE GENERATION ---
 function generateInvoice(event) {
     if (event) event.preventDefault();
 
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    
-    if (!cart || cart.items.length === 0) {
-        alert("Nothing to checkout! Please add items to your bag first.");
-        return;
-    }
+    if (!cart || cart.items.length === 0) return alert("Nothing to checkout!");
 
-    const name = document.getElementById("custName")?.value || "Guest";
+    const name = document.getElementById("custName")?.value || "Guest Customer";
     const addr = document.getElementById("custAddress")?.value || "N/A";
 
     const newInvoice = {
@@ -172,14 +168,15 @@ function generateInvoice(event) {
     window.location.href = "invoice.html";
 }
 
-// --- 6. INITIALIZE ---
+// --- 6. INITIALIZE PAGE ---
 document.addEventListener("DOMContentLoaded", () => {
-    displayProducts();
-    displayCart();
+    // 1. Setup specific page layouts
+    displayProducts(); 
+    displayCart();    
     
-    // Auto-load totals on Page Load for all pages (Products, Cart, Checkout)
-    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (savedCart) {
-        updateSummaryUI(savedCart);
+    // 2. CRITICAL: Load existing cart data to update $0.00 values on page load
+    const existingCart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (existingCart) {
+        updateSummaryUI(existingCart);
     }
 });
