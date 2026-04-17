@@ -14,10 +14,8 @@ const products = [
 
 let loginAttempts = 0; 
 
-// Captures data from registration.html
 function saveRegistration(event) {
     event.preventDefault(); 
-
     const newUser = {
         firstName: document.getElementById("firstName").value,
         lastName: document.getElementById("lastName").value,
@@ -27,26 +25,19 @@ function saveRegistration(event) {
         trn: document.getElementById("trn").value,
         password: document.getElementById("password").value 
     };
-
     let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
     users.push(newUser);
     localStorage.setItem("RegistrationData", JSON.stringify(users));
-
     alert("Registration Successful, " + newUser.firstName + "! You can now log in.");
     window.location.href = "login.html"; 
 }
 
-// Validates credentials in login.html
 function checkLogin(event) {
     event.preventDefault(); 
-
     const enteredTrn = document.getElementById("loginTrn").value;
     const enteredPass = document.getElementById("loginPassword").value;
     const errorDisplay = document.getElementById("errorMsg");
-
     const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-
-    // Match lowercase keys exactly as saved in saveRegistration
     const userFound = users.find(u => u.trn === enteredTrn && u.password === enteredPass);
 
     if (userFound) {
@@ -55,7 +46,6 @@ function checkLogin(event) {
     } else {
         loginAttempts++;
         let remaining = 3 - loginAttempts;
-
         if (loginAttempts >= 3) {
             alert("Account Locked: Too many failed attempts.");
             window.location.href = "error.html"; 
@@ -65,14 +55,11 @@ function checkLogin(event) {
     }
 }
 
-// Reset Password by matching TRN
 function resetPassword() {
     const trn = prompt("Enter your registered TRN to reset password:");
     if (!trn) return;
-
     let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
     const userIndex = users.findIndex(u => u.trn === trn);
-
     if (userIndex !== -1) {
         const newPass = prompt("Enter new password (min 8 characters):");
         if (newPass && newPass.length >= 8) {
@@ -142,13 +129,51 @@ function calculateTotals(cart) {
     updateSummaryUI(cart);
 }
 
+/**
+ * UPDATED: updateSummaryUI
+ * Now changes title to 'Shopping Cart' and lists product details
+ */
 function updateSummaryUI(cart) {
     const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    
+    // 1. Update Title to Shopping Cart
+    const titleEl = document.querySelector(".summary-box h3") || document.getElementById("summary-title");
+    if (titleEl) titleEl.innerText = "Shopping Cart";
+
+    // 2. Insert Product Details into the summary
+    // We check if a list div exists; if not, we create one before the subtotal
+    let listEl = document.getElementById("summary-item-list");
+    if (!listEl) {
+        listEl = document.createElement("div");
+        listEl.id = "summary-item-list";
+        listEl.style.marginBottom = "15px";
+        listEl.style.fontSize = "0.85em";
+        listEl.style.borderBottom = "1px solid #eee";
+        const subtotalRow = document.getElementById("cart-subtotal")?.closest('div') || titleEl.nextSibling;
+        titleEl.parentNode.insertBefore(listEl, subtotalRow);
+    }
+
+    if (cart.items.length > 0) {
+        listEl.innerHTML = cart.items.map(item => `
+            <div style="display:flex; justify-content:space-between; padding: 4px 0;">
+                <span>${item.name} x${item.quantity}</span>
+                <span>$${(item.price * item.quantity).toLocaleString()}</span>
+            </div>
+        `).join('');
+    } else {
+        listEl.innerHTML = "<em>Your bag is empty.</em>";
+    }
+
+    // 3. Update existing totals
     const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "checkout-amount"];
     ids.forEach(id => {
         let el = document.getElementById(id);
         if (el) {
-            let val = id.includes("discount") ? cart.discounts : (id.includes("tax") ? cart.taxes : (id.includes("subtotal") ? cart.subtotal : cart.totalCost));
+            let val;
+            if (id.includes("subtotal")) val = cart.subtotal;
+            else if (id.includes("discount")) val = cart.discounts;
+            else if (id.includes("tax")) val = cart.taxes;
+            else val = cart.totalCost;
             el.innerText = fmt(val);
         }
     });
@@ -211,16 +236,6 @@ function ShowUserFrequency() {
 
     if (gDiv) gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
     if (aDiv) aDiv.innerHTML = `18-25: ${"█".repeat(ageStats["18-25"])} (${ageStats["18-25"]})`;
-}
-
-function ShowInvoices() {
-    console.table(JSON.parse(localStorage.getItem("AllInvoices")) || []);
-}
-
-function GetUserInvoices() {
-    const trn = document.getElementById("searchTRN").value;
-    const invs = (JSON.parse(localStorage.getItem("AllInvoices")) || []).filter(i => i.trn === trn);
-    document.getElementById("invoiceDisplayArea").innerHTML = invs.map(i => `<p>Inv: ${i.invoiceNumber} - $${i.grandTotal}</p>`).join('');
 }
 
 // --- 6. INITIALIZATION ---
