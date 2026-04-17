@@ -2,64 +2,54 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Niketa Muschette</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <header>
+        <h1>Creole Jamaican Artistry</h1>
         <nav>
             <ul>
-                <li><a href="products.html">← Back to Shop</a></li>
                 <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="cart.html">Shopping Bag</a></li>
             </ul>
         </nav>
     </header>
 
     <main class="container">
-        <h2 style="text-align: center; margin-bottom: 30px;">Secure Checkout</h2>
-        
-        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: start;">
+        <div class="dashboard-container">
+            <h2 style="text-align: center;">Secure Checkout</h2>
             
-            <section class="checkout-form-section">
-                <h3>Shipping Details</h3>
-                <form onsubmit="generateInvoice(event)">
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label style="font-weight: 600; display: block; margin-bottom: 5px;">Full Name</label>
-                        <input type="text" id="custName" placeholder="e.g. Niketa Muschette" required>
-                    </div>
+            <div style="display: flex; justify-content: space-between; gap: 40px; margin-top: 30px;">
+                <div style="flex: 1;">
+                    <h3>Shipping Details</h3>
+                    <label>Full Name</label>
+                    <input type="text" placeholder="e.g. Niketa Muschette">
                     
-                    <div class="form-group" style="margin-bottom: 25px;">
-                        <label style="font-weight: 600; display: block; margin-bottom: 5px;">Delivery Address</label>
-                        <textarea id="custAddress" rows="4" placeholder="Street name, Town, and Parish" required></textarea>
-                    </div>
+                    <label style="margin-top: 15px; display: block;">Delivery Address</label>
+                    <textarea rows="4" placeholder="Street name, Town, and Parish"></textarea>
                     
-                    <button type="submit" class="btn" style="width: 100%; font-size: 1.1rem;">Confirm Order</button>
-                </form>
-            </section>
-
-            <section class="order-summary-box">
-                <h3 style="margin-top: 0;">Order Summary</h3>
-                <p style="font-size: 0.9rem; color: #666;">Verified & Handled by: Niketa Muschette</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-                
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-weight: 600; font-size: 1.1rem;">Amount Due:</span>
-                    <span id="summary-total" style="font-size: 1.4rem; font-weight: bold; color: #d63384;">$0.00 JMD</span>
+                    <button class="btn" style="width: 100%; margin-top: 20px;">Confirm Order</button>
                 </div>
-                
-                <p style="font-size: 0.75rem; color: #888; margin-top: 20px; text-align: center;">
-                    Standard delivery: 3-5 Business Days
-                </p>
-            </section>
-            
+
+                <div style="flex: 1; background: #f9f9f9; padding: 25px; border-radius: 15px;">
+                    <h3>Order Summary</h3>
+                    <p style="font-size: 0.8rem; color: #888;">Verified & Handled by: Niketa Muschette</p>
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: 600;">Amount Due:</span>
+                        <span id="checkout-amount" style="color: #d63384; font-size: 1.4rem; font-weight: 800;">$0.00 JMD</span>
+                    </div>
+                    
+                    <p style="text-align: center; font-size: 0.75rem; color: #aaa; margin-top: 20px;">
+                        Standard delivery: 3-5 Business Days
+                    </p>
+                </div>
+            </div>
         </div>
     </main>
-
-    <footer>
-        <p>&copy; 2026 Creole Jamaican Artistry. All Rights Reserved.</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
