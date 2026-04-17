@@ -23,7 +23,7 @@ This project is a web-based e-commerce application for a Jamaican brand called *
   * Quantity handling
   * Subtotal, tax, and discount calculations
 
-* **Lee** – Checkout and Invoice
+* **Caryl Lee** – Checkout and Invoice
 
   * Checkout page
   * Shipping details
