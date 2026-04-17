@@ -127,3 +127,6 @@ document.addEventListener("DOMContentLoaded", () => {
         ShowDashboardStats(); // Fixes the age/gender bars
     }
 });
+
+
+displayProductGrid();
