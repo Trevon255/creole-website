@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,17 +119,36 @@
             return;
         }
 
-        // Create the registration object
-        const RegistrationData = {
+        // Calculate Age from DOB for Dashboard Statistics
+        const dobValue = document.getElementById('dob').value;
+        const dobDate = new Date(dobValue);
+        const today = new Date();
+        let age = today.getFullYear() - dobDate.getFullYear();
+        const m = today.getMonth() - dobDate.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+            age--;
+        }
+
+        // Create the user object
+        const newUser = {
             firstName: document.getElementById('firstName').value,
             lastName: document.getElementById('lastName').value,
+            dob: dobValue,
+            age: age,
+            gender: document.getElementById('gender').value,
+            phone: document.getElementById('phone').value,
             trn: document.getElementById('trn').value,
             email: document.getElementById('email').value,
             password: password
         };
 
-        // Save to localStorage
-        localStorage.setItem('RegistrationData', JSON.stringify(RegistrationData));
+        // 1. Update the Running List of All Registered Users (for Dashboard)
+        let allUsers = JSON.parse(localStorage.getItem('AllUsers')) || [];
+        allUsers.push(newUser);
+        localStorage.setItem('AllUsers', JSON.stringify(allUsers));
+
+        // 2. Save the most recent registration (for Login validation)
+        localStorage.setItem('RegistrationData', JSON.stringify(newUser));
 
         alert("Registration Successful! Please login with your TRN.");
         window.location.href = "login.html";
@@ -137,3 +157,4 @@
 
 </body>
 </html>
+```
