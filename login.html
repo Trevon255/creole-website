@@ -6,7 +6,6 @@
     <title>Login | Creole</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Ensuring the layout is clean for your lab demo */
         .login-box { max-width: 400px; margin: 80px auto; padding: 30px; border: 1px solid #ddd; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: bold; }
@@ -30,10 +29,10 @@
     <div class="login-box">
         <h3 style="text-align: center;">Welcome Back</h3>
 
-        <form id="loginForm" autocomplete="off" onsubmit="checkLogin(event)">
+        <form id="loginForm" autocomplete="off" onsubmit="handleLogin(event)">
 
             <div class="form-group">
-                <label for="loginTrn">TRN</label>
+                <label for="loginTrn">TRN (XXX-XXX-XXX)</label>
                 <input type="text" 
                        id="loginTrn" 
                        placeholder="000-000-000" 
