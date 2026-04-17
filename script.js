@@ -16,21 +16,19 @@ function displayProductGrid() {
     if (!grid) return;
 
     grid.innerHTML = products.map((p, i) => `
-        <div class="product-card" style="background: white; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <div class="product-card" style="background: white; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
             <img src="${p.image}" alt="${p.name}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px; margin-bottom: 15px;">
             <h3>${p.name}</h3>
             <p style="font-size: 0.9rem; color: #666; min-height: 40px;">${p.description}</p>
-            <p style="font-weight: bold; color: #d63384; font-size: 1.2rem; margin: 15px 0;">$${p.price.toLocaleString()} JMD</p>
-            <button onclick="addToCart(${i})" style="background: #d63384; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold;">Add to Bag</button>
+            <p style="font-weight: bold; color: #d63384; font-size: 1.2rem;">$${p.price.toLocaleString()} JMD</p>
+            <button onclick="addToCart(${i})" style="background: #d63384; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%;">Add to Bag</button>
         </div>
     `).join('');
 }
 
 // --- 3. CART LOGIC ---
 function addToCart(index) {
-    // Get cart from storage or create empty one
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
-    
     const selected = products[index];
     const existing = cart.items.find(item => item.id === selected.id);
 
@@ -40,10 +38,9 @@ function addToCart(index) {
         cart.items.push({ ...selected, quantity: 1 });
     }
 
-    // Save and update UI
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    calculateTotals(cart);
-    alert(selected.name + " added to your bag!");
+    calculateTotals(cart); // This calculates and updates the UI
+    alert(selected.name + " added to bag!");
 }
 
 function calculateTotals(cart) {
@@ -59,7 +56,7 @@ function calculateTotals(cart) {
 function updateSummaryUI(cart) {
     const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     
-    // Select elements from your HTML
+    // Selecting IDs based on your HTML structure
     const subtotalEl = document.getElementById("cart-subtotal");
     const discountEl = document.getElementById("cart-discount");
     const taxEl = document.getElementById("cart-tax");
@@ -71,14 +68,52 @@ function updateSummaryUI(cart) {
     if (totalEl) totalEl.innerText = fmt(cart.totalCost);
 }
 
-// --- 4. INITIALIZATION ---
+// --- 4. DASHBOARD STATS (Fixes your 1st Screenshot) ---
+function ShowDashboardStats() {
+    const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+    let genderStats = { Male: 0, Female: 0 };
+    let ageStats = { "18-25": 0, "26-35": 0, "36+": 0 };
+
+    users.forEach(user => {
+        // Gender counting
+        if (user.gender === "Male") genderStats.Male++;
+        else if (user.gender === "Female") genderStats.Female++;
+
+        // Age counting based on Date of Birth
+        if (user.dob) {
+            const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
+            if (age <= 25) ageStats["18-25"]++;
+            else if (age <= 35) ageStats["26-35"]++;
+            else ageStats["36+"]++;
+        }
+    });
+
+    const gDiv = document.getElementById("genderFrequency");
+    const aDiv = document.getElementById("ageFrequency");
+
+    if (gDiv) {
+        gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>` +
+                         `Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
+    }
+    if (aDiv) {
+        aDiv.innerHTML = `18-25: ${"█".repeat(ageStats["18-25"])} (${ageStats["18-25"]})<br>` +
+                         `26-35: ${"█".repeat(ageStats["26-35"])} (${ageStats["26-35"]})<br>` +
+                         `36+: ${"█".repeat(ageStats["36+"])} (${ageStats["36+"]})`;
+    }
+}
+
+// --- 5. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
-    // Show the products
     displayProductGrid();
     
-    // Refresh the sidebar if items were already in the bag
+    // Update summary if data exists in storage
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) {
         updateSummaryUI(savedCart);
+    }
+    
+    // Check if we are on the Dashboard page
+    if (document.getElementById("genderFrequency")) {
+        ShowDashboardStats();
     }
 });
