@@ -3,81 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catalog | Creole Jamaican Artistry</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Home | Creole Jamaican Artistry</title>
     <style>
-        /* Catalog Specific Layout */
-        header { 
-            background: white; 
-            padding: 20px; 
-            text-align: center; 
-            border-bottom: 2px solid #d63384; 
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
-        }
-        .nav-links { margin-top: 10px; }
-        .nav-links a { 
-            margin: 0 15px; 
-            text-decoration: none; 
-            color: #333; 
-            font-weight: bold; 
-        }
-        .nav-links a:hover { color: #d63384; }
-
-        .catalog-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        
-        /* Grid setup for your JavaScript displayProductGrid function */
-        #product-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-            gap: 30px; 
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            background-color: #ffffff;
+            color: #333;
         }
 
-        .welcome-banner { 
-            background: #fdf2f8; 
-            padding: 20px; 
-            border-radius: 12px; 
-            margin-bottom: 30px; 
-            text-align: center; 
-            border-left: 5px solid #d63384;
+        /* Navigation Bar */
+        header {
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f1a7c4; /* Matching the pink 'Creole' logo */
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #666;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Hero Section Layout */
+        .hero-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1000px;
+            margin: 80px auto;
+            padding: 0 40px;
+        }
+        .hero-text {
+            flex: 1;
+            padding-right: 40px;
+        }
+        .hero-text h1 {
+            font-size: 48px;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            color: #222;
+        }
+        .hero-text p {
+            font-size: 16px;
+            color: #777;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+        .btn {
+            padding: 15px 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .btn-black {
+            background-color: #2d2d2d;
+            color: white;
+        }
+        .btn-outline {
+            border: 1px solid #ccc;
+            color: #333;
+        }
+
+        /* Hero Image */
+        .hero-image {
+            flex: 1;
+        }
+        .hero-image img {
+            width: 100%;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        footer {
+            text-align: center;
+            font-size: 10px;
+            color: #ccc;
+            padding: 40px 0;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Creole Jamaican Artistry</h1>
-    <nav class="nav-links">
-        <a href="index.html">Shop</a>
-        <a href="cart.html">My Bag</a>
-        <a href="dashboard.html">Admin</a>
-        <a href="login.html" onclick="logout()">Logout</a>
+    <div class="logo">Creole</div>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="products.html">Products</a>
+        <a href="cart.html">Cart</a>
+        <a href="checkout.html">Checkout</a>
+        <a href="register.html">Register</a>
+        <a href="login.html">Login</a>
+        <a href="about.html">About Us</a>
     </nav>
 </header>
 
-<main class="catalog-container">
-    <div class="welcome-banner">
-        <h2>Welcome to the Collection</h2>
-        <p>Explore hand-crafted Jamaican treasures designed with passion.</p>
+<main class="hero-container">
+    <div class="hero-text">
+        <h1>Woven by Tradition, Fired by Soul</h1>
+        <p>Elevate your living space with authentic, hand-crafted Jamaican decor designed for modern luxury.</p>
+        
+        <div class="btn-group">
+            <a href="products.html" class="btn btn-black">Shop Collection</a>
+            <a href="login.html" class="btn btn-outline">Sign In</a>
+        </div>
     </div>
 
-    <div id="product-grid">
-        </div>
+    <div class="hero-image">
+        <img src="Assets/collection.jpg" alt="Jamaican Artistry Collection">
+    </div>
 </main>
 
-<footer style="text-align: center; padding: 40px; color: #888;">
-    <p>&copy; 2026 Creole Jamaican Artistry. Developed by Niketa Muschette.</p>
+<footer>
+    &copy; 2026 Creole - All Rights Reserved
 </footer>
-
-<script src="script.js"></script>
-<script>
-    // Simple logout function to clear the session
-    function logout() {
-        localStorage.removeItem("isLoggedIn");
-        alert("You have been logged out.");
-    }
-</script>
 
 </body>
 </html>
