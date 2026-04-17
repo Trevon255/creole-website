@@ -2,55 +2,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout | Niketa Muschette</title>
+    <title>Checkout | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
         <h1>Creole Jamaican Artistry</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li><a href="cart.html">Shopping Bag</a></li>
-            </ul>
-        </nav>
     </header>
 
     <main class="container">
-        <div class="dashboard-container">
-            <h2 style="text-align: center;">Secure Checkout</h2>
-            
-            <div style="display: flex; justify-content: space-between; gap: 40px; margin-top: 30px;">
-                <div style="flex: 1;">
-                    <h3>Shipping Details</h3>
-                    <label>Full Name</label>
-                    <input type="text" id="cust-name" placeholder="e.g. Niketa Muschette" style="width: 100%; padding: 10px; margin-bottom: 15px;">
-                    
-                    <label style="display: block;">Delivery Address</label>
-                    <textarea id="cust-address" rows="4" placeholder="Street name, Town, and Parish" style="width: 100%; padding: 10px;"></textarea>
-                    
-                    <button class="btn" onclick="generateInvoice()" style="width: 100%; margin-top: 20px; background: #27ae60; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Confirm Order</button>
-                </div>
+        <h2>Secure Checkout</h2>
+        <div style="display: flex; gap: 40px; margin-top: 20px;">
+            <div style="flex: 1;">
+                <h3>1. Shipping & Payment</h3>
+                <label>Full Name</label>
+                <input type="text" id="cust-name" style="width:100%; padding:10px; margin-bottom:15px;">
+                
+                <label>Address</label>
+                <textarea id="cust-address" style="width:100%; padding:10px; margin-bottom:15px;"></textarea>
+                
+                <label>Amount Being Paid ($)</label>
+                <input type="number" id="amount-paid" placeholder="Enter amount" style="width:100%; padding:10px; margin-bottom:20px;">
 
-                <div style="flex: 1; background: #f9f9f9; padding: 25px; border-radius: 15px; border: 1px solid #eee;">
-                    <h3>Order Summary</h3>
-                    <p style="font-size: 0.8rem; color: #888;">Verified & Handled by: Niketa Muschette</p>
-                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
-                    
-                    <div id="checkout-item-details" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto;">
-                        </div>
+                <button onclick="generateInvoice()" style="width:100%; background:#27ae60; color:white; padding:15px; border:none; cursor:pointer; font-weight:bold;">Confirm Checkout</button>
+                <button onclick="window.location.href='cart.html'" style="width:100%; background:#95a5a6; color:white; padding:10px; border:none; cursor:pointer; margin-top:10px;">Cancel (Back to Bag)</button>
+            </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #ddd; padding-top: 15px;">
-                        <span style="font-weight: 600;">Amount Due:</span>
-                        <span id="checkout-amount" style="color: #d63384; font-size: 1.4rem; font-weight: 800;">$0.00 JMD</span>
-                    </div>
-                    
-                    <p style="text-align: center; font-size: 0.75rem; color: #aaa; margin-top: 20px;">
-                        Standard delivery: 3-5 Business Days
-                    </p>
-                </div>
+            <div style="flex: 1; background: #f9f9f9; padding: 25px; border-radius: 10px; border: 1px solid #eee;">
+                <h3>2. Order Summary</h3>
+                <p>Sub-total: <span id="cart-subtotal">$0.00 JMD</span></p>
+                <p>Discount (5%): <span id="cart-discount">$0.00 JMD</span></p>
+                <p>GCT (15%): <span id="cart-tax">$0.00 JMD</span></p>
+                <hr>
+                <h4>Total Due: <span id="checkout-amount" style="color:#d63384; font-size:1.5rem;">$0.00 JMD</span></h4>
             </div>
         </div>
     </main>
