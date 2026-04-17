@@ -13,7 +13,7 @@ const products = [
 // --- 2. DISPLAY FUNCTIONS ---
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
-    if (!grid) return;
+    if (!grid) return; //
 
     grid.innerHTML = products.map((p, i) => `
         <div class="product-card" style="background: white; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
@@ -26,13 +26,11 @@ function displayProductGrid() {
     `).join('');
 }
 
-// --- 3. SHOPPING BAG TABLE RENDERING ---
 function displayCartTable() {
     const tableBody = document.getElementById("cart-table-body");
-    if (!tableBody) return;
+    if (!tableBody) return; //
 
     const cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
-
     if (cart.items.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color: #888;">Your bag is currently empty.</td></tr>';
         return;
@@ -47,14 +45,41 @@ function displayCartTable() {
             <td>$${item.price.toLocaleString()}</td>
             <td>${item.quantity}</td>
             <td>$${(item.price * item.quantity).toLocaleString()}</td>
-            <td>
-                <button onclick="removeItem(${index})" style="background:none; border:none; color:#e74c3c; cursor:pointer; font-size:1.2rem;">&times;</button>
-            </td>
+            <td><button onclick="removeItem(${index})" style="background:none; border:none; color:#e74c3c; cursor:pointer;">&times;</button></td>
         </tr>
     `).join('');
 }
 
-// --- 4. CART LOGIC ---
+// --- 3. CHECKOUT & INVOICE LOGIC ---
+function generateInvoice() {
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    const name = document.getElementById("cust-name").value;
+    const amountPaid = parseFloat(document.getElementById("amount-paid").value);
+
+    if (!cart || cart.items.length === 0) {
+        alert("Your bag is empty!");
+        return;
+    }
+
+    if (!name || isNaN(amountPaid)) {
+        alert("Please enter your name and the payment amount.");
+        return;
+    }
+
+    // Check if payment covers the total
+    if (amountPaid < cart.totalCost) {
+        alert("Insufficient amount. Total due is: $" + cart.totalCost.toLocaleString() + " JMD");
+    } else {
+        const change = amountPaid - cart.totalCost;
+        alert("Thank you, " + name + "!\nOrder Confirmed.\nYour change: $" + change.toLocaleString() + " JMD");
+        
+        // Clear cart and redirect
+        localStorage.removeItem("ShoppingCart");
+        window.location.href = "index.html"; 
+    }
+}
+
+// --- 4. CART & TOTALS CORE ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -71,25 +96,6 @@ function addToCart(index) {
     alert(selected.name + " added to bag!");
 }
 
-function removeItem(index) {
-    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    cart.items.splice(index, 1); // Remove the item at that index
-    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    
-    // Refresh the table and the totals
-    displayCartTable();
-    calculateTotals(cart);
-}
-
-function clearCart() {
-    if (confirm("Are you sure you want to clear your shopping bag?")) {
-        localStorage.removeItem("ShoppingCart");
-        // Clear table and reset totals to $0.00
-        displayCartTable();
-        updateSummaryUI({ subtotal: 0, discounts: 0, taxes: 0, totalCost: 0 });
-    }
-}
-
 function calculateTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     cart.discounts = cart.subtotal * 0.05;
@@ -103,17 +109,24 @@ function calculateTotals(cart) {
 function updateSummaryUI(cart) {
     const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     
+    // IDs must match all HTML files (Products, Cart, Checkout)
     const subtotalEl = document.getElementById("cart-subtotal");
     const discountEl = document.getElementById("cart-discount");
     const taxEl = document.getElementById("cart-tax");
-    const totalEl = document.getElementById("cart-total");
-    const checkoutTotalEl = document.getElementById("checkout-total"); // For payment page
+    const totalEl = document.getElementById("cart-total") || document.getElementById("checkout-amount");
 
     if (subtotalEl) subtotalEl.innerText = fmt(cart.subtotal);
     if (discountEl) discountEl.innerText = (cart.discounts > 0 ? "-" : "") + fmt(cart.discounts);
     if (taxEl) taxEl.innerText = fmt(cart.taxes);
     if (totalEl) totalEl.innerText = fmt(cart.totalCost);
-    if (checkoutTotalEl) checkoutTotalEl.innerText = fmt(cart.totalCost);
+}
+
+function removeItem(index) {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    cart.items.splice(index, 1);
+    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
+    displayCartTable();
+    calculateTotals(cart);
 }
 
 // --- 5. INITIALIZATION ---
