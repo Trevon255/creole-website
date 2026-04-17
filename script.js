@@ -174,17 +174,18 @@ function generateInvoice() {
 }
 
 function displayInvoiceData(data) {
-    if (!document.getElementById("invNum")) return;
+    if (!document.getElementById("displayInvNum")) return;
 
-    document.getElementById("invNum").innerText = data.invoiceNumber;
-    document.getElementById("invDate").innerText = data.date;
-    document.getElementById("shipName").innerText = data.shipping.name;
-    document.getElementById("shipAddress").innerText = data.shipping.address;
-    document.getElementById("subTotal").innerText = "$" + data.subtotal.toLocaleString();
-    document.getElementById("taxAmount").innerText = "$" + data.tax.toLocaleString();
-    document.getElementById("grandTotal").innerText = "$" + data.total.toLocaleString();
+    document.getElementById("displayInvNum").innerText = data.invoiceNumber;
+    document.getElementById("displayDate").innerText = data.date;
+    document.getElementById("displayShipName").innerText = data.shipping.name;
+    document.getElementById("displayShipAddr").innerText = data.shipping.address;
+    document.getElementById("displaySubtotal").innerText = "$" + data.subtotal.toLocaleString();
+    document.getElementById("displayTax").innerText = "$" + data.tax.toLocaleString();
+    document.getElementById("displayGrandTotal").innerText = "$" + data.total.toLocaleString();
 
-    const itemTable = document.getElementById("invoiceItems");
+    const itemTable = document.getElementById("invoiceItemsBody");
+
     itemTable.innerHTML = data.items.map(item => `
         <tr>
             <td>${item.name}</td>
@@ -195,6 +196,8 @@ function displayInvoiceData(data) {
         </tr>
     `).join('');
 }
+
+
 
 // Auto-run if elements exist (simulating landing on the page)
 window.onload = () => {
