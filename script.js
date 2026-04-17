@@ -10,23 +10,7 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. DYNAMIC PRODUCT DISPLAY ---
-function displayProducts() {
-    const grid = document.querySelector(".product-grid");
-    if (!grid) return;
-
-    grid.innerHTML = products.map((p, index) => `
-        <div class="product-card">
-            <img src="${p.image}" class="product-image" alt="${p.name}">
-            <h3>${p.name}</h3>
-            <p>${p.description}</p>
-            <span class="product-price">$${p.price.toLocaleString()} JMD</span>
-            <button onclick="addToCart(${index})" class="btn">Add to Cart</button>
-        </div>
-    `).join('');
-}
-
-// --- 3. ADD TO CART & CALCULATIONS ---
+// --- 2. ADD TO CART & MATH LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { 
         items: [], subtotal: 0, taxes: 0, discounts: 0, totalCost: 0 
@@ -46,7 +30,10 @@ function addToCart(index) {
         });
     }
 
-    // UPDATED CALCULATIONS
+    calculateTotals(cart);
+}
+
+function calculateTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     cart.discounts = cart.subtotal * 0.05; 
     cart.taxes = (cart.subtotal - cart.discounts) * 0.15; 
@@ -54,18 +41,18 @@ function addToCart(index) {
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     updateSummaryUI(cart);
-    alert(`${selectedProduct.name} added to bag! Details, Taxes, and Totals saved.`);
 }
 
-// --- 4. UI UPDATER (For Products and Cart Pages) ---
+// --- 3. UI UPDATER (Math Display) ---
 function updateSummaryUI(cart) {
     const fmt = (val) => "$" + (val || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     
     const fields = {
-        "cart-subtotal": cart?.subtotal,
-        "cart-discount": cart?.discounts,
-        "cart-tax": cart?.taxes,
-        "cart-total": cart?.totalCost
+        "cart-subtotal": cart.subtotal,
+        "cart-discount": cart.discounts,
+        "cart-tax": cart.taxes,
+        "cart-total": cart.totalCost,
+        "checkout-amount": cart.totalCost // Syncs to Checkout Page
     };
 
     for (let id in fields) {
@@ -74,25 +61,67 @@ function updateSummaryUI(cart) {
     }
 }
 
-// --- 5. CHECKOUT SPECIFIC LOGIC ---
-function displayCheckoutAmount() {
-    const amountDisplay = document.getElementById("checkout-amount");
-    if (!amountDisplay) return;
+// --- 4. CART TABLE RENDERER (Fixes Missing Items) ---
+function displayCartTable() {
+    const tableBody = document.getElementById("cart-table-body");
+    if (!tableBody) return;
 
-    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (savedCart && savedCart.totalCost) {
-        amountDisplay.innerText = "$" + savedCart.totalCost.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }) + " JMD";
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+
+    if (!cart || !cart.items || cart.items.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 50px;">Your shopping bag is empty.</td></tr>';
+        return;
+    }
+
+    tableBody.innerHTML = cart.items.map((item, index) => `
+        <tr>
+            <td style="padding: 15px; font-weight: 600;">${item.name}</td>
+            <td style="padding: 15px;">$${item.price.toLocaleString()} JMD</td>
+            <td style="padding: 15px;">${item.quantity}</td>
+            <td style="padding: 15px;">$${(item.price * item.quantity).toLocaleString()} JMD</td>
+            <td style="padding: 15px;">
+                <button onclick="removeItem(${index})" style="color: #e74c3c; background: none; border: none; cursor: pointer; font-weight: bold;">Remove</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// --- 5. CHECKOUT ITEM DISPLAY (Fixes Checkout Details) ---
+function displayCheckoutDetails() {
+    const detailsDisplay = document.getElementById("checkout-item-details");
+    if (!detailsDisplay) return;
+
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (cart && cart.items) {
+        detailsDisplay.innerHTML = cart.items.map(item => `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem;">
+                <span>${item.quantity}x ${item.name}</span>
+                <span style="font-weight: 600;">$${(item.price * item.quantity).toLocaleString()} JMD</span>
+            </div>
+        `).join('');
     }
 }
 
-// --- 6. INITIALIZE ---
+// --- 6. REMOVE & CLEAR FUNCTIONS ---
+function removeItem(index) {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    cart.items.splice(index, 1);
+    calculateTotals(cart);
+    displayCartTable();
+}
+
+function clearCart() {
+    if (confirm("Clear your entire shopping bag?")) {
+        localStorage.removeItem("ShoppingCart");
+        location.reload(); // Hard refresh to reset all UI
+    }
+}
+
+// --- 7. INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
-    displayProducts();
-    displayCheckoutAmount(); // Runs specifically on the checkout page
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (cart) updateSummaryUI(cart);
     
-    const saved = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (saved) updateSummaryUI(saved);
+    displayCartTable();       // Runs on Cart page
+    displayCheckoutDetails(); // Runs on Checkout page
 });
