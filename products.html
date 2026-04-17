@@ -2,45 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Products | Creole Decor</title>
+    <title>Our Collection | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .container { max-width: 1200px; margin: auto; padding: 20px; }
-        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
-        .product-card { background: #fff; padding: 20px; border-radius: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .product-image { width: 100%; height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
-        .buy-btn { background: #2d2d2d; color: #fff; border: none; padding: 10px 20px; cursor: pointer; width: 100%; border-radius: 5px; }
-        #cart-summary { background: #fdf2f4; padding: 40px; border-radius: 15px; margin-top: 50px; border: 1px dashed #d8a7b1; }
-        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); text-align: center; }
-    </style>
 </head>
 <body>
     <header>
+        <h1>Creole Jamaican Artistry</h1>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li><a href="about.html">About</a></li>
+                <li><a href="cart.html">View Bag</a></li>
             </ul>
         </nav>
     </header>
 
     <main class="container">
-        <h2 style="text-align: center;">The Signature Collection</h2>
+        <h2>Handcrafted Jamaican Treasures</h2>
         <div class="product-grid"></div>
 
-        <section id="cart-summary">
-            <h3 style="text-align: center; margin-bottom: 30px;">Shopping Cart Totals</h3>
-            <div class="summary-grid">
-                <div><h4>SUBTOTAL</h4><p id="cart-subtotal">$0 JMD</p></div>
-                <div><h4>GCT (15%)</h4><p id="cart-tax">$0 JMD</p></div>
-                <div><h4>DISCOUNT (5%)</h4><p id="cart-discount">$0 JMD</p></div>
-                <div><h4>TOTAL COST</h4><p id="cart-total" style="font-weight:bold; color:#d8a7b1;">$0 JMD</p></div>
+        <div class="shopping-cart-totals">
+            <div class="total-item">
+                <label>Sub-total</label>
+                <span id="cart-subtotal">$0.00 JMD</span>
             </div>
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn" onclick="window.location.href='checkout.html'">Proceed to Checkout</button>
+            <div class="total-item">
+                <label>Estimated Total</label>
+                <span id="cart-total">$0.00 JMD</span>
             </div>
-        </section>
+            <a href="cart.html" class="btn">Review Bag & Checkout</a>
+        </div>
     </main>
 
     <script src="script.js"></script>
