@@ -1,5 +1,3 @@
-
-```javascript
 /************************************************************
 AUTHENTICATION & SECURITY
 Student Name: Niketa Muschette
@@ -104,7 +102,7 @@ if (loginForm) {
         if (user) {
             localStorage.setItem("LoggedInUser", JSON.stringify(user));
             alert("Login successful!");
-            window.location.href = "products.html"; // Redirect to catalogue
+            window.location.href = "products.html";
         } else {
             attempts--;
             errorMsg.innerText = "Invalid TRN or Password. Attempts left: " + attempts;
@@ -156,7 +154,6 @@ const products = [
     }
 ];
 
-// Save updated master list
 localStorage.setItem("AllProducts", JSON.stringify(products));
 
 function displayProducts() {
@@ -204,15 +201,18 @@ function addToCart(index) {
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
 
-    // Update UI Summary on products.html if elements exist
+    updateCartUI(cart);
+    alert(`${selectedProduct.name} added to cart!`);
+}
+
+// Function to specifically update the HTML text
+function updateCartUI(cart) {
     if(document.getElementById("cart-subtotal")){
         document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + " JMD";
-        document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString() + " JMD";
-        document.getElementById("cart-discount").innerText = "$" + cart.discounts.toLocaleString() + " JMD";
+        document.getElementById("cart-tax").innerText = "$" + Math.round(cart.taxes).toLocaleString() + " JMD";
+        document.getElementById("cart-discount").innerText = "$" + Math.round(cart.discounts).toLocaleString() + " JMD";
         document.getElementById("cart-total").innerText = "$" + Math.round(cart.totalCost).toLocaleString() + " JMD";
     }
-
-    alert(`${selectedProduct.name} added to cart!`);
 }
 
 /************************************************************
@@ -245,12 +245,10 @@ function confirmOrder(event) {
         totalCost: cart.totalCost
     };
 
-    // Store Invoice
     let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     allInvoices.push(newInvoice);
     localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
 
-    // Clear Cart after order
     localStorage.removeItem("ShoppingCart");
 
     alert(`Success! Order ${newInvoice.invoiceNumber} confirmed.\nA copy has been sent to your email.`);
@@ -261,7 +259,7 @@ function displayInvoiceData() {
     const all = JSON.parse(localStorage.getItem("AllInvoices"));
     if (!all || all.length === 0 || !document.getElementById("invNum")) return;
 
-    const data = all[all.length - 1]; // Get latest invoice
+    const data = all[all.length - 1]; 
 
     document.getElementById("invNum").innerText = data.invoiceNumber;
     document.getElementById("invDate").innerText = data.date;
@@ -291,9 +289,14 @@ function cancelOrder() {
     }
 }
 
-// Auto-init for different pages
+// Auto-run when page loads
 document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
     displayInvoiceData();
+    
+    // Check if there is already a cart in storage to fill the $0 JMD spots
+    const existingCart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if(existingCart) {
+        updateCartUI(existingCart);
+    }
 });
-```
