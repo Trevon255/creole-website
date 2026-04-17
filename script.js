@@ -113,11 +113,15 @@ function updateSummaryUI(cart) {
     if (totalEl) totalEl.innerText = fmt(cart.totalCost);
 }
 
-// New function to handle the Confirm Order button
+// Updated function to save details and redirect to invoice.html
 function processOrder(event) {
     if (event) event.preventDefault();
 
-    const name = document.querySelector('input[placeholder="Full Name"]')?.value || "Valued Customer";
+    const nameInput = document.querySelector('input[placeholder="FULL NAME"]') || document.querySelector('input[placeholder="Full Name"]');
+    const addrInput = document.querySelector('textarea');
+    
+    const name = nameInput?.value || "Valued Customer";
+    const address = addrInput?.value || "No address provided";
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
 
     if (!cart || cart.items.length === 0) {
@@ -125,14 +129,12 @@ function processOrder(event) {
         return;
     }
 
-    // Trigger the print dialog for the invoice
-    alert("Order confirmed for " + name + "! Generating your invoice...");
-    window.print();
+    // Save details for the invoice page to use
+    localStorage.setItem("CustomerName", name);
+    localStorage.setItem("CustomerAddress", address);
 
-    // Clear the cart after order is confirmed/printed
-    localStorage.removeItem("ShoppingCart");
-    alert("Transaction complete. Your bag has been cleared.");
-    window.location.href = "products.html";
+    // Redirect to the professional invoice page
+    window.location.href = "invoice.html";
 }
 
 function addToCart(index) {
@@ -178,9 +180,9 @@ document.addEventListener("DOMContentLoaded", () => {
         loginForm.addEventListener("submit", handleLogin);
     }
 
-    // Logic to catch the Confirm Order button click
-    const confirmBtn = document.querySelector('button[style*="background: #28a745"]') || 
-                       document.querySelector('button[onclick*="confirm"]');
+    // Updated listener to find your "Confirm Order" button and run processOrder
+    const confirmBtn = document.getElementById("confirm-order-btn") || 
+                       document.querySelector('button[style*="background: #28a745"]');
     
     if (confirmBtn) {
         confirmBtn.onclick = processOrder;
