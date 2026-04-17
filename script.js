@@ -50,38 +50,65 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 3. CHECKOUT & INVOICE LOGIC ---
+// --- 3. UPDATED PROFESSIONAL INVOICE LOGIC ---
 function generateInvoice() {
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     const nameInput = document.getElementById("cust-name");
     const amountInput = document.getElementById("amount-paid");
+    const addressInput = document.getElementById("cust-address");
 
     if (!cart || cart.items.length === 0) {
-        alert("Your bag is empty! Please add items before checking out.");
+        alert("Transaction Cancelled: No items found in bag.");
         return;
     }
 
     const name = nameInput.value.trim();
+    const address = addressInput ? addressInput.value.trim() : "Not Provided";
     const amountPaid = parseFloat(amountInput.value);
 
     if (!name || isNaN(amountPaid)) {
-        alert("Please enter your full name and the amount you are paying.");
+        alert("Required: Please enter Full Name and Payment Amount.");
         return;
     }
 
     if (amountPaid < cart.totalCost) {
-        alert("Insufficient amount. The total due is: $" + cart.totalCost.toLocaleString() + " JMD");
+        alert("Transaction Refused: Insufficient Payment.\nAmount Due: $" + cart.totalCost.toLocaleString() + " JMD");
     } else {
         const change = amountPaid - cart.totalCost;
         
-        // Show Success Message
-        alert("Success! Thank you, " + name + ".\n\n" +
-              "Order Total: $" + cart.totalCost.toLocaleString() + " JMD\n" +
-              "Amount Paid: $" + amountPaid.toLocaleString() + " JMD\n" +
-              "Your Change: $" + change.toLocaleString() + " JMD\n\n" +
-              "Your order has been placed.");
+        // --- BUILDS A PROFESSIONAL ITEM LIST FOR THE ALERT ---
+        let itemizedList = "";
+        cart.items.forEach(item => {
+            itemizedList += `${item.quantity}x ${item.name} @ $${item.price.toLocaleString()}\n`;
+        });
+
+        const fmt = (v) => "$" + v.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+
+        // --- THE "BILL OF SALE" DISPLAY ---
+        const invoiceDisplay = 
+            `====================================\n` +
+            `       CREOLE JAMAICAN ARTISTRY       \n` +
+            `           OFFICIAL INVOICE           \n` +
+            `====================================\n\n` +
+            `Customer: ${name}\n` +
+            `Address: ${address}\n` +
+            `Date: ${new Date().toLocaleDateString()}\n\n` +
+            `PURCHASED ITEMS:\n` +
+            `------------------------------------\n` +
+            `${itemizedList}` +
+            `------------------------------------\n` +
+            `SUB-TOTAL:      ${fmt(cart.subtotal)}\n` +
+            `DISCOUNT (5%):  -${fmt(cart.discounts)}\n` +
+            `GCT (15%):      ${fmt(cart.taxes)}\n` +
+            `TOTAL DUE:      ${fmt(cart.totalCost)}\n` +
+            `====================================\n` +
+            `AMOUNT PAID:    ${fmt(amountPaid)}\n` +
+            `CHANGE DUE:     ${fmt(change)}\n\n` +
+            `Thank you for supporting Jamaican artistry!`;
+
+        alert(invoiceDisplay);
         
-        // Clear everything
+        // Finalize transaction
         localStorage.removeItem("ShoppingCart");
         window.location.href = "index.html"; 
     }
@@ -107,11 +134,7 @@ function addToCart(index) {
 function clearCart() {
     if (confirm("Are you sure you want to clear your entire shopping bag?")) {
         localStorage.removeItem("ShoppingCart");
-        
-        // Reset Table if on cart page
         displayCartTable();
-        
-        // Reset Summary UI
         updateSummaryUI({ subtotal: 0, discounts: 0, taxes: 0, totalCost: 0 });
     }
 }
