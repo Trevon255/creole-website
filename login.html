@@ -63,37 +63,33 @@
         </form>
 
         <div class="reset-p">
-            <p>Forgot Password? <a href="#">Reset Password</a></p>
+            <p>Forgot Password? <a href="reset.html">Reset Password</a></p>
             <p>New here? <a href="register.html">Create an Account</a></p>
         </div>
     </div>
 </main>
 
 <script>
-    // Tracking login attempts locally
     let attempts = 0;
 
     document.getElementById('loginForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Stop page from refreshing
+        event.preventDefault();
 
         const trnInput = document.getElementById('loginTrn').value;
         const passInput = document.getElementById('loginPassword').value;
         const errorDisplay = document.getElementById('errorMsg');
 
-        // 1. Retrieve data from localStorage
         const registrationData = JSON.parse(localStorage.getItem('RegistrationData'));
 
-        // 2. Check if registration data exists and matches
         if (registrationData && registrationData.trn === trnInput && registrationData.password === passInput) {
-            alert("Login Successful! Redirecting to products...");
-            window.location.href = "products.html"; // Redirect to catalog
+            alert("Login Successful! Welcome to Creole.");
+            localStorage.setItem("isLoggedIn", "true");
+            window.location.href = "products.html";
         } else {
             attempts++;
-            
-            // 3. Handle three (3) failed attempts
             if (attempts >= 3) {
                 alert("Account Locked! Too many failed attempts.");
-                window.location.href = "locked.html"; // Redirect to error/locked page
+                window.location.href = "locked.html";
             } else {
                 errorDisplay.innerText = `Invalid TRN or Password. Attempt ${attempts} of 3.`;
             }
