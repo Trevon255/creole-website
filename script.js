@@ -85,6 +85,15 @@ function displayCartTable() {
 }
 
 // --- 4. CHECKOUT & INVOICE LOGIC ---
+
+// ADDED: CLEAR CART FUNCTION
+function clearCart() {
+    if (confirm("Are you sure you want to empty your shopping bag?")) {
+        localStorage.removeItem("ShoppingCart");
+        location.reload(); // Refresh to show empty state
+    }
+}
+
 function calculateTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     cart.discounts = cart.subtotal * 0.05; 
@@ -217,7 +226,6 @@ function ShowInvoices() {
     }
 }
 
-// Bridge function to view invoice from Dashboard
 function viewInvoiceDetail(invoiceNum) {
     const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     const selectedInvoice = allInvoices.find(inv => inv.invoiceNum === invoiceNum);
