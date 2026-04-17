@@ -2,11 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Bag | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Ensures the table looks clean and professional */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            text-align: left;
+            background-color: #f2f2f2;
+            padding: 12px;
+            border-bottom: 2px solid #ddd;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .btn {
+            padding: 10px 20px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .summary-box p {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <header>
+        <h1>Creole Jamaican Artistry</h1>
         <nav>
             <ul>
                 <li><a href="index.html">Home</a></li>
@@ -36,19 +71,21 @@
         </table>
 
         <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-            <div class="summary-box" style="width: 300px; padding: 15px; background: #f9f9f9; border-radius: 15px;">
+            <div class="summary-box" style="width: 350px; padding: 20px; background: #fdfdfd; border-radius: 15px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                 <p>Sub-total: <span id="cart-subtotal">$0.00 JMD</span></p>
-                <p style="color: green;">Discount (5%): <span id="cart-discount">-$0.00 JMD</span></p>
+                <p style="color: #27ae60;">Discount (5%): <span id="cart-discount">-$0.00 JMD</span></p>
                 <p>GCT (15%): <span id="cart-tax">$0.00 JMD</span></p>
-                <hr style="border:0; border-top: 1px solid #ddd; margin: 10px 0;">
-                <h3 style="color: #d63384;">Total: <span id="cart-total">$0.00 JMD</span></h3>
+                <hr style="border:0; border-top: 1px solid #ddd; margin: 15px 0;">
+                <h3 style="display: flex; justify-content: space-between; color: #d63384; margin: 0;">
+                    Total: <span id="cart-total">$0.00 JMD</span>
+                </h3>
             </div>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-            <button class="btn" onclick="clearCart()" style="background: #e74c3c;">Clear All</button>
-            <a href="products.html" class="btn" style="background: #95a5a6;">Close</a>
-            <a href="checkout.html" class="btn" style="background: #2ecc71;">Check Out</a>
+        <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px; margin-bottom: 50px;">
+            <button class="btn" onclick="clearCart()" style="background: #e74c3c;">Clear Bag</button>
+            <a href="products.html" class="btn" style="background: #7f8c8d;">Keep Shopping</a>
+            <a href="checkout.html" class="btn" style="background: #27ae60;">Go to Checkout</a>
         </div>
     </main>
 
