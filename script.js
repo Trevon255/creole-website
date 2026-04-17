@@ -180,3 +180,61 @@ document.addEventListener("DOMContentLoaded", () => {
         updateSummaryUI(existingCart);
     }
 });
+
+
+// -------- DASHBOARD --------
+
+// Load all invoices
+function loadInvoices() {
+    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+
+    let container = document.getElementById("invoiceList");
+    if (!container) return;
+
+    if (invoices.length === 0) {
+        container.innerHTML = "<p>No invoices found.</p>";
+        return;
+    }
+
+    container.innerHTML = invoices.map(inv => `
+        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+            <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
+            <p><strong>Date:</strong> ${inv.date}</p>
+            <p><strong>Total:</strong> $${inv.total.toLocaleString()} JMD</p>
+        </div>
+    `).join('');
+}
+
+// Search invoice
+function searchInvoice() {
+    let trn = document.getElementById("searchTRN").value;
+
+    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+
+    let container = document.getElementById("invoiceList");
+
+    if (!trn) {
+        loadInvoices();
+        return;
+    }
+
+    let results = invoices.filter(inv => inv.trn === trn);
+
+    if (results.length === 0) {
+        container.innerHTML = "<p>No matching invoices found.</p>";
+        return;
+    }
+
+    container.innerHTML = results.map(inv => `
+        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+            <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
+            <p><strong>Total:</strong> $${inv.total.toLocaleString()} JMD</p>
+        </div>
+    `).join('');
+}
+
+// Run dashboard ONLY if dashboard page is open
+if (document.getElementById("invoiceList")) {
+    loadInvoices();
+}
+
