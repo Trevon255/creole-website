@@ -17,44 +17,41 @@
     </header>
 
     <main class="container">
-        <h2>Your Shopping Bag</h2>
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Your Shopping Bag</h2>
+            <a href="products.html" style="text-decoration:none; font-size:2rem; color:#888;">&times;</a>
+        </div>
+
+        <table>
             <thead>
-                <tr style="text-align: left; border-bottom: 2px solid #f4cfdf;">
-                    <th style="padding: 15px;">Item Name</th>
+                <tr>
+                    <th>Item</th>
                     <th>Price</th>
-                    <th>Quantity</th>
+                    <th>Qty</th>
                     <th>Sub-total</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="cart-table-body"></tbody>
+            <tbody id="cart-table-body">
+                </tbody>
         </table>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
-            <div class="order-summary-box" style="width: 350px; padding: 20px; background: #fffcfd; border: 1px solid #f4cfdf; border-radius: 10px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span>Sub-total:</span>
-                    <span id="cart-subtotal">$0.00 JMD</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: green;">
-                    <span>Discount (5%):</span>
-                    <span id="cart-discount">-$0.00 JMD</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                    <span>GCT (15%):</span>
-                    <span id="cart-tax">$0.00 JMD</span>
-                </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+            <div class="summary-box" style="width: 300px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                <p>Sub-total: <span id="cart-subtotal">$0.00 JMD</span></p>
+                <p style="color: green;">Discount (5%): <span id="cart-discount">-$0.00 JMD</span></p>
+                <p>GCT (15%): <span id="cart-tax">$0.00 JMD</span></p>
                 <hr>
-                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem;">
-                    <span>Total:</span>
-                    <span id="cart-total" style="color: #d63384;">$0.00 JMD</span>
-                </div>
+                <h3 style="color: #d63384;">Total: <span id="cart-total">$0.00 JMD</span></h3>
             </div>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
-            <button class="btn" style="background: #888;" onclick="emptyCart()">Empty Bag</button>
-            <a href="checkout.html" class="btn">Proceed to Checkout</a>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+            <button class="btn" onclick="clearAll()" style="background: #e74c3c;">Clear All</button>
+            
+            <a href="products.html" class="btn" style="background: #95a5a6;">Close</a>
+            
+            <a href="checkout.html" class="btn" style="background: #2ecc71;">Check Out</a>
         </div>
     </main>
 
