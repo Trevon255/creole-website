@@ -101,7 +101,7 @@ function addToCart(index) {
     }
     
     calculateTotals(cart);
-    alert(selected.name + " added to your bag!");
+    alert(selected.name + " added!");
 }
 
 function calculateTotals(cart) {
@@ -114,29 +114,20 @@ function calculateTotals(cart) {
     updateSummaryUI(cart);
 }
 
-// This was the function causing the crash. It is now "Safe".
 function updateSummaryUI(cart) {
     const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     
-    // 1. Rename the title ONLY if it exists on this page
-    const titleEl = document.querySelector(".summary-box h2") || 
-                    document.querySelector(".summary-box h3") || 
-                    document.getElementById("summary-title");
-    if (titleEl) titleEl.innerText = "Shopping Cart";
-
-    // 2. Update price elements ONLY if they exist on this page
-    const priceMap = {
-        "cart-subtotal": cart.subtotal,
-        "cart-discount": cart.discounts,
-        "cart-tax": cart.taxes,
-        "cart-total": cart.totalCost,
-        "checkout-amount": cart.totalCost
-    };
-
-    for (const [id, value] of Object.entries(priceMap)) {
-        const el = document.getElementById(id);
-        if (el) el.innerText = fmt(value);
-    }
+    // This updates the numbers ONLY if they are found on the page
+    const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "checkout-amount"];
+    ids.forEach(id => {
+        let el = document.getElementById(id);
+        if (el) {
+            let val = id.includes("discount") ? cart.discounts : 
+                     (id.includes("tax") ? cart.taxes : 
+                     (id.includes("subtotal") ? cart.subtotal : cart.totalCost));
+            el.innerText = fmt(val);
+        }
+    });
 }
 
 function removeItem(index) {
