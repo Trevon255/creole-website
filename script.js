@@ -10,6 +10,22 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
+// --- 1.1 PRODUCT DISPLAY (Fixes the "Disappearing Products" bug) ---
+function displayProductGrid() {
+    const grid = document.getElementById("product-grid");
+    if (!grid) return; // Only runs if the element exists on the page
+
+    grid.innerHTML = products.map((product, index) => `
+        <div class="product-card" style="border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; background: #fff;">
+            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 250px; object-fit: cover; border-radius: 8px;">
+            <h3 style="margin: 15px 0 5px 0;">${product.name}</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">${product.description}</p>
+            <p style="font-weight: bold; color: #d63384; font-size: 1.1rem;">$${product.price.toLocaleString()} JMD</p>
+            <button onclick="addToCart(${index})" style="background: #d63384; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; width: 100%;">Add to Bag</button>
+        </div>
+    `).join('');
+}
+
 // --- 2. ADD TO CART & MATH LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { 
@@ -31,6 +47,7 @@ function addToCart(index) {
     }
 
     calculateTotals(cart);
+    alert(`${selectedProduct.name} added to your bag!`);
 }
 
 function calculateTotals(cart) {
@@ -52,7 +69,7 @@ function updateSummaryUI(cart) {
         "cart-discount": cart.discounts,
         "cart-tax": cart.taxes,
         "cart-total": cart.totalCost,
-        "checkout-amount": cart.totalCost // Syncs to Checkout Page
+        "checkout-amount": cart.totalCost 
     };
 
     for (let id in fields) {
@@ -102,7 +119,6 @@ function displayCheckoutDetails() {
     }
 }
 
-// This function was missing from your version!
 function generateInvoice() {
     const name = document.getElementById("cust-name")?.value;
     const address = document.getElementById("cust-address")?.value;
@@ -154,10 +170,13 @@ function clearCart() {
 
 // --- 7. INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
+    // This runs on EVERY page. If it finds the IDs, it fills them.
+    displayProductGrid(); 
+    
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (cart) {
         updateSummaryUI(cart);
-        displayCartTable();       // Runs on Cart page
-        displayCheckoutDetails(); // Runs on Checkout page
+        displayCartTable();       
+        displayCheckoutDetails(); 
     }
 });
