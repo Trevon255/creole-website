@@ -199,6 +199,20 @@ function displayInvoiceData(data) {
 
 // --- INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+
+if (cart && document.getElementById("summary-total")) {
+    document.getElementById("summary-total").innerText =
+        "$" + Math.round(cart.totalCost).toLocaleString() + " JMD";
+}
+
+
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+
+if (cart && document.getElementById("summary-total")) {
+    document.getElementById("summary-total").innerText =
+        "$" + Math.round(cart.totalCost).toLocaleString() + " JMD";
+}
     displayProducts();
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     updateCartUI(savedCart);
