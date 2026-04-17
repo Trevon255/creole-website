@@ -199,7 +199,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// -------- DASHBOARD --------
+
+
+
+// TREVON FULLWOOD DASHBOARD SECTION
 
 // Load all invoices
 function loadInvoices() {
