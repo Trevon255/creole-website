@@ -2,117 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Home | Creole Jamaican Artistry</title>
-    <link rel="icon" type="image/jpeg" href="Assets/creole.jpg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Side-by-side Layout & One-Scroll View */
-        .hero-flex {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 40px;
-            /* Adjusts height to fit screen minus header/footer */
-            height: calc(100vh - 160px); 
-            padding: 0 5%;
+        /* Catalog Specific Layout */
+        header { 
+            background: white; 
+            padding: 20px; 
+            text-align: center; 
+            border-bottom: 2px solid #d63384; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+        }
+        .nav-links { margin-top: 10px; }
+        .nav-links a { 
+            margin: 0 15px; 
+            text-decoration: none; 
+            color: #333; 
+            font-weight: bold; 
+        }
+        .nav-links a:hover { color: #d63384; }
+
+        .catalog-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        
+        /* Grid setup for your JavaScript displayProductGrid function */
+        #product-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
+            gap: 30px; 
         }
 
-        .hero-text {
-            flex: 1;
-            text-align: left;
-        }
-
-        .hero-image-container {
-            flex: 1.2;
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .main-display-photo {
-            width: 100%;
-            max-width: 650px;
-            height: 480px; /* Locked height to prevent scrolling */
-            object-fit: cover;
-            border-radius: 25px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border: 1px solid #f0f0f0;
-        }
-
-        .hero-title {
-            font-size: 3rem;
-            color: #2d2d2d;
-            line-height: 1.1;
-            margin-bottom: 20px;
-            letter-spacing: -1px;
-        }
-
-        .hero-subtitle {
-            font-size: 1.15rem;
-            color: #666;
-            margin-bottom: 35px;
-            max-width: 450px;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 15px;
-        }
-
-        /* Responsive adjustment for mobile */
-        @media (max-width: 900px) {
-            .hero-flex {
-                flex-direction: column;
-                height: auto;
-                padding: 40px 20px;
-                text-align: center;
-            }
-            .hero-text { text-align: center; order: 2; }
-            .hero-image-container { order: 1; justify-content: center; width: 100%; }
-            .btn-group { justify-content: center; }
-            .main-display-photo { height: 300px; }
+        .welcome-banner { 
+            background: #fdf2f8; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 30px; 
+            text-align: center; 
+            border-left: 5px solid #d63384;
         }
     </style>
 </head>
 <body>
-    <header>
-        <a href="index.html">
-            <img src="Assets/creole.jpg" alt="Creole Logo" id="mainLogo">
-        </a>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
-                <li><a href="cart.html">Cart</a></li>
-                <li><a href="checkout.html">Checkout</a></li>
-                 <li><a href="invoice.html">My Invoice</a></li>
-                <li><a href="registration.html">Register</a></li>
-                <li><a href="login.html">Login</a></li>
-                <li><a href="about.html">About Us</a></li>
-                 <li><a href="dashboard.html">dashboard</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main class="container">
-        <div class="hero-flex">
-            <div class="hero-text">
-                <h1 class="hero-title">Woven by Tradition,<br>Fired by Soul</h1>
-                <p class="hero-subtitle">Elevate your living space with authentic, hand-crafted Jamaican decor designed for modern luxury.</p>
-                
-                <div class="btn-group">
-                    <a href="products.html" class="btn" style="padding: 14px 35px;">Shop Collection</a>
-                    <a href="login.html" class="btn" style="padding: 14px 35px; background-color: transparent; color: #2d2d2d; border: 1px solid #2d2d2d;">Sign In</a>
-                </div>
-            </div>
+<header>
+    <h1>Creole Jamaican Artistry</h1>
+    <nav class="nav-links">
+        <a href="index.html">Shop</a>
+        <a href="cart.html">My Bag</a>
+        <a href="dashboard.html">Admin</a>
+        <a href="login.html" onclick="logout()">Logout</a>
+    </nav>
+</header>
 
-            <div class="hero-image-container">
-                <img src="Assets/collection.jpg" alt="Creole Collection Display" class="main-display-photo">
-            </div>
+<main class="catalog-container">
+    <div class="welcome-banner">
+        <h2>Welcome to the Collection</h2>
+        <p>Explore hand-crafted Jamaican treasures designed with passion.</p>
+    </div>
+
+    <div id="product-grid">
         </div>
-    </main>
+</main>
 
-    <footer style="margin-top: 0; padding: 15px 0; border-top: 1px solid #eee;">
-        <p>&copy; 2026 Creole - All Rights Reserved</p>
-    </footer>
+<footer style="text-align: center; padding: 40px; color: #888;">
+    <p>&copy; 2026 Creole Jamaican Artistry. Developed by Niketa Muschette.</p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+    // Simple logout function to clear the session
+    function logout() {
+        localStorage.removeItem("isLoggedIn");
+        alert("You have been logged out.");
+    }
+</script>
+
 </body>
 </html>
