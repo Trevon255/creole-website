@@ -30,6 +30,7 @@
             display: flex;
             justify-content: center;
             gap: 20px;
+            flex-wrap: wrap;
         }
         nav a {
             text-decoration: none;
@@ -38,6 +39,9 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+        nav a:hover {
+            color: #f1a7c4;
         }
 
         /* Hero Section Layout */
@@ -78,14 +82,21 @@
             font-size: 14px;
             border-radius: 4px;
             text-align: center;
+            transition: 0.3s;
         }
         .btn-black {
             background-color: #2d2d2d;
             color: white;
         }
+        .btn-black:hover {
+            background-color: #000;
+        }
         .btn-outline {
             border: 1px solid #ccc;
             color: #333;
+        }
+        .btn-outline:hover {
+            background-color: #f9f9f9;
         }
 
         /* Hero Image */
@@ -115,7 +126,7 @@
         <a href="products.html">Products</a>
         <a href="cart.html">Cart</a>
         <a href="checkout.html">Checkout</a>
-        <a href="register.html">Register</a>
+        <a href="dashboard.html">Dashboard</a> <a href="register.html">Register</a>
         <a href="login.html">Login</a>
         <a href="about.html">About Us</a>
     </nav>
@@ -138,7 +149,7 @@
 </main>
 
 <footer>
-    &copy; 2026 Creole - All Rights Reserved
+    &copy; 2026 Creole - All Rights Reserved | Developed by Niketa Muschette
 </footer>
 
 </body>
