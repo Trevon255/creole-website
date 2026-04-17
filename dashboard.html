@@ -54,8 +54,8 @@
             <div class="controls">
                 <p><strong>Search by TRN:</strong></p>
                 <input type="text" id="searchTRN" placeholder="Enter TRN (e.g., TRN-009-876-543)">
-                <button onclick="ShowInvoices()">Audit (Console Log)</button>
-                <button onclick="GetUserInvoices()" style="background:#333;">Display Results</button>
+             <button onclick="console.log(localStorage.getItem('AllInvoices'))">Audit (Console Log)</button>
+             <button onclick="displayResults()">Display Results</button>
             </div>
             
             <h3>Search Results</h3>
