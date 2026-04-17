@@ -2,26 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Invoice | Creole Jamaican Artistry</title>
+    <title>Invoice | Niketa Muschette</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .invoice-box { background: #fff; padding: 40px; border: 1px solid #eee; max-width: 800px; margin: auto; }
+        .invoice-box { background: #fff; padding: 40px; border: 1px solid #eee; max-width: 800px; margin: 30px auto; font-family: sans-serif; }
         .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
-        .shipping-info { margin-bottom: 30px; }
+        .shipping-info { margin-bottom: 30px; line-height: 1.6; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #f4f4f4; padding: 10px; text-align: left; }
+        th { background: #f4f4f4; padding: 10px; text-align: left; border-bottom: 2px solid #ddd; }
         td { padding: 10px; border-bottom: 1px solid #eee; }
         .inv-footer { text-align: right; margin-top: 20px; line-height: 1.8; }
+        .grand-total { color: #d63384; font-size: 1.5rem; font-weight: bold; }
+        @media print { .no-print { display: none; } }
     </style>
 </head>
 <body>
     <div class="container">
-        <button class="btn" onclick="window.print()" style="margin-bottom: 20px;">Print Invoice</button>
+        <div class="no-print" style="text-align: center; margin: 20px;">
+            <button class="btn" onclick="window.print()">Print Invoice</button>
+            <button class="btn" style="background:#666;" onclick="window.location.href='products.html'">New Order</button>
+        </div>
         
         <div class="invoice-box">
             <div class="invoice-header">
                 <div>
-                    <h1>INVOICE</h1>
+                    <h1 style="margin:0;">INVOICE</h1>
                     <p><strong>Invoice #:</strong> <span id="displayInvNum">---</span></p>
                     <p><strong>Date:</strong> <span id="displayDate">---</span></p>
                 </div>
@@ -44,7 +49,6 @@
                         <th>Item</th>
                         <th>Qty</th>
                         <th>Unit Price</th>
-                        <th>Discount</th>
                         <th>Sub-total</th>
                     </tr>
                 </thead>
@@ -54,14 +58,44 @@
 
             <div class="inv-footer">
                 <p>Sub-total: <span id="displaySubtotal">$0.00</span></p>
+                <p style="color: green;">Discount (5%): <span id="displayDiscount">-$0.00</span></p>
                 <p>GCT (15%): <span id="displayTax">$0.00</span></p>
                 <hr>
-                <h3 style="color: #d63384;">Grand Total: <span id="displayGrandTotal">$0.00</span></h3>
+                <p class="grand-total">Grand Total: <span id="displayGrandTotal">$0.00</span></p>
             </div>
             
             <p style="margin-top: 50px; text-align: center; color: #888;">Thank you for supporting Jamaican Artistry!</p>
         </div>
     </div>
+
     <script src="script.js"></script>
+    <script>
+        // Special logic just for the invoice page to pull the last saved order
+        document.addEventListener("DOMContentLoaded", () => {
+            const history = JSON.parse(localStorage.getItem("AllInvoices"));
+            if (history && history.length > 0) {
+                const data = history[history.length - 1]; // Get latest order
+                
+                document.getElementById("displayInvNum").innerText = data.invoiceNumber;
+                document.getElementById("displayDate").innerText = data.date;
+                document.getElementById("displayShipName").innerText = data.shipping.name;
+                document.getElementById("displayShipAddr").innerText = data.shipping.address;
+                document.getElementById("displaySubtotal").innerText = "$" + data.subtotal.toLocaleString();
+                document.getElementById("displayTax").innerText = "$" + data.tax.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById("displayDiscount").innerText = "-$" + data.discount.toLocaleString(undefined, {minimumFractionDigits: 2});
+                document.getElementById("displayGrandTotal").innerText = "$" + data.total.toLocaleString(undefined, {minimumFractionDigits: 2});
+
+                const itemTable = document.getElementById("invoiceItemsBody");
+                itemTable.innerHTML = data.items.map(item => `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>1</td>
+                        <td>$${item.price.toLocaleString()}</td>
+                        <td>$${item.price.toLocaleString()}</td>
+                    </tr>
+                `).join('');
+            }
+        });
+    </script>
 </body>
 </html>
