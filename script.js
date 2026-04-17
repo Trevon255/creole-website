@@ -10,11 +10,33 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. LOGIN & SECURITY LOGIC ---
+// --- 2. REGISTRATION & LOGIN LOGIC ---
 
-let loginAttempts = 0; // Track attempts for the current session
+let loginAttempts = 0; 
 
-// Question ii & iii: Login Validation & 3-Attempt Rule
+// Captures data from registration.html
+function saveRegistration(event) {
+    event.preventDefault(); 
+
+    const newUser = {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        dob: document.getElementById("dob").value,
+        gender: document.getElementById("gender").value,
+        email: document.getElementById("email").value,
+        trn: document.getElementById("trn").value,
+        password: document.getElementById("password").value 
+    };
+
+    let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+    users.push(newUser);
+    localStorage.setItem("RegistrationData", JSON.stringify(users));
+
+    alert("Registration Successful, " + newUser.firstName + "! You can now log in.");
+    window.location.href = "login.html"; 
+}
+
+// Validates credentials in login.html
 function checkLogin(event) {
     event.preventDefault(); 
 
@@ -24,26 +46,26 @@ function checkLogin(event) {
 
     const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
 
-    // Find user with matching TRN and Password
+    // Match lowercase keys exactly as saved in saveRegistration
     const userFound = users.find(u => u.trn === enteredTrn && u.password === enteredPass);
 
     if (userFound) {
         alert("Login Successful! Welcome, " + userFound.firstName);
-        window.location.href = "index.html"; // Redirect to catalog/home
+        window.location.href = "index.html"; 
     } else {
         loginAttempts++;
         let remaining = 3 - loginAttempts;
 
         if (loginAttempts >= 3) {
             alert("Account Locked: Too many failed attempts.");
-            window.location.href = "error.html"; // Redirect to error page
+            window.location.href = "error.html"; 
         } else {
             errorDisplay.innerText = `Invalid credentials. Attempts remaining: ${remaining}`;
         }
     }
 }
 
-// Question vi: Reset Password by matching TRN
+// Reset Password by matching TRN
 function resetPassword() {
     const trn = prompt("Enter your registered TRN to reset password:");
     if (!trn) return;
@@ -144,7 +166,7 @@ function generateInvoice() {
 
     const invoiceObj = {
         invoiceNumber: "CJ-" + Math.floor(100000 + Math.random() * 900000),
-        trn: "TRN-009-876-543", 
+        trn: document.getElementById("loginTrn")?.value || "N/A", 
         date: new Date().toLocaleDateString(),
         customer: name,
         shipping: address,
