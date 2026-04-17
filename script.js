@@ -13,7 +13,7 @@ const products = [
 // --- 2. DISPLAY FUNCTIONS ---
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
-    if (!grid) return;
+    if (!grid) return; //
 
     grid.innerHTML = products.map((p, i) => `
         <div class="product-card" style="background: white; border: 1px solid #eee; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px;">
@@ -21,12 +21,37 @@ function displayProductGrid() {
             <h3>${p.name}</h3>
             <p style="font-size: 0.9rem; color: #666; min-height: 40px;">${p.description}</p>
             <p style="font-weight: bold; color: #d63384; font-size: 1.2rem;">$${p.price.toLocaleString()} JMD</p>
-            <button onclick="addToCart(${i})" style="background: #d63384; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%;">Add to Bag</button>
+            <button onclick="addToCart(${i})" style="background: #d63384; color: white; border: none; padding: 12px; border-radius: 5px; cursor: pointer; width: 100%; font-weight: bold;">Add to Bag</button>
         </div>
     `).join('');
 }
 
-// --- 3. CART LOGIC ---
+// --- 3. SHOPPING BAG TABLE RENDERING ---
+function displayCartTable() {
+    const tableBody = document.getElementById("cart-table-body");
+    if (!tableBody) return;
+
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
+
+    if (cart.items.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px;">Your bag is empty.</td></tr>';
+        return;
+    }
+
+    tableBody.innerHTML = cart.items.map((item) => `
+        <tr>
+            <td style="display: flex; align-items: center; gap: 10px; padding: 10px;">
+                <img src="${item.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
+                ${item.name}
+            </td>
+            <td>$${item.price.toLocaleString()}</td>
+            <td>${item.quantity}</td>
+            <td>$${(item.price * item.quantity).toLocaleString()}</td>
+        </tr>
+    `).join('');
+}
+
+// --- 4. CART LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -39,8 +64,15 @@ function addToCart(index) {
     }
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    calculateTotals(cart); // This calculates and updates the UI
+    calculateTotals(cart); 
     alert(selected.name + " added to bag!");
+}
+
+function clearCart() {
+    if (confirm("Are you sure you want to clear your shopping bag?")) {
+        localStorage.removeItem("ShoppingCart");
+        location.reload(); // Refresh to update everything
+    }
 }
 
 function calculateTotals(cart) {
@@ -56,64 +88,26 @@ function calculateTotals(cart) {
 function updateSummaryUI(cart) {
     const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     
-    // Selecting IDs based on your HTML structure
     const subtotalEl = document.getElementById("cart-subtotal");
     const discountEl = document.getElementById("cart-discount");
     const taxEl = document.getElementById("cart-tax");
     const totalEl = document.getElementById("cart-total");
+    const checkoutTotalEl = document.getElementById("checkout-total"); // For checkout page
 
     if (subtotalEl) subtotalEl.innerText = fmt(cart.subtotal);
     if (discountEl) discountEl.innerText = fmt(cart.discounts);
     if (taxEl) taxEl.innerText = fmt(cart.taxes);
     if (totalEl) totalEl.innerText = fmt(cart.totalCost);
-}
-
-// --- 4. DASHBOARD STATS (Fixes your 1st Screenshot) ---
-function ShowDashboardStats() {
-    const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-    let genderStats = { Male: 0, Female: 0 };
-    let ageStats = { "18-25": 0, "26-35": 0, "36+": 0 };
-
-    users.forEach(user => {
-        // Gender counting
-        if (user.gender === "Male") genderStats.Male++;
-        else if (user.gender === "Female") genderStats.Female++;
-
-        // Age counting based on Date of Birth
-        if (user.dob) {
-            const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
-            if (age <= 25) ageStats["18-25"]++;
-            else if (age <= 35) ageStats["26-35"]++;
-            else ageStats["36+"]++;
-        }
-    });
-
-    const gDiv = document.getElementById("genderFrequency");
-    const aDiv = document.getElementById("ageFrequency");
-
-    if (gDiv) {
-        gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>` +
-                         `Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
-    }
-    if (aDiv) {
-        aDiv.innerHTML = `18-25: ${"█".repeat(ageStats["18-25"])} (${ageStats["18-25"]})<br>` +
-                         `26-35: ${"█".repeat(ageStats["26-35"])} (${ageStats["26-35"]})<br>` +
-                         `36+: ${"█".repeat(ageStats["36+"])} (${ageStats["36+"]})`;
-    }
+    if (checkoutTotalEl) checkoutTotalEl.innerText = fmt(cart.totalCost);
 }
 
 // --- 5. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
-    displayProductGrid();
+    displayProductGrid(); //
+    displayCartTable(); // Update the table if on cart.html
     
-    // Update summary if data exists in storage
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) {
         updateSummaryUI(savedCart);
-    }
-    
-    // Check if we are on the Dashboard page
-    if (document.getElementById("genderFrequency")) {
-        ShowDashboardStats();
     }
 });
