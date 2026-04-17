@@ -61,7 +61,7 @@ function updateSummaryUI(cart) {
     }
 }
 
-// --- 4. CART TABLE RENDERER (Fixes Missing Items) ---
+// --- 4. CART TABLE RENDERER ---
 function displayCartTable() {
     const tableBody = document.getElementById("cart-table-body");
     if (!tableBody) return;
@@ -86,7 +86,7 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 5. CHECKOUT ITEM DISPLAY (Fixes Checkout Details) ---
+// --- 5. CHECKOUT & INVOICE GENERATION ---
 function displayCheckoutDetails() {
     const detailsDisplay = document.getElementById("checkout-item-details");
     if (!detailsDisplay) return;
@@ -102,7 +102,42 @@ function displayCheckoutDetails() {
     }
 }
 
-// --- 6. REMOVE, CLEAR & INVOICE FUNCTIONS ---
+// This function was missing from your version!
+function generateInvoice() {
+    const name = document.getElementById("cust-name")?.value;
+    const address = document.getElementById("cust-address")?.value;
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+
+    if (!name || !address) {
+        alert("Please enter your name and delivery address.");
+        return;
+    }
+
+    let itemSummary = cart.items.map(item => 
+        `${item.name} x${item.quantity} - $${(item.price * item.quantity).toLocaleString()} JMD`
+    ).join('\n');
+
+    const receipt = `
+========================================
+       CREOLE JAMAICAN ARTISTRY
+            ORDER INVOICE
+========================================
+Customer: ${name}
+Address: ${address}
+----------------------------------------
+ITEMS:
+${itemSummary}
+----------------------------------------
+TOTAL PAID: $${cart.totalCost.toLocaleString()} JMD
+========================================
+    `;
+
+    alert(receipt);
+    localStorage.removeItem("ShoppingCart");
+    window.location.href = "index.html";
+}
+
+// --- 6. REMOVE & CLEAR FUNCTIONS ---
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
@@ -117,64 +152,12 @@ function clearCart() {
     }
 }
 
-// NEW: Confirm Order / Generate Invoice Function
-function generateInvoice() {
-    const name = document.getElementById("cust-name")?.value;
-    const address = document.getElementById("cust-address")?.value;
-    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-
-    if (!name || !address) {
-        alert("Please enter your name and delivery address to confirm the order.");
-        return;
-    }
-
-    if (!cart || !cart.items || cart.items.length === 0) {
-        alert("Your shopping bag is empty.");
-        return;
-    }
-
-    // Build invoice string
-    let itemSummary = cart.items.map(item => 
-        `${item.name} x${item.quantity} - $${(item.price * item.quantity).toLocaleString()} JMD`
-    ).join('\n');
-
-    const invoiceContent = `
-========================================
-       CREOLE JAMAICAN ARTISTRY
-            ORDER INVOICE
-========================================
-Date: ${new Date().toLocaleDateString()}
-Invoice #: ${Math.floor(Math.random() * 90000) + 10000}
-----------------------------------------
-CUSTOMER DETAILS:
-Name: ${name}
-Address: ${address}
-----------------------------------------
-ITEMS PURCHASED:
-${itemSummary}
-----------------------------------------
-Sub-total: $${cart.subtotal.toLocaleString()} JMD
-Discount (5%): -$${cart.discounts.toLocaleString()} JMD
-GCT (15%): $${cart.taxes.toLocaleString()} JMD
-========================================
-TOTAL PAID: $${cart.totalCost.toLocaleString()} JMD
-========================================
-Thank you for supporting local artistry!
-    `;
-
-    // Display formatted invoice
-    alert(invoiceContent);
-
-    // Clear cart and redirect to home
-    localStorage.removeItem("ShoppingCart");
-    window.location.href = "index.html";
-}
-
 // --- 7. INITIALIZE ---
 document.addEventListener("DOMContentLoaded", () => {
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (cart) updateSummaryUI(cart);
-    
-    displayCartTable();       // Runs on Cart page
-    displayCheckoutDetails(); // Runs on Checkout page
+    if (cart) {
+        updateSummaryUI(cart);
+        displayCartTable();       // Runs on Cart page
+        displayCheckoutDetails(); // Runs on Checkout page
+    }
 });
