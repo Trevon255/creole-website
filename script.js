@@ -130,11 +130,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savedCart) updateCartUI(savedCart);
 });
 
-//-------CHECKOUT-------
-
-
-
-
 // ------INVOICE------
 // 1. Initial Data & User Object
 let currentUser = {
@@ -152,7 +147,7 @@ function generateInvoice() {
     const newInvoice = {
         company: "Creole Jamaican Artistry",
         date: new Date().toLocaleDateString('en-JM'),
-        invoiceNumber: "CJA-" + Date.now().toString().slice(-6), // Unique 6-digit ID
+        invoiceNumber: "CJA-" + Date.now().toString().slice(-6), 
         trn: "123-456-789",
         shipping: { name: custName, address: custAddress },
         items: [
