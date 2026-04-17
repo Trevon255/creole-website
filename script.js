@@ -1,4 +1,3 @@
-
 /************************************************************
  * CREOLE JAMAICAN ARTISTRY - MASTER SCRIPT
  * Developer: Niketa Muschette
@@ -11,17 +10,47 @@ const products = [
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. LOGIN & SECURITY LOGIC (Requirements i - vi) ---
-let loginAttempts = 0; // Track failed attempts
+// --- 2. REGISTRATION, LOGIN & SECURITY LOGIC ---
+let loginAttempts = 0; 
 
+/**
+ * Requirement: Save registration data to localStorage
+ */
+function saveRegistration(event) {
+    event.preventDefault();
+    const pass = document.getElementById("password").value;
+    const confirm = document.getElementById("confirmPassword")?.value;
+
+    // Optional: Validate password match if field exists
+    if (confirm && pass !== confirm) {
+        alert("Passwords do not match!");
+        return;
+    }
+
+    const userData = {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        trn: document.getElementById("trn").value,
+        password: pass,
+        email: document.getElementById("email").value
+    };
+
+    // Requirement ii: Save to 'RegistrationData'
+    localStorage.setItem("RegistrationData", JSON.stringify(userData));
+    alert("Registration Successful! Please Login.");
+    window.location.href = "login.html";
+}
+
+/**
+ * Requirement i - iv: Handle Login attempts and validation
+ */
 function handleLogin(event) {
-    if (event) event.preventDefault(); // Stop page refresh
+    if (event) event.preventDefault(); 
     
     const trnInput = document.getElementById("loginTrn").value.trim();
     const passInput = document.getElementById("loginPassword").value;
     const errorMsg = document.getElementById("errorMsg");
 
-    // Requirement ii: Validate against localStorage 'RegistrationData'
     const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
 
     if (!storedData) {
@@ -29,25 +58,25 @@ function handleLogin(event) {
         return;
     }
 
-    // Requirement ii: Check TRN and Password
     if (storedData.trn === trnInput && storedData.password === passInput) {
         alert("Login Successful! Redirecting to Catalog...");
         loginAttempts = 0; 
         localStorage.setItem("isLoggedIn", "true");
-        window.location.href = "index.html"; // Requirement iii: Redirect to product catalog
+        window.location.href = "index.html"; 
     } else {
         loginAttempts++;
-        // Requirement iii: 3 Attempts Limit
         if (loginAttempts >= 3) {
             alert("Account Locked: Too many failed attempts.");
-            window.location.href = "error.html"; // Redirect to error/locked page
+            window.location.href = "error.html"; 
         } else {
             if (errorMsg) errorMsg.innerText = `Invalid credentials. Attempt ${loginAttempts} of 3.`;
         }
     }
 }
 
-// Requirement vi: Reset Password by matching TRN
+/**
+ * Requirement vi: Reset Password by matching TRN
+ */
 function resetPassword() {
     const trnConfirm = prompt("Please enter your TRN to verify your identity:");
     const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
@@ -56,12 +85,17 @@ function resetPassword() {
         const newPass = prompt("Enter your new password:");
         if (newPass) {
             storedData.password = newPass;
-            localStorage.setItem("RegistrationData", JSON.stringify(storedData)); // Update storage
+            localStorage.setItem("RegistrationData", JSON.stringify(storedData));
             alert("Password updated successfully! You can now log in.");
         }
     } else {
         alert("TRN verification failed. Account not found.");
     }
+}
+
+function logout() {
+    localStorage.removeItem("isLoggedIn");
+    window.location.href = "login.html";
 }
 
 // --- 3. DISPLAY FUNCTIONS ---
@@ -244,4 +278,3 @@ document.addEventListener("DOMContentLoaded", () => {
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (savedCart) updateSummaryUI(savedCart);
 });
-```
