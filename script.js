@@ -3,16 +3,70 @@
  * Developer: Niketa Muschette
  ************************************************************/
 
-// Question 1: Create an array of product objects in JavaScript.
+// 1. PRODUCT DATA
 const products = [
     { id: 101, name: "Rustic Burlap Tote", price: 3500, description: "Hand-stitched natural fiber tote.", image: "Assets/burlap bag.jpg" },
     { id: 102, name: "Artisan Serving Tray", price: 5800, description: "Cedar wood tray with Jamaican patterns.", image: "Assets/large tray .jpg" },
     { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
-// --- 2. DISPLAY FUNCTIONS ---
+// --- 2. LOGIN & SECURITY LOGIC ---
 
-// Question 2: Display the product list dynamically on the website.
+let loginAttempts = 0; // Track attempts for the current session
+
+// Question ii & iii: Login Validation & 3-Attempt Rule
+function checkLogin(event) {
+    event.preventDefault(); 
+
+    const enteredTrn = document.getElementById("loginTrn").value;
+    const enteredPass = document.getElementById("loginPassword").value;
+    const errorDisplay = document.getElementById("errorMsg");
+
+    const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+
+    // Find user with matching TRN and Password
+    const userFound = users.find(u => u.trn === enteredTrn && u.password === enteredPass);
+
+    if (userFound) {
+        alert("Login Successful! Welcome, " + userFound.firstName);
+        window.location.href = "index.html"; // Redirect to catalog/home
+    } else {
+        loginAttempts++;
+        let remaining = 3 - loginAttempts;
+
+        if (loginAttempts >= 3) {
+            alert("Account Locked: Too many failed attempts.");
+            window.location.href = "error.html"; // Redirect to error page
+        } else {
+            errorDisplay.innerText = `Invalid credentials. Attempts remaining: ${remaining}`;
+        }
+    }
+}
+
+// Question vi: Reset Password by matching TRN
+function resetPassword() {
+    const trn = prompt("Enter your registered TRN to reset password:");
+    if (!trn) return;
+
+    let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+    const userIndex = users.findIndex(u => u.trn === trn);
+
+    if (userIndex !== -1) {
+        const newPass = prompt("Enter new password (min 8 characters):");
+        if (newPass && newPass.length >= 8) {
+            users[userIndex].password = newPass;
+            localStorage.setItem("RegistrationData", JSON.stringify(users));
+            alert("Password updated! You can now log in.");
+        } else {
+            alert("Update failed. Password too short.");
+        }
+    } else {
+        alert("TRN not found.");
+    }
+}
+
+// --- 3. DISPLAY FUNCTIONS ---
+
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
     if (!grid) return;
@@ -26,7 +80,6 @@ function displayProductGrid() {
     `).join('');
 }
 
-// Question 3: Create a shopping cart page that lists items.
 function displayCartTable() {
     const body = document.getElementById("cart-table-body");
     if (!body) return;
@@ -46,24 +99,8 @@ function displayCartTable() {
     `).join('');
 }
 
-// Question 4: Show a summary of the shopping cart with the total cost.
-function displayCheckoutDetails() {
-    const el = document.getElementById("checkout-item-details");
-    if (!el) return;
-    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (cart && cart.items) {
-        el.innerHTML = cart.items.map(i => `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>${i.quantity}x ${i.name}</span>
-                <span>$${(i.price * i.quantity).toLocaleString()} JMD</span>
-            </div>
-        `).join('');
-    }
-}
+// --- 4. CART & INVOICE LOGIC ---
 
-// --- 3. CART LOGIC ---
-
-// Question 5: Add selected product to the shopping cart.
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -74,7 +111,6 @@ function addToCart(index) {
     alert(selected.name + " added!");
 }
 
-// Question 6: Calculate and display total price of items in the cart (Taxes 15%, Discount 5%).
 function calculateTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     cart.discounts = cart.subtotal * 0.05;
@@ -96,9 +132,6 @@ function updateSummaryUI(cart) {
     });
 }
 
-// --- 4. THE INVOICE GENERATOR ---
-
-// Question 7: Generate an invoice and store in AllInvoices array in localStorage.
 function generateInvoice() {
     const name = document.getElementById("cust-name")?.value;
     const address = document.getElementById("cust-address")?.value;
@@ -109,21 +142,13 @@ function generateInvoice() {
         return;
     }
 
-    const invoiceID = "CJ-" + Math.floor(100000 + Math.random() * 900000);
-    const today = new Date().toLocaleDateString();
-    const trn = "TRN-009-876-543"; 
-
     const invoiceObj = {
-        company: "Creole Jamaican Artistry",
-        invoiceNumber: invoiceID,
-        trn: trn,
-        date: today,
+        invoiceNumber: "CJ-" + Math.floor(100000 + Math.random() * 900000),
+        trn: "TRN-009-876-543", 
+        date: new Date().toLocaleDateString(),
         customer: name,
         shipping: address,
         items: cart.items,
-        subtotal: cart.subtotal,
-        discountTotal: cart.discounts,
-        taxTotal: cart.taxes,
         grandTotal: cart.totalCost
     };
 
@@ -131,12 +156,11 @@ function generateInvoice() {
     history.push(invoiceObj);
     localStorage.setItem("AllInvoices", JSON.stringify(history));
 
-    alert("Invoice Generated Successfully!");
+    alert("Invoice Generated!");
     localStorage.removeItem("ShoppingCart");
     window.location.href = "invoice.html";
 }
 
-// Question 8 & 9: Remove items and Clear Cart.
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
@@ -144,90 +168,46 @@ function removeItem(index) {
     displayCartTable();
 }
 
-function clearCart() {
-    if(confirm("Clear Bag?")) { localStorage.removeItem("ShoppingCart"); location.reload(); }
-}
+// --- 5. DASHBOARD FUNCTIONS ---
 
-/************************************************************
- * DASHBOARD & ADMIN FUNCTIONALITIES
- ************************************************************/
-
-// Question 10: ShowUserFrequency() – Simple Frequency Stats
 function ShowUserFrequency() {
-    // Ensuring it uses "RegistrationData" per requirements
     const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-    
     let genderStats = { Male: 0, Female: 0, Other: 0 };
     let ageStats = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
 
     users.forEach(user => {
-        // Count Gender
         if (genderStats[user.gender] !== undefined) genderStats[user.gender]++;
-        
-        // Count Age Group
-        const birthYear = new Date(user.dob).getFullYear();
-        const age = new Date().getFullYear() - birthYear;
-
+        const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
         if (age >= 18 && age <= 25) ageStats["18-25"]++;
         else if (age >= 26 && age <= 35) ageStats["26-35"]++;
         else if (age >= 36 && age <= 50) ageStats["36-50"]++;
         else if (age > 50) ageStats["50+"]++;
     });
 
-    const genderDiv = document.getElementById("genderFrequency");
-    const ageDiv = document.getElementById("ageFrequency");
+    const gDiv = document.getElementById("genderFrequency");
+    const aDiv = document.getElementById("ageFrequency");
 
-    if (genderDiv) {
-        genderDiv.innerHTML = `
-            <p><strong>Male:</strong> ${genderStats.Male}</p>
-            <p><strong>Female:</strong> ${genderStats.Female}</p>
-            <p><strong>Other:</strong> ${genderStats.Other}</p>
-        `;
-    }
-
-    if (ageDiv) {
-        ageDiv.innerHTML = `
-            <p><strong>18-25:</strong> ${ageStats["18-25"]}</p>
-            <p><strong>26-35:</strong> ${ageStats["26-35"]}</p>
-            <p><strong>36-50:</strong> ${ageStats["36-50"]}</p>
-            <p><strong>50+:</strong> ${ageStats["50+"]}</p>
-        `;
-    }
+    if (gDiv) gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
+    if (aDiv) aDiv.innerHTML = `18-25: ${"█".repeat(ageStats["18-25"])} (${ageStats["18-25"]})`;
 }
 
-// Question 11: ShowInvoices() - Log to console
 function ShowInvoices() {
-    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    console.log("--- Stored Invoices ---", allInvoices);
-    alert("Invoice list sent to the console (F12).");
+    console.table(JSON.parse(localStorage.getItem("AllInvoices")) || []);
 }
 
-// Question 12: GetUserInvoices() – Filter by TRN
 function GetUserInvoices() {
-    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    const searchTRN = document.getElementById("searchTRN")?.value;
-    const displayArea = document.getElementById("invoiceDisplayArea");
-
-    if (!searchTRN) return;
-
-    const results = allInvoices.filter(inv => inv.trn === searchTRN);
-
-    displayArea.innerHTML = results.length ? 
-        results.map(inv => `<p>Invoice: ${inv.invoiceNumber} | Date: ${inv.date} | Total: $${inv.grandTotal}</p>`).join('') : 
-        `<p style="color:red;">No invoices found for TRN: ${searchTRN}</p>`;
+    const trn = document.getElementById("searchTRN").value;
+    const invs = (JSON.parse(localStorage.getItem("AllInvoices")) || []).filter(i => i.trn === trn);
+    document.getElementById("invoiceDisplayArea").innerHTML = invs.map(i => `<p>Inv: ${i.invoiceNumber} - $${i.grandTotal}</p>`).join('');
 }
 
-// --- 5. INITIALIZATION ---
+// --- 6. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
     displayProductGrid();
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (cart) {
         updateSummaryUI(cart);
         displayCartTable();
-        displayCheckoutDetails();
     }
-    
-    if (document.getElementById("genderFrequency")) {
-        ShowUserFrequency();
-    }
+    if (document.getElementById("genderFrequency")) ShowUserFrequency();
 });
