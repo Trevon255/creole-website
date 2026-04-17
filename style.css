@@ -56,56 +56,55 @@ nav a:hover {
     box-shadow: var(--soft-shadow);
 }
 
-/* -----Registration-----*/
-/* Center the container on the screen */
-.registration-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-family: Arial, sans-serif;
+/* --- MODERN REGISTRATION & LOGIN FORMS --- */
+/* Replaces the old .registration-container with a modern, brand-aligned version */
+.registration-container, .login-container {
+    max-width: 500px; /* Slightly wider for better readability */
+    margin: 40px auto;
+    padding: 40px;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: var(--soft-shadow);
+    border: 1px solid #f1f1f1;
 }
 
-/* Make each label/input pair stack vertically */
 .form-group {
     display: flex;
     flex-direction: column;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
-/* Style the labels */
 .form-group label {
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
 }
 
-/* Make inputs and selects full width and pretty */
+/* The "pretty" inputs: matched to the checkout page style */
 .form-group input, 
-.form-group select {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%; /* Ensures they don't shrink */
-    box-sizing: border-box; /* Prevents padding from adding to width */
+.form-group select,
+.form-group textarea {
+    padding: 14px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    background-color: var(--gray);
+    color: var(--creole-dark);
+    font-size: 0.95rem;
+    width: 100%;
+    box-sizing: border-box;
+    transition: 0.3s ease;
 }
 
-/* Style your buttons to sit side-by-side */
-.btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #333;
-    color: white;
-    margin-right: 10px;
+.form-group input:focus, 
+.form-group select:focus {
+    border-color: var(--creole-pink);
+    background-color: var(--white);
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(244, 207, 223, 0.3);
 }
-
-.btn:hover {
-    background-color: #555;
-}
-
 
 /* --- PRODUCT GRID --- */
 .product-grid {
@@ -148,7 +147,7 @@ nav a:hover {
     margin-bottom: 20px;
 }
 
-/* --- MODERN TOTALS SECTION (Products Page) --- */
+/* --- MODERN TOTALS SECTION --- */
 .shopping-cart-totals {
     background: #fffcfd;
     border: 1px solid var(--creole-pink);
@@ -189,7 +188,7 @@ nav a:hover {
     font-weight: 800;
 }
 
-/* --- SHOPPING BAG TABLE (Cart Page) --- */
+/* --- SHOPPING BAG TABLE --- */
 table {
     width: 100%;
     border-collapse: separate;
@@ -229,11 +228,16 @@ td:last-child { border-right: 1px solid #f1f1f1; border-radius: 0 12px 12px 0; }
     cursor: pointer;
     font-weight: 700;
     font-size: 0.9rem;
+    text-align: center;
 }
 
 .btn:hover {
     background-color: var(--creole-pink-dark);
     box-shadow: 0 5px 15px rgba(214, 51, 132, 0.3);
+}
+
+.btn-secondary {
+    background-color: #9ca3af;
 }
 
 .btn-clear {
@@ -245,7 +249,6 @@ td:last-child { border-right: 1px solid #f1f1f1; border-radius: 0 12px 12px 0; }
 }
 
 /* --- DASHBOARD SPECIFIC --- */
-/* We wrap dashboard styles in a class so they don't mess up the products page */
 .dashboard-view {
     max-width: 900px;
     margin: auto;
@@ -265,6 +268,5 @@ footer {
     color: #aaa;
     border-top: 1px solid #eee;
 }
-
 
 
