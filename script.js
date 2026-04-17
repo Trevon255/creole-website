@@ -3,7 +3,7 @@
  * Developer: Niketa Muschette
  ************************************************************/
 
-// --- 1. PRODUCT CATALOGUE ---
+// Question 1: Create an array of product objects in JavaScript.
 const products = [
     { id: 101, name: "Rustic Burlap Tote", price: 3500, description: "Hand-stitched natural fiber tote.", image: "Assets/burlap bag.jpg" },
     { id: 102, name: "Artisan Serving Tray", price: 5800, description: "Cedar wood tray with Jamaican patterns.", image: "Assets/large tray .jpg" },
@@ -11,6 +11,8 @@ const products = [
 ];
 
 // --- 2. DISPLAY FUNCTIONS ---
+
+// Question 2: Display the product list dynamically on the website.
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
     if (!grid) return;
@@ -24,6 +26,7 @@ function displayProductGrid() {
     `).join('');
 }
 
+// Question 3: Create a shopping cart page that lists items.
 function displayCartTable() {
     const body = document.getElementById("cart-table-body");
     if (!body) return;
@@ -43,6 +46,7 @@ function displayCartTable() {
     `).join('');
 }
 
+// Question 4: Show a summary of the shopping cart with the total cost.
 function displayCheckoutDetails() {
     const el = document.getElementById("checkout-item-details");
     if (!el) return;
@@ -58,6 +62,8 @@ function displayCheckoutDetails() {
 }
 
 // --- 3. CART LOGIC ---
+
+// Question 5: Add selected product to the shopping cart.
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -68,6 +74,7 @@ function addToCart(index) {
     alert(selected.name + " added!");
 }
 
+// Question 6: Calculate and display total price of items in the cart (Taxes 15%, Discount 5%).
 function calculateTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
     cart.discounts = cart.subtotal * 0.05;
@@ -89,7 +96,10 @@ function updateSummaryUI(cart) {
     });
 }
 
-// --- 4. THE INVOICE GENERATOR (New & Updated) ---
+// --- 4. THE INVOICE GENERATOR ---
+
+// Question 7: Generate an invoice and store in AllInvoices array in localStorage.
+// Created by: Lee
 function generateInvoice() {
     const name = document.getElementById("cust-name")?.value;
     const address = document.getElementById("cust-address")?.value;
@@ -100,12 +110,10 @@ function generateInvoice() {
         return;
     }
 
-    // A. Generate Metadata
     const invoiceID = "CJ-" + Math.floor(100000 + Math.random() * 900000);
     const today = new Date().toLocaleDateString();
-    const trn = "TRN-009-876-543";
+    const trn = "TRN-009-876-543"; // Default business TRN
 
-    // B. Build Invoice Object
     const invoiceObj = {
         company: "Creole Jamaican Artistry",
         invoiceNumber: invoiceID,
@@ -120,41 +128,16 @@ function generateInvoice() {
         grandTotal: cart.totalCost
     };
 
-    // C. Store to "AllInvoices" Array
     let history = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     history.push(invoiceObj);
     localStorage.setItem("AllInvoices", JSON.stringify(history));
 
-    // D. Visual Display
-    let itemSummary = cart.items.map(i => `${i.name} x${i.quantity} - $${(i.price * i.quantity).toLocaleString()}`).join('\n');
-    
-    const receipt = `
-========================================
-       CREOLE JAMAICAN ARTISTRY
-            OFFICIAL INVOICE
-========================================
-Invoice #: ${invoiceID}
-Date: ${today} | TRN: ${trn}
-----------------------------------------
-Bill To: ${name}
-Address: ${address}
-----------------------------------------
-Items:
-${itemSummary}
-----------------------------------------
-Subtotal: $${cart.subtotal.toLocaleString()}
-Discount (5%): -$${cart.discounts.toLocaleString()}
-GCT (15%): $${cart.taxes.toLocaleString()}
-TOTAL COST: $${cart.totalCost.toLocaleString()} JMD
-========================================
-Invoice sent to your email!
-    `;
-
-    alert(receipt);
+    alert("Invoice Generated Successfully!");
     localStorage.removeItem("ShoppingCart");
-    window.location.href = "index.html";
+    window.location.href = "invoice.html";
 }
 
+// Question 8 & 9: Remove items and Clear Cart.
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     cart.items.splice(index, 1);
@@ -166,7 +149,95 @@ function clearCart() {
     if(confirm("Clear Bag?")) { localStorage.removeItem("ShoppingCart"); location.reload(); }
 }
 
-// --- 5. INIT ---
+/************************************************************
+ * DASHBOARD & ADMIN FUNCTIONALITIES
+ ************************************************************/
+
+// Question 10: ShowUserFrequency() – Show user frequency based on Gender and Age Group
+function ShowUserFrequency() {
+    const users = JSON.parse(localStorage.getItem("RegisterData")) || [];
+    
+    // i. Gender Categories
+    let genderStats = { Male: 0, Female: 0, Other: 0 };
+    
+    // ii. Age Groups
+    let ageStats = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
+
+    users.forEach(user => {
+        // Count Gender
+        if (genderStats[user.gender] !== undefined) {
+            genderStats[user.gender]++;
+        } else {
+            genderStats["Other"]++;
+        }
+
+        // Calculate Age and Count Groups
+        const birthDate = new Date(user.dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        
+        if (age >= 18 && age <= 25) ageStats["18-25"]++;
+        else if (age >= 26 && age <= 35) ageStats["26-35"]++;
+        else if (age >= 36 && age <= 50) ageStats["36-50"]++;
+        else if (age > 50) ageStats["50+"]++;
+    });
+
+    // iii. Display this data on a dashboard
+    const genderDiv = document.getElementById("genderFrequency");
+    const ageDiv = document.getElementById("ageFrequency");
+
+    if (genderDiv) {
+        genderDiv.innerHTML = `<strong>Gender Distribution:</strong><br> 
+            Male: ${genderStats.Male} | Female: ${genderStats.Female} | Other: ${genderStats.Other}`;
+    }
+    if (ageDiv) {
+        ageDiv.innerHTML = `<strong>Age Group Distribution:</strong><br> 
+            18-25: ${ageStats["18-25"]} | 26-35: ${ageStats["26-35"]} | 36-50: ${ageStats["36-50"]} | 50+: ${ageStats["50+"]}`;
+    }
+}
+
+// Question 11: ShowInvoices() - displays all invoices and allows search by TRN using console.log()
+function ShowInvoices() {
+    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    const searchTRN = document.getElementById("searchTRN")?.value;
+
+    console.log("--- All Stored Invoices ---");
+    console.table(allInvoices);
+
+    if (searchTRN) {
+        const results = allInvoices.filter(inv => inv.trn === searchTRN);
+        console.log(`--- Search Results for TRN: ${searchTRN} ---`);
+        console.table(results);
+        alert("Search results sent to the Console (F12).");
+    }
+}
+
+// Question 12: GetUserInvoices() – displays all the invoices for a user based on trn stored in localStorage
+function GetUserInvoices() {
+    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    const searchTRN = document.getElementById("searchTRN")?.value;
+    const displayArea = document.getElementById("invoiceDisplayArea");
+
+    if (!searchTRN) {
+        alert("Please enter a TRN to search.");
+        return;
+    }
+
+    const userInvoices = allInvoices.filter(inv => inv.trn === searchTRN);
+
+    if (userInvoices.length === 0) {
+        displayArea.innerHTML = `<p style="color:red;">No invoices found for TRN: ${searchTRN}</p>`;
+    } else {
+        displayArea.innerHTML = userInvoices.map(inv => `
+            <div class="invoice-item" style="border-bottom: 1px solid #ddd; padding: 10px 0;">
+                <p><strong>Invoice #:</strong> ${inv.invoiceNumber} | <strong>Date:</strong> ${inv.date}</p>
+                <p><strong>Customer:</strong> ${inv.customer} | <strong>Total:</strong> $${inv.grandTotal.toLocaleString()} JMD</p>
+            </div>
+        `).join('');
+    }
+}
+
+// --- 5. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
     displayProductGrid();
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
@@ -174,5 +245,10 @@ document.addEventListener("DOMContentLoaded", () => {
         updateSummaryUI(cart);
         displayCartTable();
         displayCheckoutDetails();
+    }
+    
+    // Automatically run dashboard stats if the dashboard divs exist
+    if (document.getElementById("genderFrequency")) {
+        ShowUserFrequency();
     }
 });
