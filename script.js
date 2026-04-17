@@ -84,15 +84,19 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 4. CHECKOUT & INVOICE LOGIC ---
+// --- 4. UPDATED CLEAR CART LOGIC ---
 
-// ADDED: CLEAR CART FUNCTION
-function clearCart() {
+// Explicitly attaching to 'window' ensures HTML can always find it
+window.clearCart = function() {
     if (confirm("Are you sure you want to empty your shopping bag?")) {
         localStorage.removeItem("ShoppingCart");
-        location.reload(); // Refresh to show empty state
+        // Clear summary totals immediately
+        const emptyData = { subtotal: 0, discounts: 0, taxes: 0, totalCost: 0 };
+        updateSummaryUI(emptyData);
+        // Refresh the page to update the table
+        window.location.reload();
     }
-}
+};
 
 function calculateTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
@@ -181,7 +185,6 @@ function removeItem(index) {
 
 function ShowUserFrequency() {
     const allUsers = JSON.parse(localStorage.getItem("AllUsers")) || [];
-    
     let genderCounts = { Male: 0, Female: 0, Other: 0 };
     let ageGroups = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
 
