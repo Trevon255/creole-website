@@ -3,26 +3,11 @@
  * Developer: Niketa Muschette
  ************************************************************/
 
-// --- 1. PRODUCT CATALOGUE (Arrays & Objects) ---
+// --- 1. PRODUCT CATALOGUE ---
 const products = [
-    { 
-        name: "Rustic Burlap Tote", 
-        price: 3500, 
-        description: "Hand-stitched natural fiber tote with reinforced handles.", 
-        image: "Assets/burlap bag.jpg" 
-    },
-    { 
-        name: "Artisan Serving Tray", 
-        price: 5800, 
-        description: "Cedar wood tray with hand-painted Jamaican patterns.", 
-        image: "Assets/large tray .jpg" 
-    },
-    { 
-        name: "Creole Accent Set", 
-        price: 4200, 
-        description: "A collection of 3 ceramic coasters and a matching vase.", 
-        image: "Assets/collection.jpg" 
-    }
+    { id: 101, name: "Rustic Burlap Tote", price: 3500, description: "Hand-stitched natural fiber tote.", image: "Assets/burlap bag.jpg" },
+    { id: 102, name: "Artisan Serving Tray", price: 5800, description: "Cedar wood tray with Jamaican patterns.", image: "Assets/large tray .jpg" },
+    { id: 103, name: "Creole Accent Set", price: 4200, description: "Coasters and matching vase set.", image: "Assets/collection.jpg" }
 ];
 
 // Requirement: Keep updated list on localStorage as AllProducts
@@ -45,26 +30,53 @@ function displayProducts() {
     `).join('');
 }
 
-// --- 3. SHOPPING CART LOGIC ---
+// --- 3. SHOPPING CART LOGIC (localStorage & Objects) ---
 function addToCart(index) {
-    let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [], subtotal: 0, taxes: 0, discounts: 0, totalCost: 0 };
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { 
+        items: [], 
+        subtotal: 0, 
+        taxes: 0, 
+        discounts: 0, 
+        totalCost: 0 
+    };
     
-    // Add product details
-    cart.items.push(products[index]);
+    const selectedProduct = products[index];
     
-    // Requirement: Calculations (Subtotal, 5% Discount, 15% GCT)
+    // Check if product already in cart to update quantity
+    const existingItem = cart.items.find(item => item.id === selectedProduct.id);
+    
+    if (existingItem) {
+        existingItem.quantity += 1;
+    } else {
+        // Add product details + quantity property
+        cart.items.push({ 
+            id: selectedProduct.id, 
+            name: selectedProduct.name, 
+            price: selectedProduct.price, 
+            quantity: 1 
+        });
+    }
+    
     calculateCartTotals(cart);
+    alert(`${selectedProduct.name} added to bag!`);
 }
 
 function calculateCartTotals(cart) {
-    cart.subtotal = cart.items.reduce((sum, item) => sum + item.price, 0);
+    // 1. Subtotal (Price * Quantity)
+    cart.subtotal = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // 2. Discount (5% Creole Discount)
     cart.discounts = cart.subtotal * 0.05; 
+    
+    // 3. GCT (15% Tax on discounted subtotal)
     cart.taxes = (cart.subtotal - cart.discounts) * 0.15; 
+    
+    // 4. Final Total
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
+    // Requirement: Update localStorage object
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     updateSummaryUI(cart);
-    alert("Item added to bag!");
 }
 
 // --- 4. CART PAGE ACTIONS ---
@@ -82,16 +94,31 @@ function displayCart() {
     }
 
     cart.items.forEach((item, index) => {
+        const lineTotal = item.price * item.quantity;
         tableBody.innerHTML += `
             <tr>
                 <td>${item.name}</td>
                 <td>$${item.price.toLocaleString()}</td>
-                <td>1</td>
-                <td>$${item.price.toLocaleString()}</td>
+                <td>
+                    <input type="number" value="${item.quantity}" min="1" 
+                           onchange="updateQty(${index}, this.value)" style="width:50px;">
+                </td>
+                <td>$${lineTotal.toLocaleString()}</td>
                 <td><button onclick="removeItem(${index})" class="btn-remove">Remove</button></td>
             </tr>`;
     });
     updateSummaryUI(cart);
+}
+
+// Requirement: Update Quantities
+function updateQty(index, newQty) {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    const qty = parseInt(newQty);
+    if (qty > 0) {
+        cart.items[index].quantity = qty;
+        calculateCartTotals(cart);
+        displayCart();
+    }
 }
 
 function removeItem(index) {
@@ -101,9 +128,8 @@ function removeItem(index) {
     displayCart();
 }
 
-// Requirement: Clear All Button Logic
 function clearAll() {
-    if (confirm("Are you sure you want to remove all items from your shopping cart?")) {
+    if (confirm("Clear all items from your shopping cart?")) {
         localStorage.removeItem("ShoppingCart");
         displayCart();
         updateSummaryUI(null);
@@ -129,7 +155,7 @@ function updateSummaryUI(cart) {
 function confirmCheckout(event) {
     event.preventDefault();
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (!cart) return alert("Nothing to checkout!");
+    if (!cart || cart.items.length === 0) return alert("Nothing to checkout!");
 
     const invoice = {
         invoiceNo: "CJA-" + Math.floor(Math.random() * 900000 + 100000),
