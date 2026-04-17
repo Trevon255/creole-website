@@ -159,6 +159,9 @@ function updateSummaryUI(cart) {
 
 // --- 5. CHECKOUT & INVOICE ---
 function generateInvoice(event) {
+    const addr = document.getElementById("custAddress")?.value || "N/A";
+    let user = JSON.parse(localStorage.getItem("LoggedInUser"));
+let trn = user?.trn || "000-000-000";
     if (event) event.preventDefault();
 
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
@@ -167,9 +170,10 @@ function generateInvoice(event) {
     const name = document.getElementById("custName")?.value || "Guest";
     const addr = document.getElementById("custAddress")?.value || "N/A";
 
-   const newInvoice = {
+  const newInvoice = {
     invoiceNumber: "CJA-" + Math.floor(Math.random() * 899999 + 100000),
     date: new Date().toLocaleDateString('en-JM'),
+    trn: trn,
     shipping: { name: name, address: addr },
     items: cart.items,
     subtotal: cart.subtotal,
