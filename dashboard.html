@@ -6,8 +6,8 @@
     <title>Admin Dashboard | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; }
+        .container { max-width: 900px; margin: 40px auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .stat-card { 
             background: #fff; 
             padding: 15px; 
@@ -15,6 +15,8 @@
             border-radius: 8px; 
             border-left: 5px solid #d63384; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 1.1rem;
+            color: #333;
         }
         .invoice-item { 
             background: #fdfdfd; 
@@ -28,6 +30,7 @@
         button { padding: 10px 15px; background: #d63384; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
         button:hover { background: #b02a6b; }
         .nav-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #d63384; font-weight: bold; }
+        h1, h2 { color: #222; }
     </style>
 </head>
 <body>
@@ -47,7 +50,7 @@
             </div>
         </section>
 
-        <hr style="margin: 40px 0;">
+        <hr style="margin: 40px 0; border: 0; border-top: 1px solid #eee;">
 
         <section>
             <h2>Invoice Management</h2>
@@ -56,8 +59,7 @@
                 <input type="text" id="trnInput" placeholder="Enter TRN (e.g., 123-456-789)">
                 
                 <button id="auditBtn">Audit (Console Log)</button>
-                
-                <button id="displayResultsBtn">Display Results</button>
+                <button id="displayResultsBtn" onclick="ShowInvoices()">Display Results</button>
             </div>
             
             <h3>Search Results</h3>
