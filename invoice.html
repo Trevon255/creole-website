@@ -2,57 +2,66 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Invoice | Creole</title>
+    <title>Invoice | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .invoice-box { background: #fff; padding: 40px; border: 1px solid #eee; max-width: 800px; margin: auto; }
+        .invoice-header { display: flex; justify-content: space-between; border-bottom: 2px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
+        .shipping-info { margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f4f4f4; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .inv-footer { text-align: right; margin-top: 20px; line-height: 1.8; }
+    </style>
 </head>
 <body>
-    <div class="invoice-container">
-        <header>
-            <img src="Assets/creole.jpg" alt="Logo" class="invoice-logo">
-            <h2>Creole Jamaican Artistry</h2>
-            <p><strong>TRN:</strong> 123-456-789</p>
-        </header>
+    <div class="container">
+        <button class="btn" onclick="window.print()" style="margin-bottom: 20px;">Print Invoice</button>
+        
+        <div class="invoice-box">
+            <div class="invoice-header">
+                <div>
+                    <h1>INVOICE</h1>
+                    <p><strong>Invoice #:</strong> <span id="displayInvNum">---</span></p>
+                    <p><strong>Date:</strong> <span id="displayDate">---</span></p>
+                </div>
+                <div style="text-align: right;">
+                    <h3>Creole Jamaican Artistry</h3>
+                    <p>Kingston, Jamaica</p>
+                    <p>TRN: 123-456-789</p>
+                </div>
+            </div>
 
-        <section class="invoice-title">
-            <h1>INVOICE</h1>
-            <p>Invoice #: <span id="displayInvNum"></span></p>
-            <p>Date: <span id="displayDate"></span></p>
-        </section>
+            <div class="shipping-info">
+                <h4>Customer Details:</h4>
+                <p><strong>Name:</strong> <span id="displayShipName">---</span></p>
+                <p><strong>Address:</strong> <span id="displayShipAddr">---</span></p>
+            </div>
 
-        <section class="shipping-info">
-            <h3>Shipping To:</h3>
-            <p id="displayShipName"></p>
-            <p id="displayShipAddr"></p>
-        </section>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Discount</th>
+                        <th>Sub-total</th>
+                    </tr>
+                </thead>
+                <tbody id="invoiceItemsBody">
+                    </tbody>
+            </table>
 
-        <table class="invoice-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Price</th>
-                    <th>Discount</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody id="invoiceItemsBody">
-                </tbody>
-        </table>
-
-        <div class="totals-area">
-            <p>Subtotal: <span id="displaySubtotal"></span></p>
-            <p>Tax (GCT 15%): <span id="displayTax"></span></p>
-            <h2 class="grand-total">Grand Total: <span id="displayGrandTotal"></span> JMD</h2>
+            <div class="inv-footer">
+                <p>Sub-total: <span id="displaySubtotal">$0.00</span></p>
+                <p>GCT (15%): <span id="displayTax">$0.00</span></p>
+                <hr>
+                <h3 style="color: #d63384;">Grand Total: <span id="displayGrandTotal">$0.00</span></h3>
+            </div>
+            
+            <p style="margin-top: 50px; text-align: center; color: #888;">Thank you for supporting Jamaican Artistry!</p>
         </div>
-
-        <footer>
-            <p>Thank you for supporting authentic Jamaican craftsmanship!</p>
-            <p><em>A copy of this invoice has been sent to your email.</em></p>
-            <button onclick="window.print()" class="btn">Print Invoice</button>
-            <a href="index.html" class="btn" style="background: #666;">Return Home</a>
-        </footer>
     </div>
-
-    <script src="../script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
