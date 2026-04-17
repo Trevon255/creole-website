@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reset Password | Creole Jamaican Artistry</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .reset-container { max-width: 400px; margin: 100px auto; padding: 30px; border: 1px solid #eee; border-radius: 12px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #d63384; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="reset-container">
+        <h2>Reset Password</h2>
+        <p>Enter your registered TRN to set a new password.</p>
+        <input type="text" id="resetTrn" placeholder="TRN (000-000-000)" required>
+        <input type="password" id="newPass" placeholder="New Password" required>
+        <button onclick="performReset()">Update Password</button>
+        <p><a href="login.html" style="color: #666; font-size: 14px;">Back to Login</a></p>
+    </div>
+
+    <script>
+        function performReset() {
+            const trn = document.getElementById('resetTrn').value;
+            const newPass = document.getElementById('newPass').value;
+            const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
+
+            if (storedData && storedData.trn === trn) {
+                // Update the password in the stored object
+                storedData.password = newPass;
+                localStorage.setItem("RegistrationData", JSON.stringify(storedData));
+                
+                alert("Password updated successfully! Please login.");
+                window.location.href = "login.html";
+            } else {
+                alert("TRN not found. Please check your details.");
+            }
+        }
+    </script>
+</body>
+</html>
