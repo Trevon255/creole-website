@@ -2,53 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Invoice </title>
+    <title>Invoice | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* CSS to hide buttons when printing */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { width: 100%; border: none; }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="no-print" style="text-align: center; margin: 20px;">
-            <button class="btn" onclick="window.print()">Print Invoice</button>
-            <button class="btn" style="background:#666;" onclick="window.location.href='index.html'">Return Home</button>
+            <button class="btn" onclick="window.print()" style="background:#28a745; color:white; padding:10px 20px; border-radius:5px; cursor:pointer; border:none;">Print Invoice</button>
+            <button class="btn" style="background:#666; color:white; padding:10px 20px; border-radius:5px; cursor:pointer; border:none;" onclick="window.location.href='index.html'">Return Home</button>
         </div>
         
-        <div class="invoice-box">
-            <div class="invoice-header">
+        <div class="invoice-box" style="padding: 30px; border: 1px solid #eee; background: #fff;">
+            <div class="invoice-header" style="display: flex; justify-content: space-between; margin-bottom: 30px;">
                 <div>
-                    <h1 style="margin:0;">INVOICE</h1>
+                    <h1 style="margin:0; color:#d63384;">INVOICE</h1>
                     <p><strong>Invoice #:</strong> <span id="displayInvNum">---</span></p>
                     <p><strong>Date:</strong> <span id="displayDate">---</span></p>
                 </div>
                 <div style="text-align: right;">
-                    <h3>Creole Jamaican Artistry</h3>
+                    <h3 style="margin:0;">Creole Jamaican Artistry</h3>
                     <p>Kingston, Jamaica</p>
                     <p>TRN: 123-456-789</p>
                 </div>
             </div>
 
-            <div class="shipping-info">
-                <h4>Customer Details:</h4>
+            <div class="shipping-info" style="margin-bottom: 30px; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                <h4 style="margin-top:0;">Customer Details:</h4>
                 <p><strong>Name:</strong> <span id="displayShipName">---</span></p>
                 <p><strong>Address:</strong> <span id="displayShipAddr">---</span></p>
             </div>
 
-            <table>
-                <thead>
+            <table style="width:100%; border-collapse: collapse; margin-bottom: 30px;">
+                <thead style="background: #f2f2f2;">
                     <tr>
-                        <th>Item Description</th>
-                        <th>Qty</th>
-                        <th>Unit Price</th>
-                        <th>Sub-total</th>
+                        <th style="padding:10px; text-align:left; border-bottom:2px solid #ddd;">Item Description</th>
+                        <th style="padding:10px; text-align:center; border-bottom:2px solid #ddd;">Qty</th>
+                        <th style="padding:10px; text-align:right; border-bottom:2px solid #ddd;">Unit Price</th>
+                        <th style="padding:10px; text-align:right; border-bottom:2px solid #ddd;">Sub-total</th>
                     </tr>
                 </thead>
                 <tbody id="invoiceItemsBody"></tbody>
             </table>
 
-            <div class="inv-footer">
+            <div class="inv-footer" style="text-align: right; line-height: 1.6;">
                 <p>Sub-total: <span id="displaySubtotal">$0.00</span></p>
                 <p style="color: green;">Discount (5%): <span id="displayDiscount">-$0.00</span></p>
                 <p>GCT (15%): <span id="displayTax">$0.00</span></p>
-                <p class="grand-total">Grand Total: <span id="displayGrandTotal">$0.00</span></p>
+                <p class="grand-total" style="font-size: 1.4rem; font-weight: bold; color: #d63384; margin-top: 10px;">
+                    Grand Total: <span id="displayGrandTotal">$0.00</span>
+                </p>
             </div>
             
             <p style="margin-top: 50px; text-align: center; color: #888; font-style: italic;">
@@ -56,6 +66,46 @@
             </p>
         </div>
     </div>
- <script src="script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 1. Get the data saved by your script.js
+            const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+            const customerName = localStorage.getItem("CustomerName") || "Valued Customer";
+            const address = localStorage.getItem("CustomerAddress") || "Kingston, Jamaica";
+
+            if (!cart || !cart.items) {
+                alert("Order details not found. Please try checking out again.");
+                return;
+            }
+
+            // 2. Display Header Info
+            document.getElementById("displayInvNum").innerText = "CR-" + Math.floor(Math.random() * 900000 + 100000);
+            document.getElementById("displayDate").innerText = new Date().toLocaleDateString();
+            document.getElementById("displayShipName").innerText = customerName;
+            document.getElementById("displayShipAddr").innerText = address;
+
+            // 3. Fill the Items Table
+            const tbody = document.getElementById("invoiceItemsBody");
+            tbody.innerHTML = cart.items.map(item => `
+                <tr>
+                    <td style="padding:10px; border-bottom:1px solid #eee;">${item.name}</td>
+                    <td style="padding:10px; text-align:center; border-bottom:1px solid #eee;">${item.quantity}</td>
+                    <td style="padding:10px; text-align:right; border-bottom:1px solid #eee;">$${item.price.toLocaleString()}</td>
+                    <td style="padding:10px; text-align:right; border-bottom:1px solid #eee;">$${(item.price * item.quantity).toLocaleString()}</td>
+                </tr>
+            `).join('');
+
+            // 4. Update Totals
+            const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+            document.getElementById("displaySubtotal").innerText = fmt(cart.subtotal);
+            document.getElementById("displayDiscount").innerText = (cart.discounts > 0 ? "-" : "") + fmt(cart.discounts);
+            document.getElementById("displayTax").innerText = fmt(cart.taxes);
+            document.getElementById("displayGrandTotal").innerText = fmt(cart.totalCost);
+
+            // 5. Automatically open print dialog after half a second
+            setTimeout(() => { window.print(); }, 500);
+        });
+    </script>
 </body>
 </html>
