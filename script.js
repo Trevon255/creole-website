@@ -3,99 +3,71 @@
  * Developer: Niketa Muschette
  ************************************************************/
 
-// --- 1. UTILITY FUNCTIONS ---
-function calculateAge(dob) {
-    const today = new Date();
-    const birthDate = new Date(dob);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const month = today.getMonth() - birthDate.getMonth();
-    if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) age--;
-    return age;
-}
-
-// --- 2. AUTHENTICATION ---
-const registrationForm = document.getElementById("registrationForm");
-if (registrationForm) {
-    registrationForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const firstName = document.getElementById("firstName").value.trim();
-        const trn = document.getElementById("trn").value.trim();
-        const dob = document.getElementById("dob").value;
-        const password = document.getElementById("password").value;
-
-        if (password.length < 8) return alert("Password must be 8+ characters.");
-        if (calculateAge(dob) < 18) return alert("Must be 18 or older to shop.");
-        if (!/^\d{3}-\d{3}-\d{3}$/.test(trn)) return alert("TRN Format: 000-000-000");
-
-        let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-        users.push({ firstName, trn, dob, password: btoa(password) });
-        localStorage.setItem("RegistrationData", JSON.stringify(users));
-        alert("Registration Successful!");
-        window.location.href = "login.html";
-    });
-}
-
-const loginForm = document.getElementById("loginForm");
-if (loginForm) {
-    let attempts = 3;
-    loginForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        const trn = document.getElementById("loginTrn").value.trim();
-        const pass = document.getElementById("loginPassword").value;
-        const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
-        const user = users.find(u => u.trn === trn && u.password === btoa(pass));
-
-        if (user) {
-            localStorage.setItem("LoggedInUser", JSON.stringify(user));
-            window.location.href = "products.html";
-        } else {
-            attempts--;
-            const err = document.getElementById("errorMsg");
-            if (err) err.innerText = `Invalid login. Attempts left: ${attempts}`;
-            if (attempts === 0) window.location.href = "locked.html";
-        }
-    });
-}
-
-// --- 3. PRODUCT DATA ---
+// --- 1. PRODUCT CATALOGUE (Arrays & Objects) ---
 const products = [
-    { name: "Rustic Burlap Tote", price: 3500, image: "burlap bag.jpg" },
-    { name: "Artisan Serving Tray", price: 5800, image: "large tray .jpg" },
-    { name: "Creole Accent Set", price: 4200, image: "collection.jpg" }
+    { 
+        name: "Rustic Burlap Tote", 
+        price: 3500, 
+        description: "Hand-stitched natural fiber tote with reinforced handles.", 
+        image: "Assets/burlap bag.jpg" 
+    },
+    { 
+        name: "Artisan Serving Tray", 
+        price: 5800, 
+        description: "Cedar wood tray with hand-painted Jamaican patterns.", 
+        image: "Assets/large tray .jpg" 
+    },
+    { 
+        name: "Creole Accent Set", 
+        price: 4200, 
+        description: "A collection of 3 ceramic coasters and a matching vase.", 
+        image: "Assets/collection.jpg" 
+    }
 ];
 
-// --- 4. SHOPPING BAG LOGIC ---
+// Requirement: Keep updated list on localStorage as AllProducts
+localStorage.setItem("AllProducts", JSON.stringify(products));
+
+// --- 2. DYNAMIC PRODUCT DISPLAY ---
 function displayProducts() {
     const productGrid = document.querySelector(".product-grid");
     if (!productGrid) return;
 
-    productGrid.innerHTML = products.map((product, index) => `
+    const catalogue = JSON.parse(localStorage.getItem("AllProducts"));
+    productGrid.innerHTML = catalogue.map((product, index) => `
         <div class="product-card">
-            <img src="Assets/${product.image}" class="product-image" alt="${product.name}" onerror="this.src='${product.image}'">
+            <img src="${product.image}" class="product-image" alt="${product.name}">
             <h3>${product.name}</h3>
+            <p class="description">${product.description}</p>
             <p class="product-price">$${product.price.toLocaleString()} JMD</p>
-            <button type="button" class="btn" onclick="addToCart(${index})">Add to Bag</button>
+            <button type="button" class="btn" onclick="addToCart(${index})">Add to Cart</button>
         </div>
     `).join('');
 }
 
+// --- 3. SHOPPING CART LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [], subtotal: 0, taxes: 0, discounts: 0, totalCost: 0 };
+    
+    // Add product details
     cart.items.push(products[index]);
     
-    // Recalculate Totals
+    // Requirement: Calculations (Subtotal, 5% Discount, 15% GCT)
+    calculateCartTotals(cart);
+}
+
+function calculateCartTotals(cart) {
     cart.subtotal = cart.items.reduce((sum, item) => sum + item.price, 0);
     cart.discounts = cart.subtotal * 0.05; 
     cart.taxes = (cart.subtotal - cart.discounts) * 0.15; 
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    
-    // Updates values on the bottom of product page
     updateSummaryUI(cart);
-    alert(`${products[index].name} added to your bag!`);
+    alert("Item added to bag!");
 }
 
+// --- 4. CART PAGE ACTIONS ---
 function displayCart() {
     const tableBody = document.getElementById("cart-table-body");
     if (!tableBody) return;
@@ -104,143 +76,79 @@ function displayCart() {
     tableBody.innerHTML = "";
 
     if (!cart || cart.items.length === 0) {
-        tableBody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Your bag is empty.</td></tr>";
+        tableBody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Your bag is empty.</td></tr>";
         updateSummaryUI(null);
         return;
     }
 
-    cart.items.forEach((item) => {
+    cart.items.forEach((item, index) => {
         tableBody.innerHTML += `
             <tr>
                 <td>${item.name}</td>
-                <td>$${item.price.toLocaleString()}.00</td>
+                <td>$${item.price.toLocaleString()}</td>
                 <td>1</td>
-                <td>$${item.price.toLocaleString()}.00</td>
+                <td>$${item.price.toLocaleString()}</td>
+                <td><button onclick="removeItem(${index})" class="btn-remove">Remove</button></td>
             </tr>`;
     });
     updateSummaryUI(cart);
 }
 
-function emptyCart() {
-    if (confirm("Are you sure you want to empty your bag?")) {
+function removeItem(index) {
+    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    cart.items.splice(index, 1);
+    calculateCartTotals(cart);
+    displayCart();
+}
+
+// Requirement: Clear All Button Logic
+function clearAll() {
+    if (confirm("Are you sure you want to remove all items from your shopping cart?")) {
         localStorage.removeItem("ShoppingCart");
-        if (document.getElementById("cart-table-body")) displayCart();
+        displayCart();
         updateSummaryUI(null);
     }
 }
 
+// --- 5. UI UPDATES ---
 function updateSummaryUI(cart) {
     const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "summary-total"];
-    
     if (cart) {
-        const formattedTotal = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        
-        if (document.getElementById("cart-subtotal")) 
-            document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
-        
-        if (document.getElementById("cart-discount")) 
-            document.getElementById("cart-discount").innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        
-        if (document.getElementById("cart-tax")) 
-            document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        
-        if (document.getElementById("cart-total")) document.getElementById("cart-total").innerText = formattedTotal;
-        if (document.getElementById("summary-total")) document.getElementById("summary-total").innerText = formattedTotal;
+        const format = (val) => "$" + val.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+        if (document.getElementById("cart-subtotal")) document.getElementById("cart-subtotal").innerText = format(cart.subtotal);
+        if (document.getElementById("cart-discount")) document.getElementById("cart-discount").innerText = "-" + format(cart.discounts);
+        if (document.getElementById("cart-tax")) document.getElementById("cart-tax").innerText = format(cart.taxes);
+        if (document.getElementById("cart-total")) document.getElementById("cart-total").innerText = format(cart.totalCost);
+        if (document.getElementById("summary-total")) document.getElementById("summary-total").innerText = format(cart.totalCost);
     } else {
-        ids.forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.innerText = "$0.00 JMD";
-        });
+        ids.forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerText = "$0.00 JMD"; });
     }
 }
 
-// --- 5. CHECKOUT & INVOICE ---
-function generateInvoice(event) {
-    if (event) event.preventDefault();
-
+// --- 6. CHECKOUT ---
+function confirmCheckout(event) {
+    event.preventDefault();
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (!cart || cart.items.length === 0) return alert("Nothing to checkout!");
+    if (!cart) return alert("Nothing to checkout!");
 
-    const name = document.getElementById("custName")?.value || "Guest";
-    const addr = document.getElementById("custAddress")?.value || "N/A";
-
-    const newInvoice = {
-        invoiceNumber: "CJA-" + Math.floor(Math.random() * 899999 + 100000),
-        date: new Date().toLocaleDateString('en-JM'),
-        shipping: { name: name, address: addr },
-        items: cart.items,
-        total: cart.totalCost
+    const invoice = {
+        invoiceNo: "CJA-" + Math.floor(Math.random() * 900000 + 100000),
+        name: document.getElementById("custName").value,
+        address: document.getElementById("custAddress").value,
+        paid: document.getElementById("amountPaid").value,
+        total: cart.totalCost,
+        date: new Date().toLocaleString()
     };
 
-    let history = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    history.push(newInvoice);
-    localStorage.setItem("AllInvoices", JSON.stringify(history));
-
+    localStorage.setItem("FinalInvoice", JSON.stringify(invoice));
     localStorage.removeItem("ShoppingCart");
     window.location.href = "invoice.html";
 }
 
-// --- 6. INITIALIZE ---
+// Initialize
 document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
     displayCart();
-    const existingCart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (existingCart) updateSummaryUI(existingCart);
+    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (savedCart) updateSummaryUI(savedCart);
 });
-
-
-// -------- DASHBOARD --------
-
-// Load all invoices
-function loadInvoices() {
-    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-
-    let container = document.getElementById("invoiceList");
-    if (!container) return;
-
-    if (invoices.length === 0) {
-        container.innerHTML = "<p>No invoices found.</p>";
-        return;
-    }
-
-    container.innerHTML = invoices.map(inv => `
-        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-            <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
-            <p><strong>Date:</strong> ${inv.date}</p>
-            <p><strong>Total:</strong> $${inv.total.toLocaleString()} JMD</p>
-        </div>
-    `).join('');
-}
-
-// Search invoice
-function searchInvoice() {
-    let trn = document.getElementById("searchTRN").value;
-
-    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-
-    let container = document.getElementById("invoiceList");
-
-    if (!trn) {
-        loadInvoices();
-        return;
-    }
-
-    let results = invoices.filter(inv => inv.trn === trn);
-
-    if (results.length === 0) {
-        container.innerHTML = "<p>No matching invoices found.</p>";
-        return;
-    }
-
-    container.innerHTML = results.map(inv => `
-        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-            <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
-            <p><strong>Total:</strong> $${inv.total.toLocaleString()} JMD</p>
-        </div>
-    `).join('');
-}
-
-// Run dashboard ONLY if dashboard page is open
-if (document.getElementById("invoiceList")) {
-    loadInvoices();
-}
