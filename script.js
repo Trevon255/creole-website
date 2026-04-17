@@ -91,11 +91,9 @@ function addToCart(index) {
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     
-    // Update the numbers at the bottom of products.html
+    // Updates values on the bottom of product page
     updateSummaryUI(cart);
-    
-    // Show a quick confirmation instead of jumping pages
-    alert(`${products[index].name} has been added to your bag!`);
+    alert(`${products[index].name} added to your bag!`);
 }
 
 function displayCart() {
@@ -124,7 +122,7 @@ function displayCart() {
 }
 
 function emptyCart() {
-    if (confirm("Clear all items from your bag?")) {
+    if (confirm("Are you sure you want to empty your bag?")) {
         localStorage.removeItem("ShoppingCart");
         if (document.getElementById("cart-table-body")) displayCart();
         updateSummaryUI(null);
@@ -189,60 +187,3 @@ document.addEventListener("DOMContentLoaded", () => {
     const existingCart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (existingCart) updateSummaryUI(existingCart);
 });
-
-
-// -------- DASHBOARD --------
-
-// Load all invoices
-function loadInvoices() {
-    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-
-    let container = document.getElementById("invoiceList");
-    if (!container) return;
-
-    if (invoices.length === 0) {
-        container.innerHTML = "<p>No invoices found.</p>";
-        return;
-    }
-
-    container.innerHTML = invoices.map(inv => `
-        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-            <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
-            <p><strong>Date:</strong> ${inv.date}</p>
-            <p><strong>Total:</strong> $${inv.total.toLocaleString()} JMD</p>
-        </div>
-    `).join('');
-}
-
-// Search invoice
-function searchInvoice() {
-    let trn = document.getElementById("searchTRN").value;
-
-    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-
-    let container = document.getElementById("invoiceList");
-
-    if (!trn) {
-        loadInvoices();
-        return;
-    }
-
-    let results = invoices.filter(inv => inv.trn === trn);
-
-    if (results.length === 0) {
-        container.innerHTML = "<p>No matching invoices found.</p>";
-        return;
-    }
-
-    container.innerHTML = results.map(inv => `
-        <div style="border:1px solid #ccc; padding:10px; margin:10px;">
-            <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
-            <p><strong>Total:</strong> $${inv.total.toLocaleString()} JMD</p>
-        </div>
-    `).join('');
-}
-
-// Run dashboard ONLY if dashboard page is open
-if (document.getElementById("invoiceList")) {
-    loadInvoices();
-}
