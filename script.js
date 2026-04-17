@@ -171,8 +171,8 @@ function ShowDashboardStats() {
 
 // Function to handle the TRN Search Results on the Dashboard
 function displayResults() {
-    const searchInput = document.getElementById("trnSearchInput")?.value;
-    const resultsDiv = document.getElementById("searchResultsDisplay");
+    const searchInput = document.getElementById("searchTRN")?.value;
+    const resultsDiv = document.getElementById("invoiceDisplayArea");
     const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
 
     if (!resultsDiv) return;
