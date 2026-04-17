@@ -2,8 +2,31 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* This ensures your grid actually looks like a grid */
+        #product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .shopping-cart-totals {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            max-width: 400px;
+            margin-left: auto;
+        }
+        .total-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -19,9 +42,11 @@
 
     <main class="container">
         <h2>Our Collection</h2>
-        <div class="product-grid"></div>
+        
+        <div id="product-grid"></div>
 
         <div class="shopping-cart-totals">
+            <h3>Quick Summary</h3>
             <div class="total-item">
                 <label>Sub-total</label>
                 <span id="cart-subtotal">$0.00 JMD</span>
@@ -34,11 +59,12 @@
                 <label>GCT (15%)</label>
                 <span id="cart-tax">$0.00 JMD</span>
             </div>
-            <div class="total-item">
-                <label>Estimated Total</label>
+            <div class="total-item" style="border-top: 2px solid #ddd; padding-top: 10px; margin-top: 10px;">
+                <label><strong>Estimated Total</strong></label>
                 <span id="cart-total" style="color:#d63384; font-weight:bold;">$0.00 JMD</span>
             </div>
-            <a href="cart.html" class="btn">View Shopping Bag</a>
+            <br>
+            <a href="cart.html" class="btn" style="display: block; text-align: center; text-decoration: none; background: #333; color: white; padding: 10px; border-radius: 5px;">View Full Shopping Bag</a>
         </div>
     </main>
 
