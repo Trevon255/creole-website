@@ -1,6 +1,9 @@
+/************************************************************
+ * CREOLE JAMAICAN ARTISTRY - MASTER SCRIPT
+ * Developer: Niketa Muschette
+ ************************************************************/
 
-
-// --- UTILITY FUNCTIONS ---
+// --- 1. UTILITY FUNCTIONS ---
 function calculateAge(dob) {
     const today = new Date();
     const birthDate = new Date(dob);
@@ -10,10 +13,7 @@ function calculateAge(dob) {
     return age;
 }
 
-function getUsers() { return JSON.parse(localStorage.getItem("RegistrationData")) || []; }
-function saveUsers(users) { localStorage.setItem("RegistrationData", JSON.stringify(users)); }
-
-// --- AUTHENTICATION ---
+// --- 2. AUTHENTICATION (REGISTRATION & LOGIN) ---
 const registrationForm = document.getElementById("registrationForm");
 if (registrationForm) {
     registrationForm.addEventListener("submit", function (e) {
@@ -24,62 +24,88 @@ if (registrationForm) {
         const password = document.getElementById("password").value;
 
         if (password.length < 8) return alert("Password must be 8+ characters.");
-        if (calculateAge(dob) < 18) return alert("Must be 18 or older.");
-        if (!/^\d{3}-\d{3}-\d{3}$/.test(trn)) return alert("Format: 000-000-000");
+        if (calculateAge(dob) < 18) return alert("Must be 18 or older to shop.");
+        if (!/^\d{3}-\d{3}-\d{3}$/.test(trn)) return alert("TRN Format: 000-000-000");
 
-        let users = getUsers();
-        if (users.some(u => u.trn === trn)) return alert("TRN already exists.");
+        let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+        if (users.some(u => u.trn === trn)) return alert("TRN already registered.");
 
-        users.push({ firstName, trn, dob, password: btoa(password), invoices: [] });
-        saveUsers(users);
+        users.push({ firstName, trn, dob, password: btoa(password) });
+        localStorage.setItem("RegistrationData", JSON.stringify(users));
+        alert("Registration Successful!");
         window.location.href = "login.html";
     });
 }
 
-// --- PRODUCT DATA ---
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+    let attempts = 3;
+    loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const trn = document.getElementById("loginTrn").value.trim();
+        const pass = document.getElementById("loginPassword").value;
+        const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+        const user = users.find(u => u.trn === trn && u.password === btoa(pass));
+
+        if (user) {
+            localStorage.setItem("LoggedInUser", JSON.stringify(user));
+            window.location.href = "products.html";
+        } else {
+            attempts--;
+            document.getElementById("errorMsg").innerText = `Invalid login. Attempts left: ${attempts}`;
+            if (attempts === 0) window.location.href = "locked.html";
+        }
+    });
+}
+
+// --- 3. PRODUCT DATA ---
 const products = [
-    { name: "Rustic Burlap Tote", price: 3500, description: "Hand-stitched natural jute.", image: "burlap bag.jpg" },
-    { name: "Artisan Serving Tray", price: 5800, description: "Handcrafted tray with carved handles.", image: "large tray .jpg" },
-    { name: "Creole Accent Set", price: 4200, description: "Decorative duo pieces.", image: "collection.jpg" }
+    { name: "Rustic Burlap Tote", price: 3500, image: "burlap bag.jpg" },
+    { name: "Artisan Serving Tray", price: 5800, image: "large tray .jpg" },
+    { name: "Creole Accent Set", price: 4200, image: "collection.jpg" }
 ];
 
-// --- NIKETA MUSCHETTE - CART & TABLE LOGIC ---
+// --- 4. SHOPPING BAG LOGIC ---
 function displayProducts() {
     const productGrid = document.querySelector(".product-grid");
     if (!productGrid) return;
+
     productGrid.innerHTML = products.map((product, index) => `
         <div class="product-card">
-            <img src="Assets/${product.image}" alt="${product.name}" class="product-image" onerror="this.src='${product.image}'"> 
-            <h3 class="product-title">${product.name}</h3>
-            <span class="product-price">$${product.price.toLocaleString()} JMD</span>
-            <button class="btn buy-btn" onclick="addToCart(${index})">Add to Cart</button>
+            <img src="Assets/${product.image}" alt="${product.name}" onerror="this.src='${product.image}'">
+            <h3>${product.name}</h3>
+            <p>$${product.price.toLocaleString()} JMD</p>
+            <button class="btn" onclick="addToCart(${index})">Add to Bag</button>
         </div>
     `).join('');
 }
 
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [], subtotal: 0, taxes: 0, discounts: 0, totalCost: 0 };
-    cart.items.push(products[index]);
+    const selectedItem = products[index];
+
+    cart.items.push(selectedItem);
     
-    cart.subtotal = cart.items.reduce((sum, i) => sum + i.price, 0);
-    cart.discounts = cart.subtotal * 0.05;
-    cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
+    // Recalculate Totals
+    cart.subtotal = cart.items.reduce((sum, item) => sum + item.price, 0);
+    cart.discounts = cart.subtotal * 0.05; // 5% Discount
+    cart.taxes = (cart.subtotal - cart.discounts) * 0.15; // 15% GCT
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     window.location.href = "cart.html";
 }
 
-function displayCartItems() {
+function displayCart() {
     const tableBody = document.getElementById("cart-table-body");
     if (!tableBody) return;
 
-    let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    tableBody.innerHTML = ""; 
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    tableBody.innerHTML = "";
 
     if (!cart || cart.items.length === 0) {
-        tableBody.innerHTML = "<tr><td colspan='4' style='text-align:center; padding:20px;'>Your bag is empty.</td></tr>";
-        updateCartUI(null);
+        tableBody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Your bag is empty.</td></tr>";
+        updateSummaryUI(null);
         return;
     }
 
@@ -87,55 +113,67 @@ function displayCartItems() {
         tableBody.innerHTML += `
             <tr>
                 <td>${item.name}</td>
-                <td>$${item.price.toLocaleString()}.00</td>
+                <td>$${item.price.toLocaleString()}</td>
                 <td>1</td>
-                <td>$${item.price.toLocaleString()}.00</td>
+                <td>$${item.price.toLocaleString()}</td>
             </tr>`;
     });
-    updateCartUI(cart);
+    updateSummaryUI(cart);
 }
 
-function updateCartUI(cart) {
-    const ids = ["cart-subtotal", "cart-tax", "cart-discount", "cart-total"];
-    if (!document.getElementById(ids[0])) return;
+function updateSummaryUI(cart) {
+    const sub = document.getElementById("cart-subtotal");
+    if (!sub) return;
 
-    if (cart && cart.items.length > 0) {
-        document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
-        document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        document.getElementById("cart-discount").innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        document.getElementById("cart-total").innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    if (cart) {
+        document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + ".00";
+        document.getElementById("cart-discount").innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2});
+        document.getElementById("cart-total").innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2});
+        
+        // Update Checkout Page "Amount Due" if it exists
+        const summaryTotal = document.getElementById("summary-total");
+        if (summaryTotal) summaryTotal.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2});
     } else {
-        ids.forEach(id => document.getElementById(id).innerText = "$0.00 JMD");
+        ["cart-subtotal", "cart-discount", "cart-tax", "cart-total"].forEach(id => {
+            if(document.getElementById(id)) document.getElementById(id).innerText = "$0.00";
+        });
     }
 }
 
-// --- INITIALIZATION ---
-document.addEventListener("DOMContentLoaded", () => {
-    displayProducts();
-    displayCartItems(); // This triggers the table to fill
-});
-
-// --- INVOICE GENERATION ---
+// --- 5. CHECKOUT & INVOICE GENERATION ---
 function generateInvoice(event) {
     if (event) event.preventDefault();
+
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (!cart) return alert("Cart is empty");
+    const name = document.getElementById("custName").value;
+    const addr = document.getElementById("custAddress").value;
+
+    if (!cart || cart.items.length === 0) return alert("Nothing to checkout!");
 
     const newInvoice = {
-        invoiceNumber: "CJA-" + Date.now().toString().slice(-6),
+        invoiceNumber: "CJA-" + Math.floor(Math.random() * 899999 + 100000),
         date: new Date().toLocaleDateString('en-JM'),
-        shipping: { 
-            name: document.getElementById("custName").value, 
-            address: document.getElementById("custAddress").value 
-        },
+        shipping: { name: name, address: addr },
         items: cart.items,
+        subtotal: cart.subtotal,
+        discount: cart.discounts,
+        tax: cart.taxes,
         total: cart.totalCost
     };
 
-    let all = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-    all.push(newInvoice);
-    localStorage.setItem("AllInvoices", JSON.stringify(all));
+    // Save to history
+    let history = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    history.push(newInvoice);
+    localStorage.setItem("AllInvoices", JSON.stringify(history));
+
+    // Clear cart and go to invoice page
     localStorage.removeItem("ShoppingCart");
     window.location.href = "invoice.html";
 }
 
+// --- 6. INITIALIZE PAGE ---
+document.addEventListener("DOMContentLoaded", () => {
+    displayProducts(); // For products.html
+    displayCart();     // For cart.html
+});
