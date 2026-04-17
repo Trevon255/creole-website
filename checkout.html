@@ -99,7 +99,7 @@
                 
                 <div class="form-group">
                     <label for="cust-name">Full Name</label>
-                    <input type="text" id="cust-name" placeholder="e.g. Niketa Muschette">
+                    <input type="text" id="cust-name" placeholder="Full Name">
                 </div>
                 
                 <div class="form-group">
@@ -113,7 +113,7 @@
                     <small style="color: #666;">Enter the exact total or more for cash-on-delivery calculations.</small>
                 </div>
 
-                <button onclick="generateInvoice()" class="btn-confirm">Confirm Order</button>
+                <button id="confirm-order-btn" onclick="processOrder(event)" class="btn-confirm">Confirm Order</button>
                 <button onclick="window.location.href='cart.html'" class="btn-cancel">Return to Bag</button>
             </div>
 
