@@ -2,39 +2,142 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .checkout-layout {
+            display: flex; 
+            gap: 40px; 
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .form-section, .summary-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box; /* Prevents input from overflowing */
+            font-family: inherit;
+        }
+        .summary-box {
+            background: #fdfdfd; 
+            padding: 25px; 
+            border-radius: 15px; 
+            border: 1px solid #eee; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        .btn-confirm {
+            width: 100%; 
+            background: #27ae60; 
+            color: white; 
+            padding: 15px; 
+            border: none; 
+            border-radius: 6px;
+            cursor: pointer; 
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background 0.3s;
+        }
+        .btn-confirm:hover {
+            background: #219150;
+        }
+        .btn-cancel {
+            width: 100%; 
+            background: #95a5a6; 
+            color: white; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 6px;
+            cursor: pointer; 
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <header>
         <h1>Creole Jamaican Artistry</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="cart.html">Shopping Bag</a></li>
+            </ul>
+        </nav>
     </header>
 
     <main class="container">
-        <h2>Secure Checkout</h2>
-        <div style="display: flex; gap: 40px; margin-top: 20px;">
-            <div style="flex: 1;">
+        <h2 style="border-bottom: 2px solid #eee; padding-bottom: 10px;">Secure Checkout</h2>
+        
+        <div class="checkout-layout">
+            <div class="form-section">
                 <h3>1. Shipping & Payment</h3>
-                <label>Full Name</label>
-                <input type="text" id="cust-name" style="width:100%; padding:10px; margin-bottom:15px;">
                 
-                <label>Address</label>
-                <textarea id="cust-address" style="width:100%; padding:10px; margin-bottom:15px;"></textarea>
+                <div class="form-group">
+                    <label for="cust-name">Full Name</label>
+                    <input type="text" id="cust-name" placeholder="e.g. Niketa Muschette">
+                </div>
                 
-                <label>Amount Being Paid ($)</label>
-                <input type="number" id="amount-paid" placeholder="Enter amount" style="width:100%; padding:10px; margin-bottom:20px;">
+                <div class="form-group">
+                    <label for="cust-address">Shipping Address</label>
+                    <textarea id="cust-address" rows="3" placeholder="Street address, City, Parish"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount-paid">Amount Being Paid (JMD)</label>
+                    <input type="number" id="amount-paid" placeholder="Enter amount to pay">
+                    <small style="color: #666;">Enter the exact total or more for cash-on-delivery calculations.</small>
+                </div>
 
-                <button onclick="generateInvoice()" style="width:100%; background:#27ae60; color:white; padding:15px; border:none; cursor:pointer; font-weight:bold;">Confirm Checkout</button>
-                <button onclick="window.location.href='cart.html'" style="width:100%; background:#95a5a6; color:white; padding:10px; border:none; cursor:pointer; margin-top:10px;">Cancel (Back to Bag)</button>
+                <button onclick="generateInvoice()" class="btn-confirm">Confirm Order</button>
+                <button onclick="window.location.href='cart.html'" class="btn-cancel">Return to Bag</button>
             </div>
 
-            <div style="flex: 1; background: #f9f9f9; padding: 25px; border-radius: 10px; border: 1px solid #eee;">
-                <h3>2. Order Summary</h3>
-                <p>Sub-total: <span id="cart-subtotal">$0.00 JMD</span></p>
-                <p>Discount (5%): <span id="cart-discount">$0.00 JMD</span></p>
-                <p>GCT (15%): <span id="cart-tax">$0.00 JMD</span></p>
-                <hr>
-                <h4>Total Due: <span id="checkout-amount" style="color:#d63384; font-size:1.5rem;">$0.00 JMD</span></h4>
+            <div class="summary-section">
+                <div class="summary-box">
+                    <h3 style="margin-top: 0;">2. Order Summary</h3>
+                    <div class="summary-item">
+                        <span>Sub-total</span>
+                        <span id="cart-subtotal">$0.00 JMD</span>
+                    </div>
+                    <div class="summary-item" style="color: #27ae60;">
+                        <span>Discount (5%)</span>
+                        <span id="cart-discount">-$0.00 JMD</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>GCT (15%)</span>
+                        <span id="cart-tax">$0.00 JMD</span>
+                    </div>
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
+                    <div class="summary-item" style="font-size: 1.4rem; font-weight: bold;">
+                        <span>Total Due</span>
+                        <span id="checkout-amount" style="color: #d63384;">$0.00 JMD</span>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
