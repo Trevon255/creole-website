@@ -27,7 +27,7 @@ function saveRegistration(event) {
     let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
     users.push(newUser);
     localStorage.setItem("RegistrationData", JSON.stringify(users));
-    alert("Registration Successful, " + newUser.firstName + "! You can now log in.");
+    alert("Registration Successful!");
     window.location.href = "login.html"; 
 }
 
@@ -35,26 +35,25 @@ function checkLogin(event) {
     event.preventDefault(); 
     const enteredTrn = document.getElementById("loginTrn").value;
     const enteredPass = document.getElementById("loginPassword").value;
-    const errorDisplay = document.getElementById("errorMsg");
     const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
     const userFound = users.find(u => u.trn === enteredTrn && u.password === enteredPass);
+    
     if (userFound) {
+        // FIX: Save the user so the Invoice can find the TRN later
+        localStorage.setItem("currentUser", JSON.stringify(userFound));
         alert("Login Successful! Welcome, " + userFound.firstName);
         window.location.href = "index.html"; 
     } else {
         loginAttempts++;
-        let remaining = 3 - loginAttempts;
         if (loginAttempts >= 3) {
-            alert("Account Locked: Too many failed attempts.");
             window.location.href = "error.html"; 
-        } else if (errorDisplay) {
-            errorDisplay.innerText = `Invalid credentials. Attempts remaining: ${remaining}`;
+        } else {
+            alert("Invalid credentials. Attempts remaining: " + (3 - loginAttempts));
         }
     }
 }
 
 // --- 3. DISPLAY FUNCTIONS ---
-
 function displayProductGrid() {
     const grid = document.getElementById("product-grid");
     if (!grid) return;
@@ -73,7 +72,7 @@ function displayCartTable() {
     if (!body) return;
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
     if (!cart || cart.items.length === 0) {
-        body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 20px;">Your bag is empty.</td></tr>';
+        body.innerHTML = '<tr><td colspan="5" style="text-align:center;">Your bag is empty.</td></tr>';
         return;
     }
     body.innerHTML = cart.items.map((item, index) => `
@@ -87,19 +86,13 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 4. CART LOGIC ---
-
+// --- 4. CART & INVOICE LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
     const existing = cart.items.find(item => item.id === selected.id);
-    
-    if (existing) { 
-        existing.quantity++; 
-    } else { 
-        cart.items.push({ ...selected, quantity: 1 }); 
-    }
-    
+    if (existing) { existing.quantity++; } 
+    else { cart.items.push({ ...selected, quantity: 1 }); }
     calculateTotals(cart);
     alert(selected.name + " added!");
 }
@@ -109,36 +102,87 @@ function calculateTotals(cart) {
     cart.discounts = cart.subtotal * 0.05;
     cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
-    
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     updateSummaryUI(cart);
 }
 
 function updateSummaryUI(cart) {
     const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-    
-    // This updates the numbers ONLY if they are found on the page
     const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "checkout-amount"];
     ids.forEach(id => {
         let el = document.getElementById(id);
         if (el) {
-            let val = id.includes("discount") ? cart.discounts : 
-                     (id.includes("tax") ? cart.taxes : 
-                     (id.includes("subtotal") ? cart.subtotal : cart.totalCost));
+            let val = id.includes("discount") ? cart.discounts : (id.includes("tax") ? cart.taxes : (id.includes("subtotal") ? cart.subtotal : cart.totalCost));
             el.innerText = fmt(val);
         }
     });
 }
 
+function generateInvoice() {
+    const name = document.getElementById("cust-name")?.value;
+    const address = document.getElementById("cust-address")?.value;
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    const user = JSON.parse(localStorage.getItem("currentUser")) || { trn: "N/A" };
+
+    if (!name || !address || !cart || cart.items.length === 0) {
+        alert("Please fill in shipping details.");
+        return;
+    }
+
+    const invoiceObj = {
+        invoiceNumber: "CJ-" + Math.floor(100000 + Math.random() * 900000),
+        trn: user.trn,
+        date: new Date().toLocaleDateString(),
+        customer: name,
+        shipping: address,
+        items: cart.items,
+        grandTotal: cart.totalCost
+    };
+
+    let history = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    history.push(invoiceObj);
+    localStorage.setItem("AllInvoices", JSON.stringify(history));
+
+    alert("Invoice Generated!");
+    localStorage.removeItem("ShoppingCart");
+    window.location.href = "invoice.html";
+}
+
+function clearCart() {
+    localStorage.removeItem("ShoppingCart");
+    alert("Bag cleared.");
+    location.reload();
+}
+
 function removeItem(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (!cart) return;
     cart.items.splice(index, 1);
     calculateTotals(cart);
     displayCartTable();
 }
 
-// --- 5. INITIALIZATION ---
+// --- 5. DASHBOARD FUNCTIONS ---
+function ShowUserFrequency() {
+    const users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+    let genderStats = { Male: 0, Female: 0, Other: 0 };
+    let ageStats = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
+
+    users.forEach(user => {
+        if (genderStats[user.gender] !== undefined) genderStats[user.gender]++;
+        const age = new Date().getFullYear() - new Date(user.dob).getFullYear();
+        if (age >= 18 && age <= 25) ageStats["18-25"]++;
+        else if (age >= 26 && age <= 35) ageStats["26-35"]++;
+        else if (age >= 36 && age <= 50) ageStats["36-50"]++;
+        else if (age > 50) ageStats["50+"]++;
+    });
+
+    const gDiv = document.getElementById("genderFrequency");
+    const aDiv = document.getElementById("ageFrequency");
+    if (gDiv) gDiv.innerHTML = `Male: ${"█".repeat(genderStats.Male)} (${genderStats.Male})<br>Female: ${"█".repeat(genderStats.Female)} (${genderStats.Female})`;
+    if (aDiv) aDiv.innerHTML = `18-25: ${"█".repeat(ageStats["18-25"])} (${ageStats["18-25"]})`;
+}
+
+// --- 6. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
     displayProductGrid();
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
@@ -146,4 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
         updateSummaryUI(cart);
         displayCartTable();
     }
+    // FIX: Automatically load dashboard stats if on the dashboard page
+    if (document.getElementById("genderFrequency")) ShowUserFrequency();
 });
