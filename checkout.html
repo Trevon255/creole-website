@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout | Niketa Muschette</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -25,20 +26,23 @@
                 <div style="flex: 1;">
                     <h3>Shipping Details</h3>
                     <label>Full Name</label>
-                    <input type="text" placeholder="e.g. Niketa Muschette">
+                    <input type="text" id="cust-name" placeholder="e.g. Niketa Muschette" style="width: 100%; padding: 10px; margin-bottom: 15px;">
                     
-                    <label style="margin-top: 15px; display: block;">Delivery Address</label>
-                    <textarea rows="4" placeholder="Street name, Town, and Parish"></textarea>
+                    <label style="display: block;">Delivery Address</label>
+                    <textarea id="cust-address" rows="4" placeholder="Street name, Town, and Parish" style="width: 100%; padding: 10px;"></textarea>
                     
-                    <button class="btn" style="width: 100%; margin-top: 20px;">Confirm Order</button>
+                    <button class="btn" onclick="generateInvoice()" style="width: 100%; margin-top: 20px; background: #27ae60; color: white; border: none; padding: 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Confirm Order</button>
                 </div>
 
-                <div style="flex: 1; background: #f9f9f9; padding: 25px; border-radius: 15px;">
+                <div style="flex: 1; background: #f9f9f9; padding: 25px; border-radius: 15px; border: 1px solid #eee;">
                     <h3>Order Summary</h3>
                     <p style="font-size: 0.8rem; color: #888;">Verified & Handled by: Niketa Muschette</p>
-                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <hr style="border: 0; border-top: 1px solid #ddd; margin: 15px 0;">
                     
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div id="checkout-item-details" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto;">
+                        </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid #ddd; padding-top: 15px;">
                         <span style="font-weight: 600;">Amount Due:</span>
                         <span id="checkout-amount" style="color: #d63384; font-size: 1.4rem; font-weight: 800;">$0.00 JMD</span>
                     </div>
