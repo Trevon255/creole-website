@@ -2,17 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Shopping Bag | Niketa Muschette</title>
+    <title>Shopping Bag | Creole Jamaican Artistry</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        .cart-box { padding: 30px; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { border-bottom: 2px solid #f4cfdf; padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #eee; }
-        .summary-panel { float: right; width: 300px; margin-top: 20px; padding: 15px; background: #fffcfd; border: 1px solid #f4cfdf; }
-        .row { display: flex; justify-content: space-between; margin: 5px 0; }
-        .btn-row { clear: both; display: flex; justify-content: flex-end; gap: 10px; padding-top: 20px; }
-    </style>
 </head>
 <body>
     <header>
@@ -20,40 +11,50 @@
             <ul>
                 <li><a href="index.html">Home</a></li>
                 <li><a href="products.html">Products</a></li>
-                <li><a href="cart.html"><b>Cart</b></a></li>
+                <li><a href="cart.html">Shopping Bag</a></li>
             </ul>
         </nav>
     </header>
 
     <main class="container">
-        <div class="cart-box">
-            <h2>Your Shopping Bag</h2>
-            <p style="font-size: 0.8rem; color: gray;">Verified by: Niketa Muschette</p>
+        <h2>Your Shopping Bag</h2>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr style="text-align: left; border-bottom: 2px solid #f4cfdf;">
+                    <th style="padding: 15px;">Item Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Sub-total</th>
+                </tr>
+            </thead>
+            <tbody id="cart-table-body"></tbody>
+        </table>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Item Name</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Sub-total</th>
-                    </tr>
-                </thead>
-                <tbody id="cart-table-body"></tbody>
-            </table>
-
-            <div class="summary-panel">
-                <div class="row"><span>Sub-total:</span> <span id="cart-subtotal">$0.00 JMD</span></div>
-                <div class="row"><span style="color: green;">Discount (5%):</span> <span id="cart-discount">-$0.00 JMD</span></div>
-                <div class="row"><span>GCT (15%):</span> <span id="cart-tax">$0.00 JMD</span></div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 30px;">
+            <div class="order-summary-box" style="width: 350px; padding: 20px; background: #fffcfd; border: 1px solid #f4cfdf; border-radius: 10px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>Sub-total:</span>
+                    <span id="cart-subtotal">$0.00 JMD</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: green;">
+                    <span>Discount (5%):</span>
+                    <span id="cart-discount">-$0.00 JMD</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <span>GCT (15%):</span>
+                    <span id="cart-tax">$0.00 JMD</span>
+                </div>
                 <hr>
-                <div class="row"><strong>Total:</strong> <span id="cart-total" style="font-size: 1.2rem; color: #d63384;">$0.00 JMD</span></div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1.2rem;">
+                    <span>Total:</span>
+                    <span id="cart-total" style="color: #d63384;">$0.00 JMD</span>
+                </div>
             </div>
+        </div>
 
-            <div class="btn-row">
-                <button class="btn" style="background: #999;" onclick="localStorage.removeItem('ShoppingCart'); location.reload();">Empty Bag</button>
-                <button class="btn" onclick="window.location.href='checkout.html'">Check Out</button>
-            </div>
+        <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 20px;">
+            <button class="btn" style="background: #888;" onclick="emptyCart()">Empty Bag</button>
+            <a href="checkout.html" class="btn">Proceed to Secure Checkout</a>
         </div>
     </main>
 
