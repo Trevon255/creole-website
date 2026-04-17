@@ -207,3 +207,117 @@ window.onload = () => {
         displayInvoiceData(all[all.length - 1]);
     }
 };
+
+
+
+
+
+
+// =============================
+// TREVON - DASHBOARD SECTION
+// =============================
+
+// Show user frequency (gender + age)
+function ShowUserFrequency() {
+    let users = JSON.parse(localStorage.getItem("RegistrationData")) || [];
+
+    let genderCount = { Male: 0, Female: 0, Other: 0 };
+    let ageGroups = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
+
+    users.forEach(function(user) {
+        // Gender
+        if (user.gender && genderCount[user.gender] !== undefined) {
+            genderCount[user.gender]++;
+        }
+
+        // Age
+        if (user.dob) {
+            let dob = new Date(user.dob);
+            let age = new Date().getFullYear() - dob.getFullYear();
+
+            if (age >= 18 && age <= 25) ageGroups["18-25"]++;
+            else if (age <= 35) ageGroups["26-35"]++;
+            else if (age <= 50) ageGroups["36-50"]++;
+            else ageGroups["50+"]++;
+        }
+    });
+
+    displayChart("genderChart", genderCount);
+    displayChart("ageChart", ageGroups);
+}
+
+// Display bar charts
+function displayChart(id, data) {
+    let container = document.getElementById(id);
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    for (let key in data) {
+        let value = data[key];
+
+        container.innerHTML += `
+            <div style="margin-bottom: 10px;">
+                <p>${key}: ${value}</p>
+                <div style="background: green; height: 20px; width: ${value * 40}px;"></div>
+            </div>
+        `;
+    }
+}
+
+// Show all invoices
+function ShowInvoices() {
+    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    let container = document.getElementById("invoiceList");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    invoices.forEach(function(inv) {
+        container.innerHTML += `
+            <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+                <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
+                <p><strong>TRN:</strong> ${inv.trn}</p>
+                <p><strong>Total:</strong> $${inv.totalCost}</p>
+            </div>
+        `;
+    });
+}
+
+// Search invoice by TRN
+function searchInvoice() {
+    let trn = document.getElementById("searchTRN").value;
+    let invoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    let container = document.getElementById("invoiceList");
+
+    if (!container) return;
+
+    let results = invoices.filter(function(inv) {
+        return inv.trn === trn;
+    });
+
+    container.innerHTML = "";
+
+    if (results.length === 0) {
+        container.innerHTML = "<p>No invoices found</p>";
+        return;
+    }
+
+    results.forEach(function(inv) {
+        container.innerHTML += `
+            <div style="border:1px solid green; padding:10px; margin-bottom:10px;">
+                <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
+                <p><strong>Total:</strong> $${inv.totalCost}</p>
+            </div>
+        `;
+    });
+}
+
+// Run dashboard when page loads
+window.addEventListener("load", function () {
+    ShowUserFrequency();
+    ShowInvoices();
+});
+
+
