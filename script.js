@@ -1,16 +1,11 @@
+
+```javascript
 /************************************************************
 AUTHENTICATION & SECURITY
-Names: 
-Description:
-Handles registration, login, lockout,
+Student Name: Niketa Muschette
+Description: Handles registration, login, lockout,
 TRN validation, password reset, and localStorage.
 ************************************************************/
-
-
-/************************************************************
-QUESTION 1 – USER AUTHENTICATION (LocalStorage)
-************************************************************/
-
 
 /***********************
 UTILITY FUNCTIONS
@@ -20,43 +15,34 @@ UTILITY FUNCTIONS
 function calculateAge(dob) {
     const today = new Date();
     const birthDate = new Date(dob);
-
     let age = today.getFullYear() - birthDate.getFullYear();
     const month = today.getMonth() - birthDate.getMonth();
-
     if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
         age--;
     }
-
     return age;
 }
-
 
 // Get users from localStorage
 function getUsers() {
     return JSON.parse(localStorage.getItem("RegistrationData")) || [];
 }
 
-
 // Save users to localStorage
 function saveUsers(users) {
     localStorage.setItem("RegistrationData", JSON.stringify(users));
 }
 
-
-
 /************************************************************
-REGISTRATION LOGIC
+QUESTION 1 – USER AUTHENTICATION
 ************************************************************/
 
 const registrationForm = document.getElementById("registrationForm");
 
 if (registrationForm) {
-
     registrationForm.addEventListener("submit", function (e) {
         e.preventDefault();
 
-        // Get form values
         const firstName = document.getElementById("firstName").value.trim();
         const lastName = document.getElementById("lastName").value.trim();
         const dob = document.getElementById("dob").value;
@@ -66,151 +52,89 @@ if (registrationForm) {
         const trn = document.getElementById("trn").value.trim();
         const password = document.getElementById("password").value;
 
-        // Validate Password Length
         if (password.length < 8) {
             alert("Password must be at least 8 characters long.");
             return;
         }
 
-        // Validate Age (18+)
         if (calculateAge(dob) < 18) {
             alert("You must be 18 years or older to register.");
             return;
         }
 
-        // Validate TRN Format (000-000-000)
         const trnPattern = /^\d{3}-\d{3}-\d{3}$/;
-
         if (!trnPattern.test(trn)) {
             alert("TRN must be in format 000-000-000");
             return;
         }
 
-        // Check TRN uniqueness
         let users = getUsers();
-
         const trnExists = users.some(user => user.trn === trn);
-
         if (trnExists) {
             alert("TRN already registered. Please login.");
             return;
         }
 
-        // Create new user object
         const newUser = {
-            firstName,
-            lastName,
-            dob,
-            gender,
-            phone,
-            email,
-            trn,
-            password: btoa(password), // basic encoding
+            firstName, lastName, dob, gender, phone, email, trn,
+            password: btoa(password),
             dateOfRegistration: new Date().toLocaleDateString(),
-            cart: {},
             invoices: []
         };
 
-        // Add to array
         users.push(newUser);
-
-        // Save to localStorage
         saveUsers(users);
-
         alert("Registration successful! Redirecting to login...");
-
-        window.location.href = "index.html";
+        window.location.href = "login.html";
     });
 }
 
-
-
-/************************************************************
-LOGIN LOGIC (3 Attempts + Lockout)
-************************************************************/
-
 const loginForm = document.getElementById("loginForm");
-
 if (loginForm) {
-
     let attempts = 3;
-
     loginForm.addEventListener("submit", function (e) {
         e.preventDefault();
-
         const enteredTrn = document.getElementById("loginTrn").value.trim();
         const enteredPassword = document.getElementById("loginPassword").value;
         const errorMsg = document.getElementById("errorMsg");
 
         let users = getUsers();
-
-        const user = users.find(u =>
-            u.trn === enteredTrn &&
-            u.password === btoa(enteredPassword)
-        );
+        const user = users.find(u => u.trn === enteredTrn && u.password === btoa(enteredPassword));
 
         if (user) {
-
-            // Store logged in user
             localStorage.setItem("LoggedInUser", JSON.stringify(user));
-
             alert("Login successful!");
-
-            window.location.href = "product.html";
-
+            window.location.href = "products.html"; // Redirect to catalogue
         } else {
-
             attempts--;
-
             errorMsg.innerText = "Invalid TRN or Password. Attempts left: " + attempts;
-
-            if (attempts === 0) {
-                window.location.href = "locked.html";
-            }
+            if (attempts === 0) window.location.href = "locked.html";
         }
     });
 }
 
-
-
-/************************************************************
-RESET PASSWORD FUNCTION
-************************************************************/
-
 function resetPassword() {
-
     let trn = prompt("Enter your TRN (000-000-000):");
-
     if (!trn) return;
-
     let users = getUsers();
-
     let user = users.find(u => u.trn === trn);
-
-    if (!user) {
-        alert("TRN not found.");
-        return;
-    }
+    if (!user) { alert("TRN not found."); return; }
 
     let newPassword = prompt("Enter new password (minimum 8 characters):");
-
     if (!newPassword || newPassword.length < 8) {
         alert("Password must be at least 8 characters.");
         return;
     }
-
     user.password = btoa(newPassword);
-
     saveUsers(users);
-
     alert("Password successfully updated!");
 }
+
 /************************************************************
 QUESTION 2 – PRODUCT CATALOGUE (localStorage & Objects)
+Student Name: Niketa Muschette
 ************************************************************/
 
-// 1. Array of product objects 
-// Requirement: name, price, description, image
 const products = [
     {
         name: "Rustic Burlap Tote",
@@ -222,35 +146,27 @@ const products = [
         name: "Artisan Serving Tray",
         price: 5800,
         description: "Spacious handcrafted tray with carved handles.",
-        image: "large tray .jpg"
+        image: "Assets/large%20tray%20.jpg"
     },
     {
         name: "Creole Accent Set",
         price: 4200,
         description: "A duo of decorative pieces for versatile styling.",
-        image: "collection.jpg"
+        image: "Assets/collection.jpg"
     }
 ];
 
-// 2. Keep updated product list on localStorage as 'AllProducts'
+// Save updated master list
 localStorage.setItem("AllProducts", JSON.stringify(products));
 
-// 3. Display the product list dynamically on the website
 function displayProducts() {
     const productGrid = document.querySelector(".product-grid");
-    
-    // Check if we are on the products page
     if (!productGrid) return;
 
-    // Retrieve the products we just saved
     const allProducts = JSON.parse(localStorage.getItem("AllProducts"));
-
-    // Clear existing hardcoded HTML to prevent duplicates
     productGrid.innerHTML = "";
 
     allProducts.forEach((product, index) => {
-        // Create the dynamic HTML for each product
-        // Note: buy-btn now calls the addToCart function with the item's index
         productGrid.innerHTML += `
             <div class="product-card">
                 <img src="${product.image}" alt="${product.name}" class="product-image">
@@ -263,179 +179,121 @@ function displayProducts() {
     });
 }
 
-// Initialize product display when the page loads
-document.addEventListener("DOMContentLoaded", displayProducts);
-
-
 /************************************************************
 QUESTION 3 – SHOPPING CART (localStorage and Objects)
+Student Name: Niketa Muschette
 ************************************************************/
 
 function addToCart(index) {
     const allProducts = JSON.parse(localStorage.getItem("AllProducts"));
     const selectedProduct = allProducts[index];
+    const TAX_RATE = 0.15;
+    const DISCOUNT_RATE = 0.05;
 
-    // Defining calculation rates
-    const TAX_RATE = 0.15; // 15% GCT
-    const DISCOUNT_RATE = 0.05; // 5% Discount
-
-    // Requirement: Shopping cart must include details, taxes, discounts, subtotal, and total cost.
-    // We initialize the cart as an Object if it doesn't exist
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || {
-        items: [],
-        subtotal: 0,
-        taxes: 0,
-        discounts: 0,
-        totalCost: 0
+        items: [], subtotal: 0, taxes: 0, discounts: 0, totalCost: 0
     };
 
-    // Add selected product to the cart's items array
     cart.items.push(selectedProduct);
 
-    // Update financial calculations
+    // Calculations
     cart.subtotal = cart.items.reduce((sum, item) => sum + item.price, 0);
     cart.discounts = cart.subtotal * DISCOUNT_RATE;
     cart.taxes = (cart.subtotal - cart.discounts) * TAX_RATE;
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
-    // Save the updated shopping cart object back to localStorage
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
 
-    alert(`${selectedProduct.name} has been added to your cart!`);
+    // Update UI Summary on products.html if elements exist
+    if(document.getElementById("cart-subtotal")){
+        document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + " JMD";
+        document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString() + " JMD";
+        document.getElementById("cart-discount").innerText = "$" + cart.discounts.toLocaleString() + " JMD";
+        document.getElementById("cart-total").innerText = "$" + Math.round(cart.totalCost).toLocaleString() + " JMD";
+    }
+
+    alert(`${selectedProduct.name} added to cart!`);
 }
 
 /************************************************************
-QUESTION – CHECKOUT (localStorage and Objects)
+QUESTION – CHECKOUT & INVOICE
+Student Name: Niketa Muschette
 ************************************************************/
-// 1. Initialize the user's invoice array (simulated user session)
-    let user = {
-        invoices: []
-    };
 
-    function confirmOrder(event) {
-        event.preventDefault(); 
+function confirmOrder(event) {
+    if(event) event.preventDefault();
 
-        // 2. Capture Shipping Details from the form
-        const name = document.getElementById("custName").value;
-        const address = document.getElementById("custAddress").value;
-
-        // 3. Generate the Invoice Object with all required details
-        const newInvoice = {
-            companyName: "Creole Jamaican Artistry",
-            date: new Date().toLocaleDateString('en-JM'),
-            invoiceNumber: "INV-" + Date.now(), // Generates a unique ID
-            trn: "123-456-789",
-            shippingInfo: {
-                name: name,
-                address: address
-            },
-            // Item details matching your cart summary
-            items: [
-                { name: "Rustic Burlap Tote", qty: 1, price: 3500.00, discount: "5%" },
-                { name: "Artisan Serving Tray", qty: 1, price: 5800.00, discount: "5%" }
-            ],
-            subtotal: 9300.00,
-            taxes: 1325.25, // GCT 15%
-            totalCost: 10160.25
-        };
-
-        // 4. Append to the user's array of invoices
-        user.invoices.push(newInvoice);
-
-        // 5. Store to localStorage under the key 'AllInvoices'
-        // We fetch existing data first, then add the new invoice to the list
-        let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
-        allInvoices.push(newInvoice);
-        localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
-
-        // 6. Display "Sent to Email" message and confirm order
-        alert(
-            "Success! Your order " + newInvoice.invoiceNumber + " has been confirmed.\n\n" +
-            "A copy of your invoice has been sent to your email address."
-        );
-
-        // 7. Redirect to the invoice display page
-        window.location.href = "invoice.html"; 
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (!cart || cart.items.length === 0) {
+        alert("Your cart is empty!");
+        return;
     }
 
-    function cancelOrder() {
-        if(confirm("Do you want to cancel the checkout and return to your cart?")) {
-            window.location.href = "cart.html";
-        }
+    const name = document.getElementById("custName")?.value || "Valued Customer";
+    const address = document.getElementById("custAddress")?.value || "Digital Delivery";
 
-/************************************************************
-QUESTION – INVOICE (localStorage and Objects)
-************************************************************/
-// 1. Initial Data & User Object
-let currentUser = {
-    username: "Customer",
-    invoices: [] // Array of invoice objects
-};
-
-// 2. Function to execute when Order is Confirmed (Triggered from Checkout)
-function generateInvoice() {
-    // Capture data from checkout form
-    const custName = document.getElementById("custName")?.value || "Guest User";
-    const custAddress = document.getElementById("custAddress")?.value || "No Address Provided";
-
-    // Create unique invoice object
     const newInvoice = {
-        company: "Creole Jamaican Artistry",
+        companyName: "Creole Jamaican Artistry",
         date: new Date().toLocaleDateString('en-JM'),
-        invoiceNumber: "CJA-" + Date.now().toString().slice(-6), // Unique 6-digit ID
+        invoiceNumber: "CJA-" + Date.now().toString().slice(-6),
         trn: "123-456-789",
-        shipping: { name: custName, address: custAddress },
-        items: [
-            { name: "Rustic Burlap Tote", qty: 1, price: 3500.00, discount: "5%" },
-            { name: "Artisan Serving Tray", qty: 1, price: 5800.00, discount: "5%" }
-        ],
-        subtotal: 9300.00,
-        tax: 1325.25,
-        total: 10160.25
+        shippingInfo: { name: name, address: address },
+        items: cart.items,
+        subtotal: cart.subtotal,
+        taxes: cart.taxes,
+        discounts: cart.discounts,
+        totalCost: cart.totalCost
     };
 
-    // 3. Update User Object & LocalStorage
-    currentUser.invoices.push(newInvoice);
-    
+    // Store Invoice
     let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     allInvoices.push(newInvoice);
     localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
 
-    // 4. Populate HTML (if on invoice page)
-    displayInvoiceData(newInvoice);
+    // Clear Cart after order
+    localStorage.removeItem("ShoppingCart");
 
-    // 5. Notify User
-    console.log("Invoice emailed to: user@example.com");
+    alert(`Success! Order ${newInvoice.invoiceNumber} confirmed.\nA copy has been sent to your email.`);
+    window.location.href = "invoice.html";
 }
 
-function displayInvoiceData(data) {
-    if (!document.getElementById("invNum")) return;
+function displayInvoiceData() {
+    const all = JSON.parse(localStorage.getItem("AllInvoices"));
+    if (!all || all.length === 0 || !document.getElementById("invNum")) return;
+
+    const data = all[all.length - 1]; // Get latest invoice
 
     document.getElementById("invNum").innerText = data.invoiceNumber;
     document.getElementById("invDate").innerText = data.date;
-    document.getElementById("shipName").innerText = data.shipping.name;
-    document.getElementById("shipAddress").innerText = data.shipping.address;
+    document.getElementById("shipName").innerText = data.shippingInfo.name;
+    document.getElementById("shipAddress").innerText = data.shippingInfo.address;
     document.getElementById("subTotal").innerText = "$" + data.subtotal.toLocaleString();
-    document.getElementById("taxAmount").innerText = "$" + data.tax.toLocaleString();
-    document.getElementById("grandTotal").innerText = "$" + data.total.toLocaleString();
+    document.getElementById("taxAmount").innerText = "$" + data.taxes.toLocaleString();
+    document.getElementById("grandTotal").innerText = "$" + data.totalCost.toLocaleString();
 
     const itemTable = document.getElementById("invoiceItems");
-    itemTable.innerHTML = data.items.map(item => `
-        <tr>
-            <td>${item.name}</td>
-            <td>${item.qty}</td>
-            <td>$${item.price.toLocaleString()}</td>
-            <td>${item.discount}</td>
-            <td>$${(item.price * 0.95).toLocaleString()}</td>
-        </tr>
-    `).join('');
+    if(itemTable) {
+        itemTable.innerHTML = data.items.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td>1</td>
+                <td>$${item.price.toLocaleString()}</td>
+                <td>5%</td>
+                <td>$${(item.price * 0.95).toLocaleString()}</td>
+            </tr>
+        `).join('');
+    }
 }
 
-// Auto-run if elements exist (simulating landing on the page)
-window.onload = () => {
-    // In a real app, you'd pull the LATEST invoice from localStorage to display
-    let all = JSON.parse(localStorage.getItem("AllInvoices"));
-    if (all && all.length > 0) {
-        displayInvoiceData(all[all.length - 1]);
+function cancelOrder() {
+    if(confirm("Return to your cart?")) {
+        window.location.href = "products.html";
     }
-};
+}
+
+// Auto-init for different pages
+document.addEventListener("DOMContentLoaded", () => {
+    displayProducts();
+    displayInvoiceData();
+});
+```
