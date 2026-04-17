@@ -117,13 +117,29 @@ function processOrder(event) {
     // Capture User TRN and Form Data
     const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
     const userTRN = storedData ? storedData.trn : "N/A";
-    const nameInput = document.querySelector('input[placeholder="FULL NAME"]') || 
-                      document.querySelector('input[placeholder="Full Name"]');
-    const addrInput = document.querySelector('textarea');
+    const nameInput = document.getElementById("cust-name");
+    const addrInput = document.getElementById("cust-address");
     
-    localStorage.setItem("CustomerName", nameInput?.value || "Valued Customer");
-    localStorage.setItem("CustomerAddress", addrInput?.value || "Kingston, Jamaica");
+    const customerName = nameInput?.value || "Valued Customer";
+    const customerAddress = addrInput?.value || "Kingston, Jamaica";
+
+    localStorage.setItem("CustomerName", customerName);
+    localStorage.setItem("CustomerAddress", customerAddress);
     localStorage.setItem("UserTRN", userTRN);
+
+    // Save this order into AllInvoices for the Dashboard
+    const newInvoice = {
+        invoiceNum: "CR-" + Math.floor(Math.random() * 900000 + 100000),
+        customerTrn: userTRN,
+        customerName: customerName,
+        totalCost: cart.totalCost,
+        date: new Date().toLocaleDateString(),
+        items: cart.items
+    };
+
+    let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+    allInvoices.push(newInvoice);
+    localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
 
     // Redirect to invoice page
     window.location.href = "invoice.html";
@@ -154,16 +170,81 @@ function removeItem(index) {
     }
 }
 
-// --- 5. INITIALIZATION ---
+// --- 5. DASHBOARD FUNCTIONS ---
+
+function ShowUserFrequency() {
+    // Note: Assuming registration page saves to 'AllUsers' list
+    const allUsers = JSON.parse(localStorage.getItem("AllUsers")) || [];
+    
+    let genderCounts = { Male: 0, Female: 0, Other: 0 };
+    let ageGroups = { "18-25": 0, "26-35": 0, "36-50": 0, "50+": 0 };
+
+    allUsers.forEach(user => {
+        // Count Gender
+        if (genderCounts[user.gender] !== undefined) genderCounts[user.gender]++;
+        
+        // Count Age Group
+        const age = parseInt(user.age);
+        if (age >= 18 && age <= 25) ageGroups["18-25"]++;
+        else if (age >= 26 && age <= 35) ageGroups["26-35"]++;
+        else if (age >= 36 && age <= 50) ageGroups["36-50"]++;
+        else if (age > 50) ageGroups["50+"]++;
+    });
+
+    const gDisp = document.getElementById("genderStatsDisplay");
+    const aDisp = document.getElementById("ageStatsDisplay");
+
+    if (gDisp) gDisp.innerHTML = `Male: ${genderCounts.Male} | Female: ${genderCounts.Female} | Other: ${genderCounts.Other}`;
+    if (aDisp) aDisp.innerHTML = `18-25: ${ageGroups["18-25"]} | 26-35: ${ageGroups["26-35"]} | 36-50: ${ageGroups["36-50"]} | 50+: ${ageGroups["50+"]}`;
+}
+
+function ShowInvoices() {
+    const trnInput = document.getElementById("trnInput");
+    const resultsArea = document.getElementById("searchResults");
+    if (!trnInput || !resultsArea) return;
+
+    const trnSearch = trnInput.value.trim();
+    const allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
+
+    // Filter by TRN
+    const filtered = allInvoices.filter(inv => inv.customerTrn === trnSearch);
+
+    if (filtered.length > 0) {
+        resultsArea.innerHTML = filtered.map(inv => `
+            <div style="border:1px solid #eee; padding:10px; margin-top:10px; border-radius:8px; background:#fafafa;">
+                <p><strong>Invoice #:</strong> ${inv.invoiceNum} | <strong>Date:</strong> ${inv.date}</p>
+                <p><strong>Customer:</strong> ${inv.customerName}</p>
+                <p><strong>Total:</strong> $${inv.totalCost.toLocaleString()} JMD</p>
+            </div>
+        `).join('');
+    } else {
+        resultsArea.innerHTML = "<p style='color:red;'>No invoices found for TRN: " + trnSearch + "</p>";
+    }
+}
+
+// --- 6. INITIALIZATION ---
 document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("product-grid")) displayProductGrid();
     if (document.getElementById("cart-table-body")) displayCartTable();
+    
+    // Dashboard Initialization
+    if (document.getElementById("genderStatsDisplay")) {
+        ShowUserFrequency();
+        
+        const displayBtn = document.getElementById("displayResultsBtn");
+        if (displayBtn) displayBtn.onclick = ShowInvoices;
+
+        const auditBtn = document.getElementById("auditBtn");
+        if (auditBtn) {
+            auditBtn.onclick = () => console.log("All Invoices Audit:", JSON.parse(localStorage.getItem("AllInvoices")));
+        }
+    }
+
     const loginForm = document.getElementById("loginForm");
     if (loginForm) loginForm.addEventListener("submit", handleLogin);
 
     // Listen for the Confirm Order button
-    const confirmBtn = document.getElementById("confirm-order-btn") || 
-                       document.querySelector('button[style*="background: #28a745"]');
+    const confirmBtn = document.getElementById("confirm-order-btn");
     if (confirmBtn) confirmBtn.onclick = processOrder;
 
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
