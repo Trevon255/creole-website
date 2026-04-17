@@ -11,17 +11,19 @@ const products = [
 ];
 
 // --- 2. LOGIN & SECURITY LOGIC ---
-// Track failed attempts in sessionStorage so they persist during the session but reset on close
 let loginAttempts = parseInt(sessionStorage.getItem("loginAttempts")) || 0; 
 
 function handleLogin(event) {
-    if (event) event.preventDefault(); // i. Create form logic & stop refresh
+    if (event) event.preventDefault(); 
     
-    const trnInput = document.getElementById("loginTrn").value.trim();
-    const passInput = document.getElementById("loginPassword").value;
+    const trnField = document.getElementById("loginTrn");
+    const passField = document.getElementById("loginPassword");
     const errorMsg = document.getElementById("errorMsg");
 
-    // ii. Validate against localStorage 'RegistrationData'
+    if(!trnField || !passField) return;
+
+    const trnInput = trnField.value.trim();
+    const passInput = passField.value;
     const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
 
     if (!storedData) {
@@ -29,48 +31,21 @@ function handleLogin(event) {
         return;
     }
 
-    // ii. Check currently entered TRN and Password against RegistrationData
     if (storedData.trn === trnInput && storedData.password === passInput) {
         alert("Login Successful! Welcome to Creole.");
-        loginAttempts = 0; 
         sessionStorage.setItem("loginAttempts", 0);
         localStorage.setItem("isLoggedIn", "true");
-        
-        // iii. Success: Redirect to product catalog
         window.location.href = "products.html"; 
     } else {
         loginAttempts++;
         sessionStorage.setItem("loginAttempts", loginAttempts);
 
-        // iii. Failure: Three (3) attempts limit
         if (loginAttempts >= 3) {
             alert("Account Locked: Maximum attempts reached.");
-            // iii. Otherwise: Redirect to an error/account locked page
             window.location.href = "locked.html"; 
         } else {
-            if (errorMsg) {
-                errorMsg.innerText = `Invalid credentials. Attempt ${loginAttempts} of 3.`;
-            }
+            if (errorMsg) errorMsg.innerText = `Invalid credentials. Attempt ${loginAttempts} of 3.`;
         }
-    }
-}
-
-// vi. Reset Password by matching TRN
-function resetPassword() {
-    const trnConfirm = prompt("Please enter your TRN to verify your identity:");
-    const storedData = JSON.parse(localStorage.getItem("RegistrationData"));
-
-    if (storedData && storedData.trn === trnConfirm) {
-        const newPass = prompt("Enter your new password:");
-        if (newPass && newPass.trim() !== "") {
-            storedData.password = newPass;
-            localStorage.setItem("RegistrationData", JSON.stringify(storedData));
-            alert("Password updated successfully! You can now log in.");
-        } else {
-            alert("Password reset cancelled.");
-        }
-    } else {
-        alert("TRN verification failed. Account not found.");
     }
 }
 
@@ -114,75 +89,30 @@ function displayCartTable() {
     `).join('');
 }
 
-// --- 4. CHECKOUT & INVOICE GENERATION ---
-function generateInvoice() {
-    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    const nameInput = document.getElementById("cust-name");
-    const amountInput = document.getElementById("amount-paid");
-    const addressInput = document.getElementById("cust-address");
-
-    if (!cart || cart.items.length === 0) {
-        alert("Transaction Cancelled: No items found in bag.");
-        return;
-    }
-
-    const name = nameInput.value.trim();
-    const address = addressInput ? addressInput.value.trim() : "Not Provided";
-    const amountPaid = parseFloat(amountInput.value);
-
-    if (!name || isNaN(amountPaid)) {
-        alert("Required: Please enter Full Name and Payment Amount.");
-        return;
-    }
-
-    if (amountPaid < cart.totalCost) {
-        alert("Transaction Refused: Insufficient Payment.\nAmount Due: $" + cart.totalCost.toLocaleString() + " JMD");
-    } else {
-        const change = amountPaid - cart.totalCost;
-        const orderSummary = {
-            customerName: name,
-            customerAddr: address,
-            invNum: "INV-" + Math.floor(Math.random() * 90000 + 10000),
-            date: new Date().toLocaleDateString(),
-            paid: amountPaid,
-            change: change
-        };
-        localStorage.setItem("LastOrder", JSON.stringify(orderSummary));
-        alert("Order Successful! Generating your invoice now.");
-        window.location.href = "invoice.html"; 
-    }
+// --- 4. CHECKOUT & INVOICE ---
+function calculateTotals(cart) {
+    cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
+    cart.discounts = cart.subtotal * 0.05; 
+    cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
+    cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
+    
+    localStorage.setItem("ShoppingCart", JSON.stringify(cart));
+    updateSummaryUI(cart);
 }
 
-// --- 5. RENDER FINAL INVOICE ---
-function renderFinalInvoice() {
-    const order = JSON.parse(localStorage.getItem("LastOrder"));
-    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    const itemsBody = document.getElementById("invoiceItemsBody");
+function updateSummaryUI(cart) {
+    const fmt = (v) => "$" + (v || 0).toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+    const subtotalEl = document.getElementById("cart-subtotal");
+    const discountEl = document.getElementById("cart-discount");
+    const taxEl = document.getElementById("cart-tax");
+    const totalEl = document.getElementById("cart-total") || document.getElementById("checkout-amount");
 
-    if (!order || !cart || !itemsBody) return;
-
-    document.getElementById("displayInvNum").innerText = order.invNum;
-    document.getElementById("displayDate").innerText = order.date;
-    document.getElementById("displayShipName").innerText = order.customerName;
-    document.getElementById("displayShipAddr").innerText = order.customerAddr;
-
-    itemsBody.innerHTML = cart.items.map(item => `
-        <tr>
-            <td>${item.name}</td>
-            <td>${item.quantity}</td>
-            <td>$${item.price.toLocaleString()}</td>
-            <td>$${(item.price * item.quantity).toLocaleString()}</td>
-        </tr>
-    `).join('');
-
-    const fmt = (v) => "$" + v.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-    document.getElementById("displaySubtotal").innerText = fmt(cart.subtotal);
-    document.getElementById("displayDiscount").innerText = "-" + fmt(cart.discounts);
-    document.getElementById("displayTax").innerText = fmt(cart.taxes);
-    document.getElementById("displayGrandTotal").innerText = fmt(cart.totalCost);
+    if (subtotalEl) subtotalEl.innerText = fmt(cart.subtotal);
+    if (discountEl) discountEl.innerText = (cart.discounts > 0 ? "-" : "") + fmt(cart.discounts);
+    if (taxEl) taxEl.innerText = fmt(cart.taxes);
+    if (totalEl) totalEl.innerText = fmt(cart.totalCost);
 }
 
-// --- 6. CART CORE LOGIC ---
 function addToCart(index) {
     let cart = JSON.parse(localStorage.getItem("ShoppingCart")) || { items: [] };
     const selected = products[index];
@@ -211,7 +141,22 @@ function removeItem(index) {
     }
 }
 
-function calculateTotals(cart) {
-    cart.subtotal = cart.items.reduce((sum, i) => sum + (i.price * i.quantity), 0);
-    cart.discounts = cart.subtotal * 0.05; // 5% Discount
-    cart.taxes = (cart.subtotal - cart.discounts) * 0.15;
+// --- 5. INITIALIZATION ---
+document.addEventListener("DOMContentLoaded", () => {
+    // Check which elements exist on the current page
+    if (document.getElementById("product-grid")) {
+        displayProductGrid();
+    }
+    
+    if (document.getElementById("cart-table-body")) {
+        displayCartTable();
+    }
+
+    const loginForm = document.getElementById("loginForm");
+    if (loginForm) {
+        loginForm.addEventListener("submit", handleLogin);
+    }
+
+    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (savedCart) updateSummaryUI(savedCart);
+});
