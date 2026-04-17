@@ -110,16 +110,24 @@ function addToCart(index) {
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
     updateCartUI(cart);
-    alert(item.name + " added!");
+    
+    // Redirecting to cart.html so user sees their bag immediately
+    window.location.href = "cart.html";
 }
 
 function updateCartUI(cart) {
     const ids = ["cart-subtotal", "cart-tax", "cart-discount", "cart-total"];
+    
+    // FIX: Only update if the cart has items, otherwise reset to $0
     if (document.getElementById(ids[0])) {
-        document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + " JMD";
-        document.getElementById("cart-tax").innerText = "$" + Math.round(cart.taxes).toLocaleString() + " JMD";
-        document.getElementById("cart-discount").innerText = "-$" + Math.round(cart.discounts).toLocaleString() + " JMD";
-        document.getElementById("cart-total").innerText = "$" + Math.round(cart.totalCost).toLocaleString() + " JMD";
+        if (cart && cart.items.length > 0) {
+            document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
+            document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+            document.getElementById("cart-discount").innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+            document.getElementById("cart-total").innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+        } else {
+            ids.forEach(id => document.getElementById(id).innerText = "$0.00 JMD");
+        }
     }
 }
 
@@ -127,38 +135,41 @@ function updateCartUI(cart) {
 // NIKETA MUSCHETTE - INVOICE SECTION
 // ==========================================
 
-let currentUser = {
-    username: "Customer",
-    invoices: [] 
-};
+function generateInvoice(event) {
+    if (event) event.preventDefault(); // Prevent page reload on checkout form submit
 
-function generateInvoice() {
+    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (!cart || cart.items.length === 0) {
+        alert("Cannot process an empty cart.");
+        return;
+    }
+
     const custName = document.getElementById("custName")?.value || "Guest User";
     const custAddress = document.getElementById("custAddress")?.value || "No Address Provided";
 
+    // FIX: Generate invoice based on ACTUAL cart contents
     const newInvoice = {
         company: "Creole Jamaican Artistry",
         date: new Date().toLocaleDateString('en-JM'),
         invoiceNumber: "CJA-" + Date.now().toString().slice(-6), 
         trn: "123-456-789",
         shipping: { name: custName, address: custAddress },
-        items: [
-            { name: "Rustic Burlap Tote", qty: 1, price: 3500.00, discount: "5%" },
-            { name: "Artisan Serving Tray", qty: 1, price: 5800.00, discount: "5%" }
-        ],
-        subtotal: 9300.00,
-        tax: 1325.25,
-        total: 10160.25
+        items: cart.items,
+        subtotal: cart.subtotal,
+        tax: cart.taxes,
+        discount: cart.discounts,
+        total: cart.totalCost
     };
 
-    currentUser.invoices.push(newInvoice);
-    
     let allInvoices = JSON.parse(localStorage.getItem("AllInvoices")) || [];
     allInvoices.push(newInvoice);
     localStorage.setItem("AllInvoices", JSON.stringify(allInvoices));
 
-    displayInvoiceData(newInvoice);
-    console.log("Invoice emailed to customer.");
+    // Clear cart after checkout is finished
+    localStorage.removeItem("ShoppingCart");
+
+    alert("Success! Order confirmed.");
+    window.location.href = "invoice.html";
 }
 
 function displayInvoiceData(data) {
@@ -168,19 +179,20 @@ function displayInvoiceData(data) {
     document.getElementById("displayDate").innerText = data.date;
     document.getElementById("displayShipName").innerText = data.shipping.name;
     document.getElementById("displayShipAddr").innerText = data.shipping.address;
-    document.getElementById("displaySubtotal").innerText = "$" + data.subtotal.toLocaleString();
-    document.getElementById("displayTax").innerText = "$" + data.tax.toLocaleString();
-    document.getElementById("displayGrandTotal").innerText = "$" + data.total.toLocaleString();
+    document.getElementById("displaySubtotal").innerText = "$" + data.subtotal.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById("displayTax").innerText = "$" + data.tax.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById("displayGrandTotal").innerText = "$" + data.total.toLocaleString(undefined, {minimumFractionDigits: 2});
 
     const itemTable = document.getElementById("invoiceItemsBody");
+    if (!itemTable) return;
 
     itemTable.innerHTML = data.items.map(item => `
         <tr>
             <td>${item.name}</td>
-            <td>${item.qty}</td>
+            <td>1</td>
             <td>$${item.price.toLocaleString()}</td>
-            <td>${item.discount}</td>
-            <td>$${(item.price * 0.95).toLocaleString()}</td>
+            <td>5%</td>
+            <td>$${(item.price * 0.95).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
         </tr>
     `).join('');
 }
@@ -189,11 +201,18 @@ function displayInvoiceData(data) {
 document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
     const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (savedCart) updateCartUI(savedCart);
+    updateCartUI(savedCart);
     
+    // Display latest invoice if we are on the invoice page
     let all = JSON.parse(localStorage.getItem("AllInvoices"));
     if (all && all.length > 0) {
         displayInvoiceData(all[all.length - 1]);
+    }
+
+    // Sync checkout page totals
+    const checkoutTotalDisp = document.getElementById("summary-total");
+    if (checkoutTotalDisp && savedCart) {
+        checkoutTotalDisp.innerText = "$" + savedCart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     }
 });
 
@@ -248,16 +267,18 @@ function ShowInvoices() {
         container.innerHTML += `
             <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
                 <p><strong>Invoice:</strong> ${inv.invoiceNumber}</p>
-                <p><strong>TRN:</strong> ${inv.trn}</p>
-                <p><strong>Total:</strong> $${inv.totalCost || inv.total}</p>
+                <p><strong>Customer:</strong> ${inv.shipping.name}</p>
+                <p><strong>Total:</strong> $${(inv.total || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</p>
             </div>
         `;
     });
 }
 
 window.addEventListener("load", function () {
-    ShowUserFrequency();
-    ShowInvoices();
+    if (document.getElementById("genderChart")) {
+        ShowUserFrequency();
+        ShowInvoices();
+    }
 });
 
 
