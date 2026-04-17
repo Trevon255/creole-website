@@ -90,8 +90,6 @@ function addToCart(index) {
     cart.totalCost = (cart.subtotal - cart.discounts) + cart.taxes;
 
     localStorage.setItem("ShoppingCart", JSON.stringify(cart));
-    
-    // Update UI on products page immediately
     updateSummaryUI(cart);
 }
 
@@ -121,23 +119,24 @@ function displayCart() {
 }
 
 function updateSummaryUI(cart) {
-    const subEl = document.getElementById("cart-subtotal");
-    if (!subEl) return;
+    if (!cart) return;
 
-    if (cart) {
-        document.getElementById("cart-subtotal").innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
-        document.getElementById("cart-discount").innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        document.getElementById("cart-tax").innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        document.getElementById("cart-total").innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-        
-        // Update Checkout Page "Amount Due"
-        const summaryTotal = document.getElementById("summary-total");
-        if (summaryTotal) summaryTotal.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
-    } else {
-        ["cart-subtotal", "cart-discount", "cart-tax", "cart-total", "summary-total"].forEach(id => {
-            const el = document.getElementById(id);
-            if(el) el.innerText = "$0.00 JMD";
-        });
+    // Update ID elements if they exist (Products & Cart pages)
+    const ids = ["cart-subtotal", "cart-discount", "cart-tax", "cart-total"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            if (id === "cart-subtotal") el.innerText = "$" + cart.subtotal.toLocaleString() + ".00 JMD";
+            if (id === "cart-discount") el.innerText = "-$" + cart.discounts.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+            if (id === "cart-tax") el.innerText = "$" + cart.taxes.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+            if (id === "cart-total") el.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
+        }
+    });
+
+    // CRITICAL: Update the Checkout page "Amount Due"
+    const summaryTotal = document.getElementById("summary-total");
+    if (summaryTotal) {
+        summaryTotal.innerText = "$" + cart.totalCost.toLocaleString(undefined, {minimumFractionDigits: 2}) + " JMD";
     }
 }
 
@@ -146,21 +145,19 @@ function generateInvoice(event) {
     if (event) event.preventDefault();
 
     const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    const nameInput = document.getElementById("custName");
-    const addrInput = document.getElementById("custAddress");
-
+    
     if (!cart || cart.items.length === 0) {
         alert("Nothing to checkout! Please add items to your bag first.");
         return;
     }
 
+    const name = document.getElementById("custName") ? document.getElementById("custName").value : "Guest";
+    const addr = document.getElementById("custAddress") ? document.getElementById("custAddress").value : "N/A";
+
     const newInvoice = {
         invoiceNumber: "CJA-" + Math.floor(Math.random() * 899999 + 100000),
         date: new Date().toLocaleDateString('en-JM'),
-        shipping: { 
-            name: nameInput ? nameInput.value : "Guest", 
-            address: addrInput ? addrInput.value : "N/A" 
-        },
+        shipping: { name: name, address: addr },
         items: cart.items,
         subtotal: cart.subtotal,
         discount: cart.discounts,
@@ -180,6 +177,10 @@ function generateInvoice(event) {
 document.addEventListener("DOMContentLoaded", () => {
     displayProducts();
     displayCart();
-    const cart = JSON.parse(localStorage.getItem("ShoppingCart"));
-    if (cart) updateSummaryUI(cart);
+    
+    // Automatically load cart data for summary fields on page load
+    const savedCart = JSON.parse(localStorage.getItem("ShoppingCart"));
+    if (savedCart) {
+        updateSummaryUI(savedCart);
+    }
 });
