@@ -73,11 +73,19 @@
                 <input type="password" id="password" minlength="8" title="Minimum 8 characters" required>
             </div>
 
-            <div class="button-group">
-                <button type="submit" class="btn btn-primary">Register</button>
-                <a href="login.html" class="btn btn-secondary">Back to Login</a>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" required>
             </div>
 
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Register</button>
+                <button type="reset" class="btn btn-secondary">Clear</button>
+            </div>
+
+            <p style="text-align:center; margin-top:15px;">
+                Already have an account? <a href="login.html" style="color:#d63384; font-weight:bold;">Login here</a>
+            </p>
         </form>
     </div>
 </main>
